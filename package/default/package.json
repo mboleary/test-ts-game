@@ -1,0 +1,30 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "This package may be split out into several packages depending on how the IoC containers are written",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "build": "npm run compile",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
+    "gts": "^5.0.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.0"
+  }
+}
