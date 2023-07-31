@@ -52,6 +52,7 @@ export class EntityManager {
     }
 
     /**
+     * @TODO change to work with new format
      * Updates relationship between Entity A and Entity B (is NOT reflexive!)
      * @param ida Entity A ID
      * @param idb Entity B ID
@@ -73,6 +74,7 @@ export class EntityManager {
         }
     }
 
+    // @TODO change to new format
     private removeEntityToEntityRelation(ida: string, idb: string) {
         let entityARelation = this.ecsDB.entityToEntityMap.get(ida);
         if (!entityARelation) return;
@@ -88,7 +90,7 @@ export class EntityManager {
             const rel = this.ecsDB.entityToEntityMap.get(uuid);
             if (!rel) continue;
 
-            // 2TODO finish
+            // @TODO finish
         }
     }
 
@@ -97,6 +99,6 @@ export class EntityManager {
 
         if (!baseEntity) return false;
 
-
+        return true;
     }
 }

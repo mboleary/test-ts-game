@@ -4,7 +4,7 @@
   "description": "This package may be split out into several packages depending on how the IoC containers are written",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
@@ -17,8 +17,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@ava/typescript": "^4.1.0",
     "@types/node": "^20.4.5",
     "@types/uuid": "^9.0.2",
+    "ava": "^5.3.1",
     "gts": "^5.0.0",
     "typescript": "^5.1.6"
   },

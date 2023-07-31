@@ -25,7 +25,9 @@ export class ECSDB {
     public entityMap: Map<EntityID, EntityWithoutJoins> = new Map();
     public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
     public entityToTagMap: Map<EntityID, string> = new Map();
+    // @TODO deprecate and remove (bad pattern)
     public entityToEntityMap: Map<EntityID, EntityRelationship[]> = new Map();
+    public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
     // public entityObserverMap: Map<EntityID, EventSource> = new Map();
     
     public componentMap: Map<ComponentID, ComponentWithoutJoins> = new Map();
