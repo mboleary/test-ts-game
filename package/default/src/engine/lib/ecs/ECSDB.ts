@@ -13,25 +13,23 @@ export type EntityRelationshipType = "child" | "parent";
 type EntityID = string;
 type ComponentID = string;
 type EntityRelationship = {
-    id: EntityID, 
-    type: EntityRelationshipType
+  id: EntityID;
+  type: EntityRelationshipType;
 };
 
 export class ECSDB {
-    constructor() {
+  constructor() {}
 
-    }
+  public entityMap: Map<EntityID, EntityWithoutJoins> = new Map();
+  public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
+  public entityToTagMap: Map<EntityID, string> = new Map();
+  // @TODO deprecate and remove (bad pattern)
+  public entityToEntityMap: Map<EntityID, EntityRelationship[]> = new Map();
+  public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
+  // public entityObserverMap: Map<EntityID, EventSource> = new Map();
 
-    public entityMap: Map<EntityID, EntityWithoutJoins> = new Map();
-    public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
-    public entityToTagMap: Map<EntityID, string> = new Map();
-    // @TODO deprecate and remove (bad pattern)
-    public entityToEntityMap: Map<EntityID, EntityRelationship[]> = new Map();
-    public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
-    // public entityObserverMap: Map<EntityID, EventSource> = new Map();
-    
-    public componentMap: Map<ComponentID, ComponentWithoutJoins> = new Map();
-    public componentByNameToIDMap: Map<string, ComponentID[]> = new Map();
-    public componentToEntityIDMap: Map<ComponentID, EntityID> = new Map();
-    // public componentObserverMap: Map<EntityID, EventSource> = new Map();
+  public componentMap: Map<ComponentID, ComponentWithoutJoins> = new Map();
+  public componentByNameToIDMap: Map<string, ComponentID[]> = new Map();
+  public componentToEntityIDMap: Map<ComponentID, EntityID> = new Map();
+  // public componentObserverMap: Map<EntityID, EventSource> = new Map();
 }

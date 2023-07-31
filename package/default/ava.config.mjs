@@ -1,6 +1,6 @@
 export default {
   files: [
-    "./build/**/__test__/*"
+    "./build/**/__test__/*",
     // "./test/**"
   ],
   // typescript: {
@@ -9,4 +9,4 @@ export default {
   //   },
   //   compile: false
   // },
-}
+};

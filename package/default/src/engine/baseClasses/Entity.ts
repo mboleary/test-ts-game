@@ -1,12 +1,12 @@
 export class Entity {
-    public readonly tags: string[] = [];
+  public readonly tags: string[] = [];
 
-    public parent: Entity | null = null;
+  public parent: Entity | null = null;
 
-    public readonly children: Entity[] = [];
+  public readonly children: Entity[] = [];
 
-    constructor(
-        public readonly id: string,
-        public name: string
-    ) {}
+  constructor(
+    public readonly id: string,
+    public name: string,
+  ) {}
 }
