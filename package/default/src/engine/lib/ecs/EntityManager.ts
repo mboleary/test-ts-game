@@ -1,6 +1,12 @@
 import { Entity } from "../../baseClasses/Entity";
-import { ECSDB, EntityRelationshipType } from "./ECSDB";
+import { ECSDB } from "./ECSDB";
 import { v4 as uuidv4 } from "uuid";
+
+type RawEntityData = Partial<Omit<Entity, "id">>;
+type RawMultipleEntityData = RawEntityData & {
+  children: RawMultipleEntityData | Entity[];
+  parent: RawMultipleEntityData | Entity;
+};
 
 /**
  * Provides functions to access data in the ECS DB to the rest of the engine
@@ -8,17 +14,21 @@ import { v4 as uuidv4 } from "uuid";
 export class EntityManager {
   constructor(private readonly ecsDB: ECSDB) {}
 
-  public getEntityByID(uuid: string) {
-    return this.ecsDB.entityMap.get(uuid) || null;
+  public getEntityByID(uuid: string): Entity | null {
+    return (this.ecsDB.entityMap.get(uuid) as Entity | undefined) || null;
   }
 
-  public hasEntity(uuid: string) {
+  public hasEntity(uuid: string): boolean {
     return this.ecsDB.entityMap.has(uuid);
   }
 
-  public createEntity(rawEntityData: Partial<Omit<Entity, "id">> = {}) {
+  /**
+   * Create a SINGLE new entity
+   * @param rawEntityData data to generate entity from
+   */
+  public createEntity(rawEntityData: RawEntityData = {}): Entity {
     const uuid = uuidv4();
-    const entity = new Entity(uuid, rawEntityData.name || "");
+    const entity = new Entity(uuid, rawEntityData.name || "", this.ecsDB);
 
     Object.seal(entity);
     this.ecsDB.entityMap.set(uuid, entity);
@@ -30,79 +40,58 @@ export class EntityManager {
     }
 
     if (rawEntityData.parent) {
-      // this.ecsDB.entityToEntityMap.set(uuid, [rawEntityData.parent.id, "parent"]);
-      // this.ecsDB.entityToEntityMap.set(rawEntityData.parent.id, [uuid, "child"]);
-      this.updateEntityToEntityRelation(
-        uuid,
-        rawEntityData.parent.id,
-        "parent",
-      );
-      this.updateEntityToEntityRelation(rawEntityData.parent.id, uuid, "child");
+      // @TODO set parent if present in db
     }
 
     if (rawEntityData.children) {
       for (const child of rawEntityData.children) {
-        // this.ecsDB.entityToEntityMap.set(uuid, [child.id, "child"]);
-        // this.ecsDB.entityToEntityMap.set(child.id, [uuid, "parent"]);
-        this.updateEntityToEntityRelation(uuid, child.id, "child");
-        this.updateEntityToEntityRelation(child.id, uuid, "parent");
+        // @TODO set children if present
       }
     }
+
+    return entity;
   }
 
-  /**
-   * @TODO change to work with new format
-   * Updates relationship between Entity A and Entity B (is NOT reflexive!)
-   * @param ida Entity A ID
-   * @param idb Entity B ID
-   * @param type Relation Type
-   */
-  private updateEntityToEntityRelation(
-    ida: string,
-    idb: string,
-    type: EntityRelationshipType,
-  ) {
-    let entityARelation = this.ecsDB.entityToEntityMap.get(ida);
-    if (entityARelation) {
-      const existingRelationToUpdate = entityARelation.find(
-        (val) => val.id === idb,
-      );
-      if (existingRelationToUpdate) {
-        existingRelationToUpdate.type = type;
+  public createMultipleEntities(rawEntityData: RawMultipleEntityData): Entity {
+    const entity = this.createEntity(rawEntityData);
+
+    // Create children and parent if they don't already exist
+    rawEntityData.children?.forEach((child) => {
+      if (child.id) {
+        // Attach child
+        if (this.ecsDB.validateEntity(child.id)) {
+          this.ecsDB.setParentOfEntity(entity, child);
+        }
       } else {
-        entityARelation.push({ id: idb, type });
+        const childEntity = this.createEntity(child);
+        this.ecsDB.setParentOfEntity(entity, childEntity);
       }
-    } else {
-      entityARelation = [];
-      entityARelation.push({ id: idb, type });
-      this.ecsDB.entityToEntityMap.set(ida, entityARelation);
-    }
-  }
+    });
 
-  // @TODO change to new format
-  private removeEntityToEntityRelation(ida: string, idb: string) {
-    let entityARelation = this.ecsDB.entityToEntityMap.get(ida);
-    if (!entityARelation) return;
-
-    const uuids = [];
-
-    for (const rel of entityARelation) {
-      uuids.push(rel.id);
+    if (rawEntityData.parent) {
+      if (rawEntityData.parent.id) {
+        this.ecsDB.setParentOfEntity(rawEntityData.parent, entity);
+      } else {
+        const parentEntity = this.createEntity(rawEntityData.parent);
+        this.ecsDB.setParentOfEntity(parentEntity, entity);
+      }
     }
 
-    // Remove inverse relationship
-    for (const uuid of uuids) {
-      const rel = this.ecsDB.entityToEntityMap.get(uuid);
-      if (!rel) continue;
-
-      // @TODO finish
-    }
+    return entity;
   }
 
   public deleteEntity(uuid: string): boolean {
     const baseEntity = this.ecsDB.entityMap.get(uuid);
 
     if (!baseEntity) return false;
+
+    // @TODO check if this is parent of anything
+
+    // @TODO check if this is child of anything
+
+    // @TODO check various caches to see if this needs to be removed
+
+    this.ecsDB.entityMap.delete(uuid);
 
     return true;
   }
