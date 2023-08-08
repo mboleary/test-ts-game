@@ -1,9 +1,10 @@
 /**
  * Implements the Query Manager for the World
+ * @TODO move to separate package due to alasql dependencies
  */
 
 import { QueryManager, QueryResults } from "./QueryManager";
-import * as alasql from "alasql";
+// import * as alasql from "alasql";
 import { ECSDB } from "./ECSDB";
 import { Component, Entity } from "../../baseClasses";
 

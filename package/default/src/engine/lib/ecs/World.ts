@@ -1,9 +1,11 @@
 import { ECSDB } from "./ECSDB";
 import { EntityManager } from "./EntityManager";
+// import { QueryManager } from "./QueryManager";
 
 export class World /*implements Serializable, Subscribable*/ {
   private readonly ecsDB: ECSDB;
   public readonly entityManager: EntityManager;
+  // public readonly queryManager: QueryManager;
 
   constructor() {
     this.ecsDB = new ECSDB();

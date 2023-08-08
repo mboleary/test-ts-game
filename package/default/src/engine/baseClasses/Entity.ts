@@ -1,8 +1,15 @@
 import { ECSDB } from "../lib/ecs/ECSDB";
+import { GameEvent } from "../lib/event/GameEvent";
+import { GameEventTreeEmitter } from "../lib/event/GameEventTreeEmitter";
+import { EmitOptions } from "../lib/event/types/EmitOptions";
+import { Eventable } from "../lib/event/types/Eventable";
 import { Component } from "./Component";
 
-export class Entity {
+export class Entity implements Eventable {
   public readonly tags: string[] = [];
+
+  protected readonly _eventEmitter: GameEventTreeEmitter =
+    new GameEventTreeEmitter(() => this.parent?._eventEmitter);
 
   // public parent: Entity | null = null;
 
@@ -13,6 +20,22 @@ export class Entity {
     public name: string,
     private readonly _ecsdb: ECSDB,
   ) {}
+
+  emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {
+    this._eventEmitter.emit(type, event, options);
+  }
+  subscribe(type: string, handler: Function): void {
+    this._eventEmitter.subscribe(type, handler);
+  }
+  unsubscribe(handler: Function): void {
+    this._eventEmitter.unsubscribe(handler);
+  }
+  unsubscribeAll(type: string): void {
+    this._eventEmitter.unsubscribeAll(type);
+  }
+  once(type: string, handler: Function): void {
+    this._eventEmitter.once(type, handler);
+  }
 
   get parent(): Entity | null {
     return this._ecsdb.getParentOfEntity(this);
