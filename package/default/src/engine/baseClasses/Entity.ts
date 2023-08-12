@@ -18,7 +18,7 @@ export class Entity implements Eventable {
   constructor(
     public readonly id: string,
     public name: string,
-    private readonly _ecsdb: ECSDB,
+    protected readonly _ecsdb: ECSDB,
   ) {}
 
   emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {

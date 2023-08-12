@@ -7,9 +7,13 @@ export class World /*implements Serializable, Subscribable*/ {
   public readonly entityManager: EntityManager;
   // public readonly queryManager: QueryManager;
 
-  constructor() {
-    this.ecsDB = new ECSDB();
+  constructor(ecsdb?: ECSDB) {
+    this.ecsDB = ecsdb || new ECSDB();
     this.entityManager = new EntityManager(this.ecsDB);
+  }
+
+  public merge(world: World) {
+    // @TODO merge into our ECSDB
   }
 
   public serialize() {
