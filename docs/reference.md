@@ -4,6 +4,8 @@
 - https://www.digitalocean.com/community/tutorials/typescript-new-project
 - https://prettier.io/docs/en/install.html
 - https://github.com/prettier/eslint-config-prettier#installation
+- https://www.typescriptlang.org/tsconfig
+    - adding support for DOM types
 
 ## Inspiration
 - https://excaliburjs.com/docs/
