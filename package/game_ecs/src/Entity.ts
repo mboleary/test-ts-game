@@ -1,4 +1,4 @@
-import { ECSDB } from "../lib/ecs/ECSDB";
+import { ECSDB } from "./ECSDB";
 import { GameEvent } from "../lib/event/GameEvent";
 import { GameEventTreeEmitter } from "../lib/event/GameEventTreeEmitter";
 import { EmitOptions } from "../lib/event/types/EmitOptions";

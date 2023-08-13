@@ -1,4 +1,4 @@
-import { Entity } from "../../baseClasses/Entity";
+import { Entity } from "./Entity";
 import { ECSDB } from "./ECSDB";
 import { v4 as uuidv4 } from "uuid";
 

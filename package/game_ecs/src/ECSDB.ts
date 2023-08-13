@@ -2,8 +2,8 @@
  * ECS Database: Provides the store for entities and components as well as some indexes
  */
 
-import { Component } from "../../baseClasses/Component";
-import { Entity } from "../../baseClasses/Entity";
+import { Component } from "./Component";
+import { Entity } from "./Entity";
 
 // type EntityWithoutJoins = Omit<Entity, "parent" | "children" | "components">;
 // type ComponentWithoutJoins = Omit<Component, "entity">;

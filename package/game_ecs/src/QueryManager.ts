@@ -2,7 +2,8 @@
  * Implements the Query Manager base class for querying Entities and Components on the ECSDB
  */
 
-import { Component, Entity } from "../../baseClasses";
+import { Component } from "./Component";
+import { Entity } from "./Entity";
 import { ECSDB } from "./ECSDB";
 
 export type QueryResults = (Entity | Component)[];

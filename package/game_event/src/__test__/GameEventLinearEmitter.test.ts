@@ -3,8 +3,6 @@
  */
 
 import test from "ava";
-import { Entity } from "../../../baseClasses";
-import { ECSDB } from "../../ecs/ECSDB";
 import { GameEvent } from "../GameEvent";
 import { GameEventEmitter } from "../GameEventEmitter";
 import { GameEventLinearEmitter } from "../GameEventLinearEmitter";
@@ -36,7 +34,7 @@ test.serial("Event can be emitted and received via a subscriber", (t) => {
 
   const EVENT_NAME = "event.test";
   const EVENT_TYPE = "EVENT_TYPE";
-  const EXAMPLE_TARGET = new Entity("id", "name", new ECSDB());
+  const EXAMPLE_TARGET = {};
 
   emitter.subscribe(EVENT_NAME, exampleHandler);
 
@@ -54,7 +52,7 @@ test.serial("EventEmitter is cleared properly", (t) => {
 
   const EVENT_NAME = "event.test";
   const EVENT_TYPE = "EVENT_TYPE";
-  const EXAMPLE_TARGET = new Entity("id", "name", new ECSDB());
+  const EXAMPLE_TARGET = {};
 
   emitter.subscribe(EVENT_NAME, exampleHandler);
 
@@ -79,7 +77,7 @@ test.serial("Event is not received by unsubscribed handlers", (t) => {
 
   const EVENT_NAME = "event.test";
   const EVENT_TYPE = "EVENT_TYPE";
-  const EXAMPLE_TARGET = new Entity("id", "name", new ECSDB());
+  const EXAMPLE_TARGET = {};
 
   emitter.subscribe(EVENT_NAME, exampleHandler1);
 
@@ -112,7 +110,7 @@ test.serial(
 
     const EVENT_NAME = "event.test";
     const EVENT_TYPE = "EVENT_TYPE";
-    const EXAMPLE_TARGET = new Entity("id", "name", new ECSDB());
+    const EXAMPLE_TARGET = {};
 
     emitter.subscribe(EVENT_NAME, exampleHandler1);
     emitter.subscribe(EVENT_NAME, exampleHandler2);
@@ -141,7 +139,7 @@ test.serial("Event handlers are properly unsubscribed by type", (t) => {
   const EVENT_NAME_A = "event.test.a";
   const EVENT_NAME_B = "event.test.b";
   const EVENT_TYPE = "EVENT_TYPE";
-  const EXAMPLE_TARGET = new Entity("id", "name", new ECSDB());
+  const EXAMPLE_TARGET = {};
 
   emitter.subscribe(EVENT_NAME_A, exampleHandlerA);
   emitter.subscribe(EVENT_NAME_B, exampleHandlerB);

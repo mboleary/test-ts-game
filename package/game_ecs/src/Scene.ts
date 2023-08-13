@@ -1,5 +1,5 @@
-import { ECSDB } from "../lib/ecs/ECSDB";
-import { World } from "../lib/ecs/World";
+import { ECSDB } from "./ECSDB";
+import { World } from "./World";
 import { Entity } from "./Entity";
 
 export class Scene extends Entity {
