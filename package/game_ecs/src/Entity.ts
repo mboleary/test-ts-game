@@ -1,8 +1,5 @@
 import { ECSDB } from "./ECSDB";
-import { GameEvent } from "../lib/event/GameEvent";
-import { GameEventTreeEmitter } from "../lib/event/GameEventTreeEmitter";
-import { EmitOptions } from "../lib/event/types/EmitOptions";
-import { Eventable } from "../lib/event/types/Eventable";
+import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable } from "game_event";
 import { Component } from "./Component";
 
 export class Entity implements Eventable {

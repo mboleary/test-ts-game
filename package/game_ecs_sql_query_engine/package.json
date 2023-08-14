@@ -1,8 +1,8 @@
 {
-  "name": "game_event",
+  "name": "game_ecs_sql_query_engine",
   "version": "1.0.0",
-  "description": "Universal event library aimed at developing games",
-  "main": "build/index.js",
+  "description": "Query engine that implements SQL querying on the ECS Database",
+  "main": "index.js",
   "scripts": {
     "test": "ava",
     "lint": "gts lint",
@@ -27,6 +27,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
     "uuid": "^9.0.0"
   }
 }

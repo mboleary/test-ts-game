@@ -1,3 +1,4 @@
-# Default package for test game
+# Example 2D engine
 
-This package may be split out into several packages depending on how the IoC containers are written
+This assmebles a basic 2D engine and will generate a package for use in a web browser environment.
+

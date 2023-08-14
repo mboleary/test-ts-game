@@ -27,8 +27,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "inversify": "^6.0.1",
-    "reflect-metadata": "^0.1.13",
+    "game_event": "file:../game_event",
     "uuid": "^9.0.0"
   }
 }
