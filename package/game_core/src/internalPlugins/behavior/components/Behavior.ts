@@ -1,7 +1,16 @@
 import { Component } from "game_ecs";
 
+
+
 export abstract class Behavior {
-    public abstract readonly typename: string;
+
+    constructor(
+        typename: string,
+    ) {
+        
+    }
+
+    
 
     public init?(): void;
     public loop?(): void;

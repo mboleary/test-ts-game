@@ -5,7 +5,7 @@ import { GameTimeManager } from "./GameTimeManager";
 export class EngineHotloopManager {
     constructor(
         private readonly time: GameTimeManager,
-        private pluginManager: EnginePluginManager
+        private readonly pluginManager: EnginePluginManager
     ) {}
 
     private _loopRunning: boolean = false;
@@ -22,7 +22,7 @@ export class EngineHotloopManager {
     public startLoop(): void {
         if (!this._loopRunning) {
             this._loopRunning = true;
-            this.loopFunctions = [...this.pluginManager.loopFunctions];
+            this.loopFunctions = ([] as Function[]).concat(this.pluginManager.preloopFunctions, this.pluginManager.loopFunctions, this.pluginManager.postloopFunctions);
             if (this.time.paused) {
                 this.time.unpauseTime();
             } else {

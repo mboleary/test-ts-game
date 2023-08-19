@@ -1,8 +1,8 @@
-import { EnginePluginManager } from "../../plugin/EnginePluginManager";
+import { EngineInternals } from "../../plugin";
 import { PluginWithLoop } from "../../plugin/Plugin";
 
 export class BehaviorHandlerPlugin extends PluginWithLoop<object> {
-    protected _build(pluginManager: EnginePluginManager): object {
+    protected _build(engineInternals: EngineInternals): object {
         return {};
     }
     public token: Symbol = Symbol.for("Behavior");
@@ -47,5 +47,4 @@ export class BehaviorHandlerPlugin extends PluginWithLoop<object> {
     public postdestroy?(): Promise<void> {
         throw new Error("Method not implemented.");
     }
-
 }
