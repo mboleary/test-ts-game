@@ -14,6 +14,10 @@ type RawMultipleEntityData = RawEntityData & {
 export class EntityManager {
   constructor(private readonly ecsDB: ECSDB) {}
 
+  public getAllEntities(): Entity[] {
+    return Array.from(this.ecsDB.entityMap.values());
+  }
+
   public getEntityByID(uuid: string): Entity | null {
     return (this.ecsDB.entityMap.get(uuid) as Entity | undefined) || null;
   }

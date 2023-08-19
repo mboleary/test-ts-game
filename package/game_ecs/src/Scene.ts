@@ -12,5 +12,8 @@ export class Scene extends Entity {
     ) {
         super(id, name, new ECSDB());
         this.world = new World(this._ecsdb);
+
+        // Add self to ECSDB
+        this._ecsdb.entityMap.set(id, this);
     }
 }

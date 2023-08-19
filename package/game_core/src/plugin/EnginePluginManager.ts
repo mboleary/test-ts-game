@@ -93,6 +93,26 @@ export class EnginePluginManager {
         return plugin.instance;
     }
 
+    /**
+     * Clears all plugins from the Plugin Manager
+     */
+    public clear() {
+        this.preinitFunctions.splice(0, this.preinitFunctions.length);
+        this.initFunctions.splice(0, this.initFunctions.length);
+        this.postinitFunctions.splice(0, this.postinitFunctions.length);
+        this.prestartFunctions.splice(0, this.prestartFunctions.length);
+        this.startFunctions.splice(0, this.startFunctions.length);
+        this.poststartFunctions.splice(0, this.poststartFunctions.length);
+        this.preloopFunctions.splice(0, this.preloopFunctions.length);
+        this.loopFunctions.splice(0, this.loopFunctions.length);
+        this.postloopFunctions.splice(0, this.postloopFunctions.length);
+        this.predestroyFunctions.splice(0, this.predestroyFunctions.length);
+        this.destroyFunctions.splice(0, this.destroyFunctions.length);
+        this.postdestroyFunctions.splice(0, this.postdestroyFunctions.length);
+
+        this.pluginsMap.clear();
+    }
+
     private getEngineInternals(): EngineInternals {
         return {
             get: (token: Symbol) => {

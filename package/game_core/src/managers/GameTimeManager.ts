@@ -15,7 +15,7 @@ export class GameTimeManager {
 
     public getTime() {
         if (this.isPaused) return this.timePaused;
-        return window.performance.now() - this.timeDiff;
+        return globalThis.performance.now() - this.timeDiff;
     }
     
     public get paused(): boolean {
@@ -30,7 +30,10 @@ export class GameTimeManager {
      * Initializes time
      */
     public initTime() {
-        this.currTime = window.performance.now();
+        this.currTime = globalThis.performance.now();
+        this.timeDiff = 0;
+        this.timePaused = 0;
+        this.isPaused = false;
     }
 
     /**
@@ -56,7 +59,7 @@ export class GameTimeManager {
      */
     public pauseTime() {
         this.isPaused = true;
-        this.timePaused = window.performance.now();
+        this.timePaused = globalThis.performance.now();
     }
     
     /**
@@ -65,7 +68,9 @@ export class GameTimeManager {
     public unpauseTime() {
         if (!this.isPaused) return;
         this.isPaused = false;
-        this.timeDiff += window.performance.now() - this.timePaused;
+        this.timeDiff += globalThis.performance.now() - this.timePaused;
         this.timePaused = 0;
     }
+
+    // @TODO allow for setting the time for networked games
 }

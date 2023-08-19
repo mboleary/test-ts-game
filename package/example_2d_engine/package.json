@@ -3,21 +3,27 @@
   "version": "1.0.0",
   "description": "This is a pre-built 2d engine",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "ava",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
+    "postcompile": "npm run rollup",
     "build": "npm run compile",
+    "rollup": "rollup -c ./rollup.config.mjs",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "serve": ""
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.0",
     "@types/node": "^20.4.5",
     "@types/uuid": "^9.0.2",
     "ava": "^5.3.1",

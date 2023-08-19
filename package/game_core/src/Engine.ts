@@ -11,6 +11,7 @@ export class Engine {
     private readonly worldManager = new GameWorldManager();
 
     private initialized = false;
+    private started = false;
 
     constructor(debug = false) {
         
@@ -37,9 +38,13 @@ export class Engine {
         for (const initFunc of this.pluginManager.postinitFunctions) {
             initFunc();
         }
+
+        this.initialized = true;
     }
 
     public start() {
+
+        if (!this.initialized) throw new Error('Engine not initialized!');
         
         // start
         for (const startFunc of this.pluginManager.prestartFunctions) {
@@ -54,8 +59,34 @@ export class Engine {
             startFunc();
         }
 
+        this.started = true;
+
         // begin loop
         this.hotloopManager.startLoop();
+    }
+
+    public destroy() {
+
+        if (!this.started) throw new Error('Engine not started!');
+
+        // destroy
+        for (const destroyFunc of this.pluginManager.predestroyFunctions) {
+            destroyFunc();
+        }
+
+        for (const destroyFunc of this.pluginManager.destroyFunctions) {
+            destroyFunc();
+        }
+
+        for (const destroyFunc of this.pluginManager.postdestroyFunctions) {
+            destroyFunc();
+        }
+
+        this.pluginManager.clear();
+
+        this.initialized = false;
+        this.started = false;
+
     }
 
     // Utility functions
