@@ -1,5 +1,9 @@
-import { Component } from "../../../baseClasses";
+import { Component } from "game_ecs";
 
-export class Behavior {
+export abstract class Behavior {
+    public abstract readonly typename: string;
 
+    public init?(): void;
+    public loop?(): void;
+    public destroy?(): void;
 }

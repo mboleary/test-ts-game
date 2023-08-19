@@ -2,7 +2,7 @@
   "name": "game_core",
   "version": "1.0.0",
   "description": "Core components of the game framework",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "ava",
     "lint": "gts lint",
@@ -27,6 +27,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "game_ecs": "file:../game_ecs",
+    "game_event": "file:../game_event",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13",
     "uuid": "^9.0.0"

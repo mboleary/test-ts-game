@@ -1,7 +1,10 @@
-import { PluginWithLoop } from "../../baseClasses/Plugin";
+import { EnginePluginManager } from "../../plugin/EnginePluginManager";
+import { PluginWithLoop } from "../../plugin/Plugin";
 
-export class BehaviorHandlerPlugin extends PluginWithLoop<any> {
-    public instance: any;
+export class BehaviorHandlerPlugin extends PluginWithLoop<object> {
+    protected _build(pluginManager: EnginePluginManager): object {
+        return {};
+    }
     public token: Symbol = Symbol.for("Behavior");
     constructor(
         // private engine;

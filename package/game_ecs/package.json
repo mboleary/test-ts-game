@@ -2,7 +2,7 @@
   "name": "game_ecs",
   "version": "1.0.0",
   "description": "ECS Library for game engine",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "ava",
     "lint": "gts lint",
