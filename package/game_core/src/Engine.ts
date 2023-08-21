@@ -5,10 +5,10 @@ import { Plugin } from "./plugin/Plugin";
 
 export class Engine {
 
-    private readonly pluginManager = new EnginePluginManager(this);
-    private readonly timeManager = new GameTimeManager();
-    private readonly hotloopManager = new EngineHotloopManager(this.timeManager, this.pluginManager);
-    private readonly worldManager = new GameWorldManager();
+    protected readonly pluginManager = new EnginePluginManager(this);
+    protected readonly timeManager = new GameTimeManager();
+    // protected readonly hotloopManager = new EngineHotloopManager(this.timeManager, this.pluginManager);
+    protected readonly worldManager = new GameWorldManager();
 
     private initialized = false;
     private started = false;
@@ -61,8 +61,7 @@ export class Engine {
 
         this.started = true;
 
-        // begin loop
-        this.hotloopManager.startLoop();
+        
     }
 
     public destroy() {
