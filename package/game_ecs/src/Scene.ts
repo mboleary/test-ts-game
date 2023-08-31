@@ -1,4 +1,4 @@
-import { ECSDB } from "./ECSDB";
+import { ECSDB } from "./db/ECSDB";
 import { World } from "./World";
 import { Entity } from "./Entity";
 

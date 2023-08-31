@@ -1,4 +1,4 @@
-import { ECSDB } from "./ECSDB";
+import { ECSDB } from "./db/ECSDB";
 import { EntityManager } from "./EntityManager";
 // import { QueryManager } from "./QueryManager";
 

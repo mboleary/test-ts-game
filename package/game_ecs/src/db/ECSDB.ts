@@ -2,8 +2,8 @@
  * ECS Database: Provides the store for entities and components as well as some indexes
  */
 
-import { Component } from "./Component";
-import { Entity } from "./Entity";
+import { Component } from "../Component";
+import { Entity } from "../Entity";
 
 // type EntityWithoutJoins = Omit<Entity, "parent" | "children" | "components">;
 // type ComponentWithoutJoins = Omit<Component, "entity">;
@@ -18,15 +18,26 @@ type ComponentID = string;
 // };
 
 export class ECSDB {
-  constructor() {}
+  constructor(
+    public readonly temporary: boolean = false, 
+    public readonly parent: ECSDB | null = null
+  ) {}
+
+  public canBeOverridden() {
+    return this.temporary || this.parent !== null;
+  }
+
+  public canOnlyBeOverriddenBy(): ECSDB | null {
+    return this.parent;
+  }
 
   /**
    * Entity-related functionality
    */
 
   public entityMap: Map<EntityID, Entity> = new Map();
-  public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
-  public entityToTagMap: Map<EntityID, string> = new Map();
+  // public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
+  // public entityToTagMap: Map<EntityID, string> = new Map();
   // @TODO deprecate and remove (bad pattern)
   // public entityToEntityMap: Map<EntityID, EntityRelationship[]> = new Map();
   public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
@@ -90,7 +101,7 @@ export class ECSDB {
    */
 
   public componentMap: Map<ComponentID, Component> = new Map();
-  public componentByNameToIDMap: Map<string, ComponentID[]> = new Map();
+  // public componentByNameToIDMap: Map<string, ComponentID[]> = new Map();
   public componentToEntityIDMap: Map<ComponentID, EntityID> = new Map();
   public componentByTypeToIDMap: Map<string, ComponentID[]> = new Map();
   // public componentObserverMap: Map<EntityID, EventSource> = new Map();

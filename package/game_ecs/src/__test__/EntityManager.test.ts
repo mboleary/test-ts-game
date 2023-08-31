@@ -3,7 +3,7 @@
  */
 
 import test from "ava";
-import { ECSDB } from "../ECSDB";
+import { ECSDB } from "../db/ECSDB";
 import { EntityManager } from "../EntityManager";
 
 let ecsdb: ECSDB;

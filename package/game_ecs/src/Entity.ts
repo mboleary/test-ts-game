@@ -1,21 +1,15 @@
-import { ECSDB } from "./ECSDB";
+import { v4 as uuidv4 } from "uuid";
+import { ECSDB } from "./db/ECSDB";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable } from "game_event";
 import { Component } from "./Component";
 
 export class Entity implements Eventable {
-  public readonly tags: string[] = [];
-
   protected readonly _eventEmitter: GameEventTreeEmitter =
     new GameEventTreeEmitter(() => this.parent?._eventEmitter);
 
-  // public parent: Entity | null = null;
-
-  // public readonly children: Entity[] = [];
-
   constructor(
     public readonly id: string,
-    public name: string,
-    protected readonly _ecsdb: ECSDB,
+    protected _ecsdb: ECSDB,
   ) {}
 
   emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {
@@ -34,6 +28,23 @@ export class Entity implements Eventable {
     this._eventEmitter.once(type, handler);
   }
 
+  /**
+   * Use this to absorb an entity into another ECSDB if using a temporary one
+   * @TODO figure out how to not duplicate this
+   * @param ecsdb 
+   */
+  public overrideECSDB(ecsdb: ECSDB) {
+    if (this._ecsdb.canBeOverridden()) {
+      const override = this._ecsdb.canOnlyBeOverriddenBy()
+      if (override && override !== ecsdb) {
+        throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
+      }
+      this._ecsdb = ecsdb;
+    } else {
+      throw new Error("Entity ECSDB is not overridable");
+    }
+  }
+
   get parent(): Entity | null {
     return this._ecsdb.getParentOfEntity(this);
   }
@@ -42,12 +53,19 @@ export class Entity implements Eventable {
     return this._ecsdb.getChildrenOfEntity(this);
   }
 
-  // The following functions are only for convenience
-  public attachComponent(comp: Component) {
+  public attachChild(entity: Entity) {
     console.log("not implemented");
   }
 
-  public attachChild(entity: Entity) {
+  public detachChild(entity: Entity): boolean {
+    return false;
+  }
+
+  get components(): Component[] {
+    return [];
+  }
+
+  public attachComponent(comp: Component) {
     console.log("not implemented");
   }
 
@@ -55,12 +73,21 @@ export class Entity implements Eventable {
     return false;
   }
 
-  public detachChild(entity: Entity): boolean {
-    return false;
+  public getComponent(type: Symbol | null): Component | null {
+    return null;
   }
 
   public setParent(entity: Entity) {
     // console.log("not implemented");
     this._ecsdb.setParentOfEntity(entity, this);
+  }
+
+  static build(components: Component[]): Entity {
+    // @TODO once we figure out the ecsdb stuff, change this
+    const entity = new Entity(uuidv4(), new ECSDB(true));
+    for (const c of components) {
+      entity.attachComponent(c);
+    }
+    return entity;
   }
 }

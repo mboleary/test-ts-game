@@ -1,5 +1,5 @@
 import { Entity } from "./Entity";
-import { ECSDB } from "./ECSDB";
+import { ECSDB } from "./db/ECSDB";
 import { v4 as uuidv4 } from "uuid";
 
 type RawEntityData = Partial<Omit<Entity, "id">>;
@@ -32,16 +32,16 @@ export class EntityManager {
    */
   public createEntity(rawEntityData: RawEntityData = {}): Entity {
     const uuid = uuidv4();
-    const entity = new Entity(uuid, rawEntityData.name || "", this.ecsDB);
+    const entity = new Entity(uuid, this.ecsDB);
 
     Object.seal(entity);
     this.ecsDB.entityMap.set(uuid, entity);
 
-    if (rawEntityData.tags) {
-      for (const tag of rawEntityData.tags) {
-        this.ecsDB.entityToTagMap.set(uuid, tag);
-      }
-    }
+    // if (rawEntityData.tags) {
+    //   for (const tag of rawEntityData.tags) {
+    //     this.ecsDB.entityToTagMap.set(uuid, tag);
+    //   }
+    // }
 
     if (rawEntityData.parent) {
       // @TODO set parent if present in db

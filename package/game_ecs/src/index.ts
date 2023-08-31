@@ -1,5 +1,6 @@
+export * from "./db";
 export * from "./Component";
-export * from "./ECSDB";
+export * from "./db/ECSDB";
 export * from "./Entity";
 export * from "./EntityManager";
 export * from "./QueryManager";

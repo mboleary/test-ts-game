@@ -4,7 +4,7 @@
 
 import { Component } from "./Component";
 import { Entity } from "./Entity";
-import { ECSDB } from "./ECSDB";
+import { ECSDB } from "./db/ECSDB";
 
 export type QueryResults = (Entity | Component)[];
 
