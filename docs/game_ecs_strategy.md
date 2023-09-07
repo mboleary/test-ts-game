@@ -72,3 +72,62 @@ scene.appendChild(e);
 
 In that case, the newly-created Entity's ECSDB instance will be replaced as soon as it is added to the scene, and the new ECSDB will likely not be able to be overridden.
 
+## Systems and Plugins
+
+The Engine will have a plugin to allow systems to run code, but we also need to figure out how to inject the plugin instances into the systems for usecases like controlling an entity or interfacing with a networking plugin
+
+Here are some examples of how this could work.
+
+In the `main.ts` file:
+```js
+function buildSystems(engineInternals) {
+    const sysInit = System.for(SystemLifecycle.INIT, [...types], (entities) => {}, {priority: 0});
+    const sysLoop = System.for(SystemLifecycle.LOOP, [...types], (entities) => {}, {priority: 0});
+    const sysDestroy = System.for(SystemLifecycle.DESTROY, [...types], (entities) => {}, {priority: 0});
+
+    return [sysInit, sysLoop, sysDestroy];
+}
+function main() {
+    const engine = new Engine();
+
+    const inputPlugin = new InputPlugin({...options});
+    const systemPlugin = new SystemPlugin(buildSystems);
+
+    engine.initialize([]);
+
+    const scene = new Scene(uuidv4(), "default");
+
+    engine.setCurrentScene(scene);
+
+    engine.start();
+
+    console.log(engine.getWorld());
+
+    window.addEventListener("beforeunload", (e) => {
+        engine.destroy();
+    });
+}
+```
+This approach would let the System Plugin provide the internals to a function that can provide them to each of the systems that needs them, but this has the downside of making it harder to control which scenes the systems are added to.
+
+Bevy takes the approach of providing what they call Resources (in our lingo, these are the plugin instances) to each of the systems individually. Maybe we can do something similar. A few key things we need to keep in mind are that the core engine logic and the ECS implementation are split apart, so we need to work around that.
+
+Given that we account for a `priority` value in the system, perhaps we could abandon the current plugin implementation of those lifecycle functions (`init`, `loop`, etc.)? If this is done, there will need to be a way to handle behaviors globally so that plugins have a lifecycle point that can still be called to initialize the plugin functionality irrespective of the current ECS world.
+
+The following could be passed into the constructor for a Plugin:
+- engine components
+- a way to get other plugins
+- a way to get the current world
+- a way to set resources for other systems to use
+    - this replaces the current Plugin's build system
+
+Actually, we could keep the concept of having a separate class to construct the plugin, but remove the lifecycle functions and replace it work the resources thing mentioned above. We definitely want to keep the pattern of being able to construct the plugin and pass it into the engine's constructor parameters.
+
+```js
+const demoPlugin = new DummyPlugin({...options});
+const engine = new Engine([demoPlugin]);
+```
+
+## Querying
+
+The Query Engine should probably be implemented as an abstract interface to allow arbitrary query engines to be installed into the engine. A usecase of this is to allow a custom query engine for querying Entities and Components.

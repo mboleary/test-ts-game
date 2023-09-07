@@ -1,5 +1,5 @@
 import { ECSDB } from "./db/ECSDB";
-import { EntityManager } from "./EntityManager";
+import { EntityManager } from "./managers/EntityManager";
 // import { QueryManager } from "./QueryManager";
 
 export class World /*implements Serializable, Subscribable*/ {

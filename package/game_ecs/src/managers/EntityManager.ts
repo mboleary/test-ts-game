@@ -1,5 +1,5 @@
-import { Entity } from "./Entity";
-import { ECSDB } from "./db/ECSDB";
+import { Entity } from "../Entity";
+import { ECSDB } from "../db/ECSDB";
 import { v4 as uuidv4 } from "uuid";
 
 type RawEntityData = Partial<Omit<Entity, "id">>;

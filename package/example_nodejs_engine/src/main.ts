@@ -8,7 +8,7 @@ export function main() {
 
     engine.initialize([]);
 
-    const scene = new Scene(uuidv4(), "default");
+    const scene = new Scene(uuidv4());
 
     engine.setCurrentScene(scene);
 

@@ -4,7 +4,7 @@
 
 import test from "ava";
 import { ECSDB } from "../db/ECSDB";
-import { EntityManager } from "../EntityManager";
+import { EntityManager } from "../managers/EntityManager";
 
 let ecsdb: ECSDB;
 let em: EntityManager;
@@ -27,9 +27,7 @@ test("EntityManager was initialized", (t) => {
 });
 
 test.serial("Can add Entity", (t) => {
-  em.createEntity({
-    name: "TEST",
-  });
+  em.createEntity({});
 
   // Entity was added to Entity Map
   t.not(Array.from(ecsdb.entityMap.keys()).length, 0);

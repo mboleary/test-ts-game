@@ -82,11 +82,15 @@ export class Entity implements Eventable {
     this._ecsdb.setParentOfEntity(entity, this);
   }
 
-  static build(components: Component[]): Entity {
+  static build(items: (Entity | Component<any>)[] = []): Entity {
     // @TODO once we figure out the ecsdb stuff, change this
     const entity = new Entity(uuidv4(), new ECSDB(true));
-    for (const c of components) {
-      entity.attachComponent(c);
+    for (const i of items) {
+      if (i instanceof Component) {
+        entity.attachComponent(i);
+      } else {
+        entity.attachChild(i);
+      }
     }
     return entity;
   }

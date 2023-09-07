@@ -5,10 +5,10 @@ import { Plugin } from "./plugin/Plugin";
 
 export class Engine {
 
-    protected readonly pluginManager = new EnginePluginManager(this);
     protected readonly timeManager = new GameTimeManager();
     // protected readonly hotloopManager = new EngineHotloopManager(this.timeManager, this.pluginManager);
     protected readonly worldManager = new GameWorldManager();
+    protected readonly pluginManager = new EnginePluginManager(this, this.timeManager, this.worldManager);
 
     private initialized = false;
     private started = false;
