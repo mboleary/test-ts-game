@@ -36,10 +36,6 @@ export class ECSDB {
    */
 
   public entityMap: Map<EntityID, Entity> = new Map();
-  // public entityByNameToIDMap: Map<string, EntityID[]> = new Map();
-  // public entityToTagMap: Map<EntityID, string> = new Map();
-  // @TODO deprecate and remove (bad pattern)
-  // public entityToEntityMap: Map<EntityID, EntityRelationship[]> = new Map();
   public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
   public entityParentToChildMap: Map<EntityID, EntityID[]> = new Map();
   public entityToComponentMap: Map<EntityID, ComponentID[]> = new Map();

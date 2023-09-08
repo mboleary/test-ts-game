@@ -73,7 +73,7 @@ export class Entity implements Eventable {
     return false;
   }
 
-  public getComponent(type: Symbol | null): Component | null {
+  public getComponent<T>(type: Symbol): T | null {
     return null;
   }
 
