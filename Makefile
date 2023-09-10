@@ -1,4 +1,6 @@
 
+all: example_2d_engine example_nodejs_engine
+
 # Core game libraries
 game_event:
 	cd package/game_event && \
