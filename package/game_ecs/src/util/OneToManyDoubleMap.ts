@@ -20,7 +20,22 @@ export class OneToManyDoubleMap<K, V> {
   }
   public deleteValue(value: V): boolean {
     const key = this.reverseMap.get(value);
-    return key !== undefined && this.reverseMap.delete(value) && this.map.delete(key);
+    if (key) {
+      this.reverseMap.delete(value);
+      const keyResult = this.map.get(key);
+      keyResult?.splice(keyResult.indexOf(value) - 1);
+      return true;
+    }
+    return false;
+  }
+  public delete(key: K, value: V): boolean {
+    const keyResult = this.map.get(key);
+    if (keyResult?.indexOf(value)) {
+      this.reverseMap.delete(value);
+      keyResult.splice(keyResult.indexOf(value) - 1, 1);
+      return true;
+    }
+    return false;
   }
   public entries(): Iterable<[K, V[]]> {
     return this.map.entries();
@@ -43,6 +58,9 @@ export class OneToManyDoubleMap<K, V> {
   }
   public hasValue(value: V): boolean {
     return this.reverseMap.has(value);
+  }
+  public has(key: K, value: V): boolean {
+    return this.map.get(key) === value;
   }
   public keys(): Iterable<K> {
     return this.map.keys();

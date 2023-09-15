@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { ECSDB } from "./db/ECSDB";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable } from "game_event";
-import { Component } from "./Component";
+import { Component, ComponentType } from "./Component";
 
 export class Entity implements Eventable {
   protected readonly _eventEmitter: GameEventTreeEmitter =
@@ -12,18 +12,46 @@ export class Entity implements Eventable {
     protected _ecsdb: ECSDB,
   ) {}
 
+  /**
+   * Emit an event on this Entity
+   * @param type event type
+   * @param event event
+   * @param options Emitter Options
+   */
   emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {
     this._eventEmitter.emit(type, event, options);
   }
+
+  /**
+   * Subscribe to events
+   * @param type event type
+   * @param handler event handler
+   */
   subscribe(type: string, handler: Function): void {
     this._eventEmitter.subscribe(type, handler);
   }
+
+  /**
+   * Unsubscribe a handler from receiving events
+   * @param handler event handler
+   */
   unsubscribe(handler: Function): void {
     this._eventEmitter.unsubscribe(handler);
   }
+
+  /**
+   * Unsubscribe all handlers from an event type
+   * @param type 
+   */
   unsubscribeAll(type: string): void {
     this._eventEmitter.unsubscribeAll(type);
   }
+
+  /**
+   * Subscribe to an event to handle one instance of it
+   * @param type event type
+   * @param handler event handler
+   */
   once(type: string, handler: Function): void {
     this._eventEmitter.once(type, handler);
   }
@@ -46,40 +74,61 @@ export class Entity implements Eventable {
   }
 
   get parent(): Entity | null {
-    return this._ecsdb.getParentOfEntity(this);
+    return this._ecsdb.entityDB.getParentOfEntity(this);
   }
 
   get children(): Entity[] {
-    return this._ecsdb.getChildrenOfEntity(this);
+    return this._ecsdb.entityDB.getChildrenOfEntity(this);
   }
 
   public attachChild(entity: Entity) {
-    console.log("not implemented");
+    this._ecsdb.entityDB.setParentOfEntity(this, entity);
   }
 
   public detachChild(entity: Entity): boolean {
+    if (this._ecsdb.entityDB.entityHasChild(this.id, entity.id)) {
+      this._ecsdb.entityDB.detachParentFromEntity(entity.id);
+      return true;
+    }
     return false;
   }
 
   get components(): Component[] {
-    return [];
+    return this._ecsdb.componentDB.getComponentsForEntity(this.id);
   }
 
   public attachComponent(comp: Component) {
-    console.log("not implemented");
+    this._ecsdb.componentDB.attachComponentToEntity(comp, this.id);
+  }
+
+  public setComponent<T>(componentType: ComponentType, componentData: T) {
+    this._ecsdb.componentDB.setComponentDataOnEntity(this.id, componentType, componentData);
   }
 
   public detachComponent(comp: Component): boolean {
-    return false;
+    this._ecsdb.componentDB.destroyComponent(comp.id);
+    return true;
   }
 
-  public getComponent<T>(type: Symbol): T | null {
-    return null;
+  public detachComponentByType(componentType: ComponentType): boolean {
+    const comp = this._ecsdb.componentDB.getComponentForEntityByType(this.id, componentType);
+    if (!comp) return false;
+    this._ecsdb.componentDB.destroyComponent(comp.id);
+    return true;
+  }
+
+  public getComponent<T>(type: ComponentType): T | null {
+    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
+    return comp?.data || null;
+  }
+
+  public getComponentObject<T>(type: ComponentType): Component<T> | null {
+    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
+    return comp || null;
   }
 
   public setParent(entity: Entity) {
-    // console.log("not implemented");
-    this._ecsdb.setParentOfEntity(entity, this);
+    this._ecsdb.entityDB.setParentOfEntity(entity, this);
   }
 
   static build(items: (Entity | Component<any>)[] = []): Entity {

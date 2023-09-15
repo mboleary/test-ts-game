@@ -30,5 +30,5 @@ test.serial("Can add Entity", (t) => {
   em.createEntity({});
 
   // Entity was added to Entity Map
-  t.not(Array.from(ecsdb.entityMap.keys()).length, 0);
+  t.not(Array.from(ecsdb.entityDB.entityMap.keys()).length, 0);
 });

@@ -6,6 +6,8 @@ export type ComponentData = {
   [key: string]: any;
 };
 
+export type ComponentType = Symbol | Function | string | null;
+
 export class Component<T = ComponentData> {
   /**
    * Creates a Component that will be attached to an entity
@@ -15,8 +17,8 @@ export class Component<T = ComponentData> {
    */
   constructor(
     public readonly id: string,
-    public readonly type: Symbol | null,
-    public readonly data: T,
+    public readonly type: ComponentType,
+    public data: T,
     protected _ecsdb: ECSDB,
   ) {}
 
@@ -38,12 +40,12 @@ export class Component<T = ComponentData> {
   }
 
   get entity(): Entity | null {
-    return null;
+    return this._ecsdb.componentDB.getEntityForComponent(this.id);
   }
 
   // Convenience functions
   public setEntity(entity: Entity) {
-    throw new Error("not implemented");
+    return this._ecsdb.componentDB.attachComponentToEntity<T>(this, entity.id);
   }
 
   static build<T>(type: Symbol | null, data: T): Component<T> {

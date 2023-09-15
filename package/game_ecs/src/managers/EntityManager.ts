@@ -15,15 +15,15 @@ export class EntityManager {
   constructor(private readonly ecsDB: ECSDB) {}
 
   public getAllEntities(): Entity[] {
-    return Array.from(this.ecsDB.entityMap.values());
+    return Array.from(this.ecsDB.entityDB.entityMap.values());
   }
 
   public getEntityByID(uuid: string): Entity | null {
-    return (this.ecsDB.entityMap.get(uuid) as Entity | undefined) || null;
+    return (this.ecsDB.entityDB.entityMap.get(uuid) as Entity | undefined) || null;
   }
 
   public hasEntity(uuid: string): boolean {
-    return this.ecsDB.entityMap.has(uuid);
+    return this.ecsDB.entityDB.entityMap.has(uuid);
   }
 
   /**
@@ -35,7 +35,7 @@ export class EntityManager {
     const entity = new Entity(uuid, this.ecsDB);
 
     Object.seal(entity);
-    this.ecsDB.entityMap.set(uuid, entity);
+    this.ecsDB.entityDB.entityMap.set(uuid, entity);
 
     // if (rawEntityData.tags) {
     //   for (const tag of rawEntityData.tags) {
@@ -63,21 +63,21 @@ export class EntityManager {
     rawEntityData.children?.forEach((child) => {
       if (child.id) {
         // Attach child
-        if (this.ecsDB.validateEntity(child.id)) {
-          this.ecsDB.setParentOfEntity(entity, child);
+        if (this.ecsDB.entityDB.validateEntity(child.id)) {
+          this.ecsDB.entityDB.setParentOfEntity(entity, child);
         }
       } else {
         const childEntity = this.createEntity(child);
-        this.ecsDB.setParentOfEntity(entity, childEntity);
+        this.ecsDB.entityDB.setParentOfEntity(entity, childEntity);
       }
     });
 
     if (rawEntityData.parent) {
       if (rawEntityData.parent.id) {
-        this.ecsDB.setParentOfEntity(rawEntityData.parent, entity);
+        this.ecsDB.entityDB.setParentOfEntity(rawEntityData.parent, entity);
       } else {
         const parentEntity = this.createEntity(rawEntityData.parent);
-        this.ecsDB.setParentOfEntity(parentEntity, entity);
+        this.ecsDB.entityDB.setParentOfEntity(parentEntity, entity);
       }
     }
 
@@ -85,7 +85,7 @@ export class EntityManager {
   }
 
   public deleteEntity(uuid: string): boolean {
-    const baseEntity = this.ecsDB.entityMap.get(uuid);
+    const baseEntity = this.ecsDB.entityDB.entityMap.get(uuid);
 
     if (!baseEntity) return false;
 
@@ -95,7 +95,7 @@ export class EntityManager {
 
     // @TODO check various caches to see if this needs to be removed
 
-    this.ecsDB.entityMap.delete(uuid);
+    this.ecsDB.entityDB.entityMap.delete(uuid);
 
     return true;
   }

@@ -2,8 +2,11 @@
  * ECS Database: Provides the store for entities and components as well as some indexes
  */
 
-import { Component } from "../Component";
+import { Component, ComponentType } from "../Component";
 import { Entity } from "../Entity";
+import { OneToManyDoubleMap } from "../util/OneToManyDoubleMap";
+import { ComponentDB } from "./ComponentDB";
+import { EntityDB } from "./EntityDB";
 
 // type EntityWithoutJoins = Omit<Entity, "parent" | "children" | "components">;
 // type ComponentWithoutJoins = Omit<Component, "entity">;
@@ -18,6 +21,10 @@ type ComponentID = string;
 // };
 
 export class ECSDB {
+
+  public readonly entityDB = new EntityDB(this);
+  public readonly componentDB = new ComponentDB(this);
+
   constructor(
     public readonly temporary: boolean = false, 
     public readonly parent: ECSDB | null = null
@@ -29,86 +36,5 @@ export class ECSDB {
 
   public canOnlyBeOverriddenBy(): ECSDB | null {
     return this.parent;
-  }
-
-  /**
-   * Entity-related functionality
-   */
-
-  public entityMap: Map<EntityID, Entity> = new Map();
-  public entityChildToParentMap: Map<EntityID, EntityID> = new Map();
-  public entityParentToChildMap: Map<EntityID, EntityID[]> = new Map();
-  public entityToComponentMap: Map<EntityID, ComponentID[]> = new Map();
-  // public entityObserverMap: Map<EntityID, EventSource> = new Map();
-
-  public getChildrenOfEntity(entity: Entity): Entity[] {
-    const childIDs = this.entityParentToChildMap.get(entity.id) || [];
-    return childIDs
-      .map((id) => this.entityMap.get(id) || null)
-      .filter((val) => val !== null) as Entity[];
-  }
-
-  public getParentOfEntity(entity: Entity): Entity | null {
-    const id = this.entityChildToParentMap.get(entity.id);
-
-    if (id) {
-      return (this.entityMap.get(id) as Entity | undefined) || null;
-    } else {
-      return null;
-    }
-  }
-
-  public getComponentsForEntity(entity: Entity): Component[] {
-    const compIDs = this.entityToComponentMap.get(entity.id) || [];
-    return compIDs
-      .map((id) => this.componentMap.get(id) || null)
-      .filter((val) => val !== null) as Component[];
-  }
-
-  public setParentOfEntity(parentEntity: Entity, targetEntity: Entity) {
-    // Validate entities
-    this.validateEntity(parentEntity.id);
-    this.validateEntity(targetEntity.id);
-
-    this.entityChildToParentMap.set(targetEntity.id, parentEntity.id);
-    this._appendEntityChild(parentEntity.id, targetEntity.id);
-  }
-
-  public validateEntity(entityID: string): boolean {
-    if (!this.entityMap.has(entityID)) {
-      throw new Error(`Entity not found: ${entityID}`);
-    }
-    return true;
-  }
-
-  private _appendEntityChild(parentEntityID: string, childEntityID: string) {
-    let arr = this.entityParentToChildMap.get(parentEntityID);
-
-    if (!arr) {
-      arr = [];
-    }
-
-    arr.push(childEntityID);
-    this.entityParentToChildMap.set(parentEntityID, arr);
-  }
-
-  /**
-   * Component-related functionality
-   */
-
-  public componentMap: Map<ComponentID, Component> = new Map();
-  // public componentByNameToIDMap: Map<string, ComponentID[]> = new Map();
-  public componentToEntityIDMap: Map<ComponentID, EntityID> = new Map();
-  public componentByTypeToIDMap: Map<string, ComponentID[]> = new Map();
-  // public componentObserverMap: Map<EntityID, EventSource> = new Map();
-
-  public getEntityForComponent(comp: Component): Entity | null {
-    const id = this.componentToEntityIDMap.get(comp.id);
-
-    if (id) {
-      return (this.entityMap.get(id) as Entity | undefined) || null;
-    } else {
-      return null;
-    }
   }
 }
