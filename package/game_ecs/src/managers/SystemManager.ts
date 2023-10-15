@@ -1,7 +1,9 @@
 import { System } from "../System";
 import { ECSDB } from "../db";
+import { Manager } from "./Manager";
 
-export class SystemManager {
+export class SystemManager implements Manager {
+    private systems: Map<string, System> = new Map();
     constructor(
         private readonly ecsDB: ECSDB
     ) {}
@@ -13,6 +15,10 @@ export class SystemManager {
     }
 
     private enrollSystem(system: System) {
+        this.systems.set(system.id, system);
+    }
 
+    public getSystems() {
+        return Array.from(this.systems.values());
     }
 }

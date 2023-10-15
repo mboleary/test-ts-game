@@ -6,8 +6,9 @@
 import { Entity } from "../Entity";
 import { ECSDB } from "../db/ECSDB";
 import { Query } from "../query";
+import { Manager } from "./Manager";
 
-export class QueryManager {
+export class QueryManager implements Manager {
   constructor(protected readonly ecsDB: ECSDB) {}
 
   /**

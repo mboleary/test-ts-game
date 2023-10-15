@@ -1,6 +1,7 @@
 import { Entity } from "../Entity";
 import { ECSDB } from "../db/ECSDB";
 import { v4 as uuidv4 } from "uuid";
+import { Manager } from "./Manager";
 
 type RawEntityData = Partial<Omit<Entity, "id">>;
 type RawMultipleEntityData = RawEntityData & {
@@ -11,7 +12,7 @@ type RawMultipleEntityData = RawEntityData & {
 /**
  * Provides functions to access data in the ECS DB to the rest of the engine
  */
-export class EntityManager {
+export class EntityManager implements Manager {
   constructor(private readonly ecsDB: ECSDB) {}
 
   public getAllEntities(): Entity[] {
