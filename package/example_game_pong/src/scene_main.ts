@@ -2,13 +2,14 @@ import { Component, Entity, Scene, System, SystemLifecycle } from "game_ecs";
 import { Input } from "./plugins/basicInput/Input";
 import { Vector2 } from "game_transform";
 
-export function buildScene(input: Input) {
+export function buildScene(input?: Input) {
     const pc = Component.build<null>(Symbol.for("pc"), null);
     const lPaddle = Component.build(Symbol.for("paddle"), {size: 20});
     const lpSpeed = Component.build<number>(Symbol.for("speed"), 5);
     const lpPosition = Component.build(Symbol.for("transform"), new Vector2());
     const lpAcceleration = Component.build(Symbol.for("acceleration"), new Vector2());
-    const leftPaddle = Entity.build([pc, lPaddle, lpSpeed, lpPosition, lpAcceleration]);
+    const lpName = Component.build(Symbol.for("name"), "Left Paddle");
+    const leftPaddle = Entity.build([lpName, pc, lPaddle, lpSpeed, lpPosition, lpAcceleration]);
 
     const ai = Component.build(Symbol.for("ai"), null);
     const rPaddle = Component.build(Symbol.for("paddle"), {size: 20});
@@ -25,17 +26,18 @@ export function buildScene(input: Input) {
     const ballEntity = Entity.build([reflect, bSpeed, bPosition, bAcceleration, bComp]);
 
     const scene = Scene.build([leftPaddle, rightPaddle, ballEntity]);
+    // const scene = new Scene("test");
 
     const playerControlSystem = System.build(SystemLifecycle.LOOP, [Symbol.for("pc"), Symbol.for("acceleration"), Symbol.for("speed")], (entities) => {
         for (const entity of entities) {
             const acc = entity.getComponent(Symbol.for("acceleration")) as Vector2;
             const speed = entity.getComponent(Symbol.for("speed")) as number;
             
-            if (input.getKey("up")) {
-                acc.set(acc.x, -speed);
-            } else if (input.getKey("down")) {
-                acc.set(acc.x, speed);
-            }
+            // if (input.getKey("up")) {
+            //     acc.set(acc.x, -speed);
+            // } else if (input.getKey("down")) {
+            //     acc.set(acc.x, speed);
+            // }
         }
     });
 
@@ -64,13 +66,13 @@ export function buildScene(input: Input) {
             const acc = entity.getComponent(Symbol.for("acceleration")) as Vector2;
             const speed = entity.getComponent(Symbol.for("speed")) as number;
             
-            if (input.getKey("up")) {
-                acc.set(acc.x, -speed);
-            } else if (input.getKey("down")) {
-                acc.set(acc.x, speed);
-            } else {
-                acc.set(acc.x, 0);
-            }
+            // if (input.getKey("up")) {
+            //     acc.set(acc.x, -speed);
+            // } else if (input.getKey("down")) {
+            //     acc.set(acc.x, speed);
+            // } else {
+            //     acc.set(acc.x, 0);
+            // }
         }
     });
 

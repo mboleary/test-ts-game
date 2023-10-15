@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ECSDB } from "./db/ECSDB";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable } from "game_event";
 import { Component, ComponentType } from "./Component";
+import { mergeECSDB } from "./util/ecsdbOverrideHelper";
 
 export class Entity implements Eventable {
   protected readonly _eventEmitter: GameEventTreeEmitter =
@@ -10,7 +11,10 @@ export class Entity implements Eventable {
   constructor(
     public readonly id: string,
     protected _ecsdb: ECSDB,
-  ) {}
+  ) {
+    // Add self to ECSDB
+    this._ecsdb.entityDB.entityMap.set(id, this);
+  }
 
   /**
    * Emit an event on this Entity
@@ -67,6 +71,7 @@ export class Entity implements Eventable {
       if (override && override !== ecsdb) {
         throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
       }
+      mergeECSDB(this._ecsdb, ecsdb);
       this._ecsdb = ecsdb;
     } else {
       throw new Error("Entity ECSDB is not overridable");

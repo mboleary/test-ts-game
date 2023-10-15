@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Entity } from "./Entity";
 import { ECSDB } from "./db";
+import { mergeECSDB } from "./util/ecsdbOverrideHelper";
 
 export type ComponentData = {
   [key: string]: any;
@@ -33,6 +34,7 @@ export class Component<T = ComponentData> {
       if (override && override !== ecsdb) {
         throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
       }
+      mergeECSDB(this._ecsdb, ecsdb);
       this._ecsdb = ecsdb;
     } else {
       throw new Error("Entity ECSDB is not overridable");

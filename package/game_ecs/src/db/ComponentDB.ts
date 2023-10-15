@@ -93,4 +93,18 @@ export class ComponentDB {
   public entityHasComponent(entityID: EntityID, componentID: ComponentID): boolean {
     return this.entityToComponentDoubleMap.has(entityID, componentID);
   }
+
+  public mergeComponentDB(remoteECSDB: ECSDB) {
+    if (remoteECSDB === this.ecsdb) return;
+
+    for (const [key, val] of remoteECSDB.componentDB.componentMap.entries()) {
+      this.componentMap.set(key, val);
+    }
+
+    for (const [key, valArr] of remoteECSDB.componentDB.entityToComponentDoubleMap.entries()) {
+      for (const val of valArr) {
+        this.entityToComponentDoubleMap.set(key, val);
+      }
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import { ECSDB } from "./db/ECSDB";
+import { Entity } from "./Entity";
 import { EntityManager } from "./managers/EntityManager";
 import { Manager } from "./managers/Manager";
 // import { QueryManager } from "./QueryManager";
@@ -17,6 +18,10 @@ export class World /*implements Serializable, Subscribable*/ {
         this.managerMap.set(man.constructor, man);
       }
     }
+  }
+
+  public get root(): Entity | null {
+    return this.ecsDB.entityDB.getRootEntity();
   }
 
   public merge(world: World) {
