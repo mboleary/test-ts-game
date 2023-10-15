@@ -14,18 +14,19 @@ export class EntityDB {
   ) {}
 
   public readonly entityMap: Map<EntityID, Entity> = new Map();
-  public readonly entityChildToParentDoubleMap: OneToManyDoubleMap<EntityID, EntityID> = new OneToManyDoubleMap();
+  // Parents have multiple children (one key to multiple values)
+  public readonly entityParentToChildDoubleMap: OneToManyDoubleMap<EntityID, EntityID> = new OneToManyDoubleMap();
   // public entityObserverMap: Map<EntityID, EventSource> = new Map();
 
   public getChildrenOfEntity(entity: Entity): Entity[] {
-    const childIDs: string[] = this.entityChildToParentDoubleMap.getValue(entity.id) || [];
+    const childIDs: string[] = this.entityParentToChildDoubleMap.getValue(entity.id) || [];
     return childIDs
       .map((id) => this.entityMap.get(id) || null)
       .filter((val) => val !== null) as Entity[];
   }
 
   public getParentOfEntity(entity: Entity): Entity | null {
-    const id: string | undefined = this.entityChildToParentDoubleMap.getKey(entity.id);
+    const id: string | undefined = this.entityParentToChildDoubleMap.getKey(entity.id);
 
     if (id) {
       return (this.entityMap.get(id) as Entity | undefined) || null;
@@ -34,13 +35,13 @@ export class EntityDB {
     }
   }
 
-  public setParentOfEntity(parentEntity: Entity, targetEntity: Entity) {
-    console.log("Set Parent to Child:", parentEntity, targetEntity);
+  public setParentOfEntity(parentEntity: Entity, childEntity: Entity) {
+    console.log("Set Parent to Child:", parentEntity, childEntity);
     // @TODO handle logic around ECSDB matching and overriding. Also ensure that relations are not being lost
-    if (!this.entityMap.has(targetEntity.id)) {
+    if (!this.entityMap.has(childEntity.id)) {
       // Target likely has temp ECSDB
       console.log("override child ecsdb");
-      targetEntity.overrideECSDB(this.ecsdb);
+      childEntity.overrideECSDB(this.ecsdb);
     } else if (!this.entityMap.has(parentEntity.id)) {
       // Parent likely has temp ecsdb
       console.log("override parent ecsdb");
@@ -48,17 +49,18 @@ export class EntityDB {
     }
     // Validate entities
     this.validateEntity(parentEntity.id);
-    this.validateEntity(targetEntity.id);
+    this.validateEntity(childEntity.id);
 
-    console.log("Set target to parent relationship");
-    this.entityChildToParentDoubleMap.set(targetEntity.id, parentEntity.id);
+    console.log("Set parent to child relationship");
+    this.entityParentToChildDoubleMap.set(parentEntity.id, childEntity.id);
 
     // @TODO once observers are implemented, trigger those
   }
 
-  public detachParentFromEntity(targetEntityID: string) {
-    this.validateEntity(targetEntityID);
-    this.entityChildToParentDoubleMap.deleteKey(targetEntityID);
+  public detachParentFromEntity(parentEntityID: string) {
+    this.validateEntity(parentEntityID);
+    // @TODO check that this is correct
+    this.entityParentToChildDoubleMap.deleteValue(parentEntityID);
 
     // @TODO once observers are implemented, trigger those
   }
@@ -68,7 +70,7 @@ export class EntityDB {
   }
 
   public entityHasChild(parentEntityID: string, childEntityID: string): boolean {
-    return this.entityChildToParentDoubleMap.has(childEntityID, parentEntityID);
+    return this.entityParentToChildDoubleMap.has(parentEntityID, childEntityID);
   }
 
   public validateEntity(entityID: string): boolean {
@@ -90,9 +92,9 @@ export class EntityDB {
       this.entityMap.set(key, val);
     }
 
-    for (const [key, valArr] of remoteECSDB.entityDB.entityChildToParentDoubleMap.entries()) {
+    for (const [key, valArr] of remoteECSDB.entityDB.entityParentToChildDoubleMap.entries()) {
       for (const val of valArr) {
-        this.entityChildToParentDoubleMap.set(key, val);
+        this.entityParentToChildDoubleMap.set(key, val);
       }
     }
   }
@@ -100,7 +102,7 @@ export class EntityDB {
   public getRootEntity(): Entity | null {
     const toRet = [];
     for (const k of this.entityMap.keys()) {
-      if (this.entityChildToParentDoubleMap.getKey(k)) {
+      if (this.entityParentToChildDoubleMap.getKey(k)) {
         continue;
       } else {
         toRet.push(k);

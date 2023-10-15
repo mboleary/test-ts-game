@@ -1,5 +1,9 @@
 import { ForEachCallbackFn } from "./DoubleMap.interface";
 
+/**
+ * One Key to Many Values
+ * each value should only map to one key
+ */
 export class OneToManyDoubleMap<K, V> {
   private readonly map = new Map<K, V[]>();
   private readonly reverseMap = new Map<V, K>();
