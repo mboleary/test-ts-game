@@ -27,6 +27,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "game_core": "file:../game_core",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13",
     "uuid": "^9.0.0"

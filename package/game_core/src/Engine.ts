@@ -2,13 +2,15 @@ import { Scene, World } from "game_ecs";
 import { EngineHotloopManager, GameTimeManager, GameWorldManager } from "./managers";
 import { EnginePluginManager } from "./plugin";
 import { Plugin } from "./plugin/Plugin";
+import { EngineSystemManager } from "./system/EngineSystemManager";
 
 export class Engine {
 
-    protected readonly pluginManager = new EnginePluginManager(this);
     protected readonly timeManager = new GameTimeManager();
     // protected readonly hotloopManager = new EngineHotloopManager(this.timeManager, this.pluginManager);
     protected readonly worldManager = new GameWorldManager();
+    protected readonly systemManager = new EngineSystemManager(this, this.timeManager, this.worldManager);
+    protected readonly pluginManager = new EnginePluginManager(this, this.timeManager, this.worldManager, this.systemManager);
 
     private initialized = false;
     private started = false;

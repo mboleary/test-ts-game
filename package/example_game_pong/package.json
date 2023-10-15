@@ -1,0 +1,46 @@
+{
+  "name": "example_2d_engine",
+  "version": "1.0.0",
+  "description": "This is a pre-built 2d engine",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "ava",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "postcompile": "npm run rollup",
+    "build": "npm run compile",
+    "rollup": "rollup -c ./rollup.config.mjs",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint",
+    "serve": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@ava/typescript": "^4.1.0",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
+    "ava": "^5.3.1",
+    "eslint-config-prettier": "^8.9.0",
+    "gts": "^5.0.0",
+    "prettier": "3.0.0",
+    "rollup": "^3.28.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "game_core": "file:../game_core",
+    "game_core_browser": "file:../game_core_browser",
+    "game_ecs": "file:../game_ecs",
+    "game_event": "file:../game_event",
+    "game_transform": "file:../game_transform",
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.0"
+  }
+}
