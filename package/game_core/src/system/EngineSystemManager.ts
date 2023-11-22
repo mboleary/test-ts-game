@@ -19,6 +19,11 @@ export class EngineSystemManager {
 
     }
 
+    /**
+     * @TODO create an observer on the world to get all new entities, also get the world's querymanager to read all cached queries.
+     * This will give us all of the entities that need to be fed into the systems and also which systems need to be run
+     */
+
     public add(systems: System[]) {
         for (const system of systems) {
             this.enrollSystem(system);
@@ -33,12 +38,18 @@ export class EngineSystemManager {
         return Array.from(this.systems.values());
     }
 
+    // @TODO might remove this
     public getAllSystems() {
         const sysMan = this.worldManager.world.getManager<SystemManager>(SystemManager);
         if (sysMan) {
             return this.sortSystems(this.getGlobalSystems().concat(sysMan.getSystems()));
         }
         return this.sortSystems(this.getGlobalSystems());
+    }
+
+    public getSystemsToRunThisFrame() {
+        // **Get all systems that need to be run this frame**
+        // Get 
     }
 
     private sortSystems(systemsArr: System[]) {

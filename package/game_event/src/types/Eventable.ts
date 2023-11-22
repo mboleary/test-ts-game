@@ -1,4 +1,5 @@
 import { GameEvent } from "../GameEvent";
+import { Observer } from "../observer";
 import { EmitOptions } from "./EmitOptions";
 
 /**
@@ -10,4 +11,11 @@ export interface Eventable {
   unsubscribe(handler: Function): void;
   unsubscribeAll(type: string): void;
   once(type: string, handler: Function): void;
+}
+
+/**
+ * Interface that enables observers to be created on a class
+ */
+export interface Observable {
+  subscribe<T>(path: string): Observer<T>;
 }

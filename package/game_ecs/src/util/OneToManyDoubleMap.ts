@@ -70,12 +70,9 @@ export class OneToManyDoubleMap<K, V> {
     return this.map.keys();
   }
   public set(key: K, value: V): void {
-    console.log("set:", key, value);
     const valArr = this.map.get(key) || [];
     valArr.push(value);
-    console.log("mapset:", key, valArr);
     this.map.set(key, valArr);
-    console.log("revmapset:", value, key);
     this.reverseMap.set(value, key);
   }
   public values(): Iterable<V> {

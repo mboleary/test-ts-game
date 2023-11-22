@@ -22,21 +22,21 @@ export function match(eventTypeName: string, eventListenerName: string) {
   return true;
 }
 
-export function getAllHandlers(
+export function getAllHandlers<T>(
   eventTypeName: string,
-  listenerMap: Map<string, Function[]>,
-): Function[] {
+  listenerMap: Map<string, T[]>,
+): T[] {
   const eventTypeNameArray = eventTypeName.split(".");
-  const handlersToReturn: Function[] = [];
+  const handlersToReturn: T[] = [];
 
   const curr = [];
   for (const str of eventTypeNameArray) {
     curr.push(str);
     const lstr = curr.join(".");
     if (listenerMap.has(lstr)) {
-      handlersToReturn.push(...(listenerMap.get(lstr) as Function[]));
+      handlersToReturn.push(...(listenerMap.get(lstr) as T[]));
     } else if (listenerMap.has(lstr + ".*")) {
-      handlersToReturn.push(...(listenerMap.get(lstr + ".*") as Function[]));
+      handlersToReturn.push(...(listenerMap.get(lstr + ".*") as T[]));
     }
   }
 

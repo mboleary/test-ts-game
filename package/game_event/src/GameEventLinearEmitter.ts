@@ -11,7 +11,7 @@ export class GameEventLinearEmitter extends GameEventEmitter {
   private readonly listenerMap: Map<string, Function[]> = new Map();
 
   emit(type: string, event: GameEvent<any>, options: EmitOptions) {
-    const handlers = getAllHandlers(type, this.listenerMap);
+    const handlers = getAllHandlers<Function>(type, this.listenerMap);
 
     for (const h of handlers) {
       try {

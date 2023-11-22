@@ -4,3 +4,5 @@ export * from "./GameEventLinearEmitter";
 export * from "./GameEventTreeEmitter";
 export * from "./types";
 export * from "./util";
+export * from "./observer";
+
