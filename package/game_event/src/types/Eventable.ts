@@ -17,5 +17,5 @@ export interface Eventable {
  * Interface that enables observers to be created on a class
  */
 export interface Observable {
-  subscribe<T>(path: string): Observer<T>;
+  observe<T>(path: string): Observer<T>;
 }

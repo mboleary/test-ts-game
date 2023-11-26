@@ -33,7 +33,10 @@ export class ComponentDB {
   }
 
   public attachComponentToEntity<T>(component: Component<T>, entityID: EntityID) {
-    // @TODO ECSDB override logic
+    // check that this component is using this ecsdb
+    if (!component.sameECSDB(this.ecsdb)) {
+      component.overrideECSDB(this.ecsdb);
+    }
     if (this.hasComponent(component.id)) {
       throw new Error(`Component ${component.id} already present in world`);
     }
@@ -107,4 +110,12 @@ export class ComponentDB {
       }
     }
   }
+
+  /**
+   * Register component (which may not have entity attached)
+   * @param comp Component
+   */
+  // public addComponent(comp: Component<any>) {
+  //   this.componentMap.set(comp.id, comp);
+  // }
 }

@@ -64,7 +64,8 @@ export class OneToManyDoubleMap<K, V> {
     return this.reverseMap.has(value);
   }
   public has(key: K, value: V): boolean {
-    return this.map.get(key) === value;
+    const res = this.map.get(key);
+    return res ? res.includes(value): false;
   }
   public keys(): Iterable<K> {
     return this.map.keys();

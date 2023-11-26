@@ -1,21 +1,21 @@
 // Internal implementation used to manage subscriptions and notifying them of relevant changes
 
-import { getAllHandlers } from "../util";
+// import { getAllHandlers } from "../util";
 import { Observer } from "./Observer";
 
 export class ObserverManager {
-  private observerMap: Map<string, Observer<any>[]> = new Map();
+  private observerMap: Map<any, Observer<any>[]> = new Map();
   constructor() {}
 
-  public subscribe<T>(eventPath: string): Observer<T> {
-    const observer = new Observer<T>(eventPath);
+  public subscribe<T>(type: any): Observer<T> {
+    const observer = new Observer<T>(type);
 
-    let observerArray = this.observerMap.get(eventPath);
+    let observerArray = this.observerMap.get(type);
     if (observerArray === undefined) {
       observerArray = [];
     }
     observerArray.push(observer);
-    this.observerMap.set(eventPath, observerArray);
+    this.observerMap.set(type, observerArray);
 
     // Remove observer from handler map when closed
     observer.addCloseHandler(this.unsubscribe);
@@ -23,11 +23,16 @@ export class ObserverManager {
     return observer;
   }
 
-  public notify<T>(eventPath: string, data: T) {
-    const observers = getAllHandlers<Observer<T>>(eventPath, this.observerMap);
-    
-    for (const o of observers) {
-      o.notify(data);
+  public notify<T>(type: any, data: T) {
+    // const observers = getAllHandlers<Observer<T>>(eventPath, this.observerMap);
+    const observers = this.observerMap.get(type);
+
+    if (observers) {
+      for (const o of observers) {
+        o.notify(data);
+      }
+    } else {
+      return;
     }
   }
 

@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 import { ECSDB } from "./db/ECSDB";
-import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable } from "game_event";
+import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable, Observable, Observer, ObserverManager } from "game_event";
 import { Component, ComponentType } from "./Component";
 import { mergeECSDB } from "./util/ecsdbOverrideHelper";
+import { buildProxy } from "./util/buildProxy";
 
-export class Entity implements Eventable {
+export class Entity implements Eventable, Observable {
   protected readonly _eventEmitter: GameEventTreeEmitter =
     new GameEventTreeEmitter(() => this.parent?._eventEmitter);
+  protected readonly _observerManager: ObserverManager = new ObserverManager();
 
   constructor(
     public readonly id: string,
@@ -14,6 +16,15 @@ export class Entity implements Eventable {
   ) {
     // Add self to ECSDB
     this._ecsdb.entityDB.entityMap.set(id, this);
+  }
+
+  /**
+   * Observe a property
+   * @param type property to observe
+   * @returns 
+   */
+  observe<T>(type: any): Observer<T> {
+    return this._observerManager.subscribe(type);
   }
 
   /**
@@ -123,6 +134,19 @@ export class Entity implements Eventable {
   }
 
   public getComponent<T>(type: ComponentType): T | null {
+    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
+    if (comp) {
+      if (typeof comp.data === 'object') {
+        return buildProxy<any>(comp.data, this._observerManager, type);
+      } else {
+        return comp.data;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public getComponentWithoutProxy<T>(type: ComponentType): T | null {
     const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
     return comp?.data || null;
   }

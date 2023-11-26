@@ -36,22 +36,18 @@ export class EntityDB {
   }
 
   public setParentOfEntity(parentEntity: Entity, childEntity: Entity) {
-    console.log("Set Parent to Child:", parentEntity, childEntity);
     // @TODO handle logic around ECSDB matching and overriding. Also ensure that relations are not being lost
     if (!this.entityMap.has(childEntity.id)) {
       // Target likely has temp ECSDB
-      console.log("override child ecsdb");
       childEntity.overrideECSDB(this.ecsdb);
     } else if (!this.entityMap.has(parentEntity.id)) {
       // Parent likely has temp ecsdb
-      console.log("override parent ecsdb");
       parentEntity.overrideECSDB(this.ecsdb);
     }
     // Validate entities
     this.validateEntity(parentEntity.id);
     this.validateEntity(childEntity.id);
 
-    console.log("Set parent to child relationship");
     this.entityParentToChildDoubleMap.set(parentEntity.id, childEntity.id);
 
     // @TODO once observers are implemented, trigger those

@@ -21,7 +21,10 @@ export class Component<T = ComponentData> {
     public readonly type: ComponentType,
     public data: T,
     protected _ecsdb: ECSDB,
-  ) {}
+  ) {
+    // Add self to ecsdb
+    // this._ecsdb.componentDB.addComponent(this);
+  }
 
   /**
    * Use this to absorb an entity into another ECSDB if using a temporary one
@@ -39,6 +42,15 @@ export class Component<T = ComponentData> {
     } else {
       throw new Error("Entity ECSDB is not overridable");
     }
+  }
+
+  /**
+   * used to determine if the ECSDB needs to be overridden
+   * @param ecsdb ecsdb to check
+   * @returns true if they are the same
+   */
+  public sameECSDB(ecsdb: ECSDB): boolean {
+    return this._ecsdb === ecsdb;
   }
 
   get entity(): Entity | null {

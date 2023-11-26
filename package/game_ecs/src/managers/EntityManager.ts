@@ -54,6 +54,12 @@ export class EntityManager implements Manager {
       }
     }
 
+    if (rawEntityData.components) {
+      for (const comp of rawEntityData.components) {
+        entity.attachComponent(comp);
+      }
+    }
+
     return entity;
   }
 

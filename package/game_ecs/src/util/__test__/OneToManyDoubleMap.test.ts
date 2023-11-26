@@ -62,6 +62,16 @@ test.serial("can get key and value after storing multiple items", (t) => {
   }
 });
 
+test.serial("can check if a pair of key and values are present", (t) => {
+  doubleMap.set(KEY1, VAL1);
+  doubleMap.set(KEY1, VAL2);
+  if (doubleMap.has(KEY1, VAL1)) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
 test.serial("after changing a value, will not remove the first value", (t) => {
   doubleMap.set(KEY1, VAL1);
   doubleMap.set(KEY1, VAL2);
