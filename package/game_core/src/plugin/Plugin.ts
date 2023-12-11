@@ -30,15 +30,9 @@ export abstract class Plugin<T> {
     protected abstract _build(engineInternals: EngineInternals): T;
 
     // Hooks
-    public preinit? (): Promise<void>;
     public init?(): Promise<void>;
-    public postinit?(): Promise<void>;
-    public prestart? (): Promise<void>;
     public start?(): Promise<void>;
-    public poststart?(): Promise<void>;
-    public predestroy? (): Promise<void>;
     public destroy?(): Promise<void>;
-    public postdestroy?(): Promise<void>;
 }
 
 export abstract class PluginWithLoop<T> extends Plugin<T> {
@@ -47,7 +41,5 @@ export abstract class PluginWithLoop<T> extends Plugin<T> {
     }
 
     // Hooks
-    public preloop? (): Promise<void>;
     public loop?(): Promise<void>;
-    public postloop?(): Promise<void>;
 }

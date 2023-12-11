@@ -1,17 +1,20 @@
 // import { Container } from "inversify";
 import { Engine } from "../Engine";
 import { GameTimeManager, GameWorldManager } from "../managers";
+import { ResourceManager } from "../resource/ResourceManager";
 import { EngineSystemManager } from "../system/EngineSystemManager";
 import { EngineInternals } from "./EngineInternals.type";
-import { Plugin, PluginWithLoop } from "./Plugin";
+import { Plugin } from "./Plugin";
 
 export class EnginePluginManager {
+
+    public readonly resourceManager: ResourceManager<symbol> = new ResourceManager();
 
     constructor(
         private readonly engine: Engine,
         private readonly timeManager: GameTimeManager,
         private readonly worldManager: GameWorldManager,
-        private readonly globalSystemManager: EngineSystemManager,
+        private readonly globalSystemManager: EngineSystemManager
     ) {
 
     }
@@ -126,6 +129,7 @@ export class EnginePluginManager {
             engine: this.engine,
             timeManager: this.timeManager,
             worldManager: this.worldManager,
+            resourceManager: this.resourceManager
         }
     }
 }

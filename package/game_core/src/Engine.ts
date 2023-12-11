@@ -29,17 +29,19 @@ export class Engine {
         this.pluginManager.lockPlugins();
 
         // init
-        for (const initFunc of this.pluginManager.preinitFunctions) {
-            initFunc();
-        }
+        // for (const initFunc of this.pluginManager.preinitFunctions) {
+        //     initFunc();
+        // }
 
-        for (const initFunc of this.pluginManager.initFunctions) {
-            initFunc();
-        }
+        // for (const initFunc of this.pluginManager.initFunctions) {
+        //     initFunc();
+        // }
 
-        for (const initFunc of this.pluginManager.postinitFunctions) {
-            initFunc();
-        }
+        // for (const initFunc of this.pluginManager.postinitFunctions) {
+        //     initFunc();
+        // }
+
+        // @TODO system manager init lifecycle
 
         this.initialized = true;
     }
@@ -49,17 +51,19 @@ export class Engine {
         if (!this.initialized) throw new Error('Engine not initialized!');
         
         // start
-        for (const startFunc of this.pluginManager.prestartFunctions) {
-            startFunc();
-        }
+        // for (const startFunc of this.pluginManager.prestartFunctions) {
+        //     startFunc();
+        // }
 
-        for (const startFunc of this.pluginManager.startFunctions) {
-            startFunc();
-        }
+        // for (const startFunc of this.pluginManager.startFunctions) {
+        //     startFunc();
+        // }
 
-        for (const startFunc of this.pluginManager.poststartFunctions) {
-            startFunc();
-        }
+        // for (const startFunc of this.pluginManager.poststartFunctions) {
+        //     startFunc();
+        // }
+
+        // @TODO system manager start lifecycle
 
         this.started = true;
 
@@ -71,17 +75,19 @@ export class Engine {
         if (!this.started) throw new Error('Engine not started!');
 
         // destroy
-        for (const destroyFunc of this.pluginManager.predestroyFunctions) {
-            destroyFunc();
-        }
+        // for (const destroyFunc of this.pluginManager.predestroyFunctions) {
+        //     destroyFunc();
+        // }
 
-        for (const destroyFunc of this.pluginManager.destroyFunctions) {
-            destroyFunc();
-        }
+        // for (const destroyFunc of this.pluginManager.destroyFunctions) {
+        //     destroyFunc();
+        // }
 
-        for (const destroyFunc of this.pluginManager.postdestroyFunctions) {
-            destroyFunc();
-        }
+        // for (const destroyFunc of this.pluginManager.postdestroyFunctions) {
+        //     destroyFunc();
+        // }
+
+        // @TODO system manager destroy lifecycle
 
         this.pluginManager.clear();
 
