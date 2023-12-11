@@ -1,1 +1,2 @@
-export interface Manager {}
+export abstract class Manager {
+}

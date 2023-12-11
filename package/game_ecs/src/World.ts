@@ -4,6 +4,8 @@ import { EntityManager } from "./managers/EntityManager";
 import { Manager } from "./managers/Manager";
 // import { QueryManager } from "./QueryManager";
 
+export type ManagerBuilder<T extends Manager> = (ecsdb: ECSDB, world: World) => T;
+
 export class World /*implements Serializable, Subscribable*/ {
   private readonly ecsDB: ECSDB;
   public readonly entityManager: EntityManager;
@@ -28,7 +30,8 @@ export class World /*implements Serializable, Subscribable*/ {
     // @TODO merge into our ECSDB
   }
 
-  public addManager(manager: Manager) {
+  public addManager<T extends Manager>(managerBuilder: ManagerBuilder<T>) {
+    const manager = managerBuilder(this.ecsDB, this);
     this.managerMap.set(manager.constructor, manager);
   }
 
