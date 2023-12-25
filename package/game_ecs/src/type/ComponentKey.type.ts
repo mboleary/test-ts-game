@@ -1,1 +1,1 @@
-export type ComponentKeyType = Symbol | Function | string | null;
+export type ComponentKeyType = symbol | Function | string;

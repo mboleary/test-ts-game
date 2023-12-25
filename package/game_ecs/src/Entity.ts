@@ -11,11 +11,10 @@ export class Entity implements Eventable, Observable {
   protected readonly _observerManager: ObserverManager = new ObserverManager();
 
   constructor(
-    public readonly id: string,
     protected _ecsdb: ECSDB,
+    public readonly id: string,
+    public readonly children: Entity[]
   ) {
-    // Add self to ECSDB
-    this._ecsdb.entityDB.entityMap.set(id, this);
   }
 
   /**
@@ -76,26 +75,27 @@ export class Entity implements Eventable, Observable {
    * @TODO figure out how to not duplicate this
    * @param ecsdb 
    */
-  public overrideECSDB(ecsdb: ECSDB) {
-    if (this._ecsdb.canBeOverridden()) {
-      const override = this._ecsdb.canOnlyBeOverriddenBy()
-      if (override && override !== ecsdb) {
-        throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
-      }
-      mergeECSDB(this._ecsdb, ecsdb);
-      this._ecsdb = ecsdb;
-    } else {
-      throw new Error("Entity ECSDB is not overridable");
-    }
-  }
+  // public overrideECSDB(ecsdb: ECSDB) {
+  //   if (this._ecsdb.canBeOverridden()) {
+  //     const override = this._ecsdb.canOnlyBeOverriddenBy()
+  //     if (override && override !== ecsdb) {
+  //       throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
+  //     }
+  //     mergeECSDB(this._ecsdb, ecsdb);
+  //     this._ecsdb = ecsdb;
+  //   } else {
+  //     throw new Error("Entity ECSDB is not overridable");
+  //   }
+  // }
 
   get parent(): Entity | null {
-    return this._ecsdb.entityDB.getParentOfEntity(this);
+    // return this._ecsdb.entityDB.getParentOfEntity(this);
+    return this._ecsdb.getParentOfEntity(this);
   }
 
-  get children(): Entity[] {
-    return this._ecsdb.entityDB.getChildrenOfEntity(this);
-  }
+  // get children(): Entity[] {
+  //   return this._ecsdb.entityDB.getChildrenOfEntity(this);
+  // }
 
   public attachChild(entity: Entity) {
     this._ecsdb.entityDB.setParentOfEntity(this, entity);

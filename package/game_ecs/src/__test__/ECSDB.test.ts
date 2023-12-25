@@ -7,11 +7,9 @@ import { ECSDB } from "../db/ECSDB";
 import { EntityManager } from "../managers/EntityManager";
 
 let ecsdb: ECSDB;
-let em: EntityManager;
 
 function ecsSetup() {
-  ecsdb = new ECSDB();
-  em = new EntityManager(ecsdb);
+  ecsdb = new ECSDB();;
 }
 
 test.beforeEach(() => {
@@ -22,13 +20,15 @@ test("ECSDB was initialized", (t) => {
   if (ecsdb) t.pass();
 });
 
-test("EntityManager was initialized", (t) => {
-  if (em) t.pass();
-});
-
 test.serial("Can add Entity", (t) => {
-  em.createEntity({});
+  const entity = ecsdb.addEntity({});
 
-  // Entity was added to Entity Map
-  t.not(Array.from(ecsdb.entityDB.entityMap.keys()).length, 0);
+  // Entity was created
+  if (!entity) {
+    t.fail(`Entity was not returned`);
+  }
+
+  // Entity reference is the same
+  const getEntityResult = ecsdb.getEntity(entity.id);
+  t.not(getEntityResult, entity, 'Entity reference is not the same as returned entity');
 });
