@@ -7,9 +7,12 @@ import { Entity } from "../Entity";
 import { ECSDB } from "../db/ECSDB";
 import { Query } from "../query";
 import { Manager } from "./Manager";
+import { World } from "../World";
 
-export class QueryManager implements Manager {
-  constructor(protected readonly ecsDB: ECSDB) {}
+export class QueryManager extends Manager {
+  constructor(ecsDB: ECSDB, world: World) {
+    super(ecsDB, world);
+  }
 
   /**
    * Query the ECSDB based on components

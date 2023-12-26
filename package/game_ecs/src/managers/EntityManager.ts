@@ -2,6 +2,7 @@ import { Entity } from "../Entity";
 import { ECSDB } from "../db/ECSDB";
 import { v4 as uuidv4 } from "uuid";
 import { Manager } from "./Manager";
+import { World } from "../World";
 
 type RawEntityData = Partial<Omit<Entity, "id">>;
 type RawMultipleEntityData = RawEntityData & {
@@ -12,11 +13,14 @@ type RawMultipleEntityData = RawEntityData & {
 /**
  * Provides functions to access data in the ECS DB to the rest of the engine
  */
-export class EntityManager implements Manager {
-  constructor(private readonly ecsDB: ECSDB) {}
+export class EntityManager extends Manager {
+  constructor(ecsDB: ECSDB, world: World) {
+    super(ecsDB, world);
+  }
 
   public getAllEntities(): Entity[] {
-    return Array.from(this.ecsDB.entityDB.entityMap.values());
+    // return Array.from(this.ecsDB.entityDB.entityMap.values());
+    
   }
 
   public getEntityByID(uuid: string): Entity | null {

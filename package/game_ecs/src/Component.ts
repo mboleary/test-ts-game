@@ -1,7 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-import { Entity } from "./Entity";
-import { ECSDB } from "./db";
-import { mergeECSDB } from "./util/ecsdbOverrideHelper";
 import { ComponentKeyType } from "./type/ComponentKey.type";
 
 export type ComponentData = {
@@ -19,6 +15,5 @@ export class Component<T = ComponentData> {
   constructor(
     public readonly key: ComponentKeyType,
     public data: T,
-  ) {
-  }
+  ) {}
 }

@@ -23,12 +23,14 @@ export class World /*implements Serializable, Subscribable*/ {
   }
 
   public get root(): Entity | null {
-    return this.ecsDB.entityDB.getRootEntity();
+    // @TODO implement this when adding flags
+    return null;
+    // return this.ecsDB.
   }
 
-  public merge(world: World) {
-    // @TODO merge into our ECSDB
-  }
+  // public merge(world: World) {
+  //   // @TODO merge into our ECSDB
+  // }
 
   public addManager<T extends Manager>(managerBuilder: ManagerBuilder<T>) {
     const manager = managerBuilder(this.ecsDB, this);

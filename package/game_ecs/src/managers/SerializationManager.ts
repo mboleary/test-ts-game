@@ -1,9 +1,10 @@
 import { ECSDB } from "../db";
+import { World } from "../World";
 import { Manager } from "./Manager";
 
-export class SerializationManager implements Manager {
-  constructor(private readonly ecsdb: ECSDB) {
-
+export class SerializationManager extends Manager {
+  constructor(ecsdb: ECSDB, world: World) {
+    super(ecsdb, world);
   }
 
   public serialize() {

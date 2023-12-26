@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { ECSDB } from "./db/ECSDB";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable, Observable, Observer, ObserverManager } from "game_event";
-import { Component, ComponentType } from "./Component";
+import { Component } from "./Component";
 import { mergeECSDB } from "./util/ecsdbOverrideHelper";
 import { buildProxy } from "./util/buildProxy";
+import { ComponentKeyType } from "./type/ComponentKey.type";
 
 export class Entity implements Eventable, Observable {
   protected readonly _eventEmitter: GameEventTreeEmitter =
@@ -11,9 +12,9 @@ export class Entity implements Eventable, Observable {
   protected readonly _observerManager: ObserverManager = new ObserverManager();
 
   constructor(
-    protected _ecsdb: ECSDB,
+    protected ecsdb: ECSDB,
     public readonly id: string,
-    public readonly children: Entity[]
+    private readonly _children: Entity[]
   ) {
   }
 
@@ -90,86 +91,55 @@ export class Entity implements Eventable, Observable {
 
   get parent(): Entity | null {
     // return this._ecsdb.entityDB.getParentOfEntity(this);
-    return this._ecsdb.getParentOfEntity(this);
+    return this.ecsdb.getParentOfEntity(this.id);
   }
 
-  // get children(): Entity[] {
-  //   return this._ecsdb.entityDB.getChildrenOfEntity(this);
-  // }
+  get children(): Entity[] {
+    return this._children.slice();
+  }
 
   public attachChild(entity: Entity) {
-    this._ecsdb.entityDB.setParentOfEntity(this, entity);
+    this.ecsdb.attachChild(this.id, entity.id);
   }
 
   public detachChild(entity: Entity): boolean {
-    if (this._ecsdb.entityDB.entityHasChild(this.id, entity.id)) {
-      this._ecsdb.entityDB.detachParentFromEntity(entity.id);
-      return true;
-    }
-    return false;
+    return this.ecsdb.detachChild(this.id, entity.id);
   }
 
-  get components(): Component[] {
-    return this._ecsdb.componentDB.getComponentsForEntity(this.id);
+  get components(): ComponentKeyType[] {
+    return this.ecsdb.getComponentsOfEntity(this.id);
   }
 
   public attachComponent(comp: Component) {
-    this._ecsdb.componentDB.attachComponentToEntity(comp, this.id);
+    this.ecsdb.attachComponent(this.id, comp.key, comp.data);
   }
 
-  public setComponent<T>(componentType: ComponentType, componentData: T) {
-    this._ecsdb.componentDB.setComponentDataOnEntity(this.id, componentType, componentData);
+  public setComponent<T>(key: ComponentKeyType, componentData: T) {
+    this.ecsdb.setComponent(this.id, key, componentData);
   }
 
-  public detachComponent(comp: Component): boolean {
-    this._ecsdb.componentDB.destroyComponent(comp.id);
-    return true;
+  public detachComponent(comp: ComponentKeyType): boolean {
+    return this.ecsdb.detachComponent(this.id, comp);
   }
 
-  public detachComponentByType(componentType: ComponentType): boolean {
-    const comp = this._ecsdb.componentDB.getComponentForEntityByType(this.id, componentType);
-    if (!comp) return false;
-    this._ecsdb.componentDB.destroyComponent(comp.id);
-    return true;
-  }
-
-  public getComponent<T>(type: ComponentType): T | null {
-    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
+  public getComponent<T>(type: ComponentKeyType): T | null {
+    const comp = this.ecsdb.getComponentFromEntity<T>(this.id, type);
     if (comp) {
-      if (typeof comp.data === 'object') {
-        return buildProxy<any>(comp.data, this._observerManager, type);
+      if (typeof comp === 'object') {
+        return buildProxy<any>(comp, this._observerManager, type);
       } else {
-        return comp.data;
+        return comp;
       }
     } else {
       return null;
     }
   }
 
-  public getComponentWithoutProxy<T>(type: ComponentType): T | null {
-    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
-    return comp?.data || null;
-  }
-
-  public getComponentObject<T>(type: ComponentType): Component<T> | null {
-    const comp = this._ecsdb.componentDB.getComponentForEntityByType<T>(this.id, type);
-    return comp || null;
+  public getComponentWithoutProxy<T>(type: ComponentKeyType): T | null {
+    return this.ecsdb.getComponentFromEntity<T>(this.id, type);
   }
 
   public setParent(entity: Entity) {
-    this._ecsdb.entityDB.setParentOfEntity(entity, this);
-  }
-
-  static build(items: (Entity | Component<any>)[] = []): Entity {
-    // @TODO once we figure out the ecsdb stuff, change this
-    const entity = new Entity(uuidv4(), new ECSDB(true));
-    for (const i of items) {
-      if (i instanceof Component) {
-        entity.attachComponent(i);
-      } else {
-        entity.attachChild(i);
-      }
-    }
-    return entity;
+    this.ecsdb.attachChild(entity.id, this.id);
   }
 }

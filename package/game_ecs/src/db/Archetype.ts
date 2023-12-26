@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Component } from "../Component";
 import { Entity } from "../Entity";
 import { ComponentKeyType } from "../type/ComponentKey.type";
+import { GetAllEntitiesOptions } from "../type/GetAllEntitiesOptions.type";
 import { ECSDB } from "./ECSDB";
 
 export type AddEntityParameters = {
@@ -459,6 +460,53 @@ export class Archetype {
     if (this.typeIndex.has(key)) return;
 
     this.allocComponentType(key);
+  }
+
+  public getEntityChildrenArray(uuid: string): Entity[] {
+    const index = this.getIndexOrThrow(uuid);
+
+    return this.children[index];
+  }
+
+  public getEntityComponentArray(uuid: string): ComponentKeyType[] {
+    const index = this.getIndexOrThrow(uuid);
+    const toRet = [];
+
+    for (const key of this.typeIndex.keys()) {
+      const compIndex = this.typeIndex.get(key);
+
+      if (!compIndex) {
+        continue;
+      }
+
+      if (this.components[compIndex][index] !== null) {
+        toRet.push(key);
+      }
+    }
+
+    return toRet;
+  }
+
+  public getAllEntityUuids({
+    deletedEquals,
+    mountedEquals,
+    activeEquals
+  }: GetAllEntitiesOptions = {}): Entity[] {
+    const toRet = [];
+    for (let i = 0; i < this.matrixLength; i++) {
+      if (this.temp[i]) continue;
+      if (deletedEquals !== undefined && deletedEquals !== this.deleted[i]) {
+        continue;
+      }
+      if (mountedEquals !== undefined && mountedEquals !== this.mounted[i]) {
+        continue;
+      }
+      if (activeEquals !== undefined && activeEquals !== this.active[i]) {
+        continue;
+      }
+      toRet.push(this.ref[i]);
+    }
+    return toRet;
   }
   /**
    * Splits the Archetype into several smaller Archetypes

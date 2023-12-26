@@ -5,6 +5,7 @@
 import { Component } from "../Component";
 import { Entity } from "../Entity";
 import { ComponentKeyType } from "../type/ComponentKey.type";
+import { GetAllEntitiesOptions } from "../type/GetAllEntitiesOptions.type";
 import { AddEntityParameters, Archetype } from "./Archetype";
 
 export class ECSDB {
@@ -65,8 +66,11 @@ export class ECSDB {
 
       archetype = this.archetypes[maxIndex];
     }
+    const entity = archetype.addEntity({uuid, ref, active, temp, mounted, parent, children});
 
-    return archetype.addEntity({uuid, ref, active, temp, mounted, parent, children});
+    this.entityArchetypeMap.set(entity.id, archetype);
+
+    return entity;
   }
 
   public destroyEntity(uuid: string): boolean {
@@ -77,6 +81,8 @@ export class ECSDB {
     }
 
     archetype.removeEntity(uuid);
+
+    this.entityArchetypeMap.delete(uuid);
 
     return true;
   }
@@ -105,7 +111,10 @@ export class ECSDB {
   // public getChildrenOfEntity(uuid: string): (Entity | null)[] {}
 
   // Might not be necessary
-  // public getComponentsOfEntity(uuid: string): ComponentKeyType[] {}
+  public getComponentsOfEntity(uuid: string): ComponentKeyType[] {
+    const archetype = this.getArchetypeForEntityUuid(uuid);
+    return archetype.getEntityComponentArray(uuid);
+  }
 
   public attachChild(targetUuid: string, childUuid: string) {
     const targetArchetype = this.getArchetypeForEntityUuid(targetUuid);
@@ -182,8 +191,29 @@ export class ECSDB {
     return false;
   }
 
+  public setComponent<T>(targetUuid: string, key: ComponentKeyType, data: T) {
+    const archetype = this.getArchetypeForEntityUuid(targetUuid);
+    archetype.setEntityComponent(targetUuid, key, data);
+  }
+
   public getComponentFromEntity<T>(targetUuid: string, key: ComponentKeyType): T | null {
     const archetype = this.getArchetypeForEntityUuid(targetUuid);
     return archetype.getEntityComponent(targetUuid, key);
+  }
+
+  // public getAllEntityUuids({
+  //   includeDeleted = false,
+  //   includeMounted = true,
+  //   includeActive = true
+  // }: GetAllEntitiesOptions = {}): Entity[] {
+  //   const toRet = [];
+
+  //   for (const archetype of this.archetypes) {
+
+  //   }
+  // }
+
+  public getArchetypes(): Archetype[] {
+    return this.archetypes;
   }
 }
