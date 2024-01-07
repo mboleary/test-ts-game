@@ -26,7 +26,7 @@ test("Archetype was initialized", (t) => {
   if (archetype) t.pass();
 });
 
-test.serial("Can add Entity", (t) => {
+test.serial("archetype.addEntity: Can add new entity", (t) => {
   const entity = archetype.addEntity({});
 
   if (!entity) t.fail('Entity not returned after creation');
@@ -34,4 +34,30 @@ test.serial("Can add Entity", (t) => {
   const archetypeGet = archetype.getEntity(entity.id);
 
   if (!archetypeGet) t.fail('Archetype could not get Entity')
+
+  t.pass();
 });
+
+// archetype..getEntityParent
+
+// archetype.removeEntity
+
+// archetype.removeEntity
+
+// archetype.getEntity
+
+// archetype.setEntityActive
+
+// archetype.setEntityTemp
+
+// archetype.setEntityMounted
+
+// archetype.setEntityComponent
+
+// archetype.getEntityComponent
+
+// archetype.entityHasComponent
+
+// archetype.getComponentKeys
+
+

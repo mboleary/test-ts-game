@@ -78,7 +78,7 @@ export class Archetype {
     if (components) {
       for (const comp of components) {
         const idx = this.typeIndex.get(comp.key);
-        if (!idx) {
+        if (idx === undefined) {
           console.warn(`No component type index available for type ${String(comp.key)} on entity uuid ${uuid}. Skipping...`);
           continue;
         }
@@ -125,7 +125,7 @@ export class Archetype {
     if (components) {
       for (const comp of components) {
         const idx = this.typeIndex.get(comp.key);
-        if (!idx) {
+        if (idx === undefined) {
           console.warn(`No component type index available for type ${String(comp.key)} on entity uuid ${uuid}. Skipping...`);
           continue;
         }
@@ -291,6 +291,7 @@ export class Archetype {
 
     // Allocate an index for the component type
     this.typeIndex.set(key, index);
+    console.log("allocComponent:", key, index, this.components, this.matrixLength);
 
     // Register data type for the component
     // @TODO later
@@ -299,7 +300,7 @@ export class Archetype {
   private getIndexOrThrow(uuid: string): number {
     const index = this.uuidMap.get(uuid);
 
-    if (index) {
+    if (index !== undefined) {
       return index;
     }
     throw new Error(`Entity ${uuid} does not exist in this Archetype`);
@@ -372,7 +373,7 @@ export class Archetype {
   public getEntity(uuid: string): Entity | null {
     const index = this.uuidMap.get(uuid);
 
-    if (!index) {
+    if (index === undefined) {
       return null;
     }
 
@@ -433,7 +434,7 @@ export class Archetype {
 
     const compIndex = this.typeIndex.get(componentKey);
 
-    if (!compIndex) {
+    if (compIndex === undefined) {
       return null;
     }
 
@@ -445,7 +446,7 @@ export class Archetype {
 
     const compIndex = this.typeIndex.get(key);
 
-    if (!compIndex) {
+    if (compIndex === undefined) {
       return false;
     }
 
@@ -475,7 +476,7 @@ export class Archetype {
     for (const key of this.typeIndex.keys()) {
       const compIndex = this.typeIndex.get(key);
 
-      if (!compIndex) {
+      if (compIndex === undefined) {
         continue;
       }
 
@@ -487,10 +488,10 @@ export class Archetype {
     return toRet;
   }
 
-  public getAllEntityUuids({
+  public getAllEntities({
     deletedEquals,
     mountedEquals,
-    activeEquals
+    activeEquals,
   }: GetAllEntitiesOptions = {}): Entity[] {
     const toRet = [];
     for (let i = 0; i < this.matrixLength; i++) {

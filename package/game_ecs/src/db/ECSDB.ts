@@ -18,11 +18,37 @@ export class ECSDB {
     this.archetypes.push(new Archetype(this));
   }
 
-  private checkTypes(components: Component[], types: ComponentKeyType[]): number {
-    let toRet = 0;
+  private getComponentKeys(components: Component[]): ComponentKeyType[] {
+    const map = new Map<ComponentKeyType, boolean>();
 
     for (const comp of components) {
-      if (types.includes(comp.key)) {
+      if (map.has(comp.key)) {
+        continue;
+      }
+      map.set(comp.key, true);
+    }
+
+    return Array.from(map.keys());
+  }
+
+  private getMissingTypes(typesInArchetype: ComponentKeyType[], typesInComponents: ComponentKeyType[]): ComponentKeyType[] {
+    const toRet = [];
+
+    for (const type of typesInComponents) {
+      if (typesInArchetype.includes(type)) {
+        continue;
+      }
+      toRet.push(type);
+    }
+
+    return toRet;
+  }
+
+  private checkTypes(keysPresentInComponents: ComponentKeyType[], types: ComponentKeyType[]): number {
+    let toRet = 0;
+
+    for (const key of keysPresentInComponents) {
+      if (types.includes(key)) {
         toRet += 1;
       }
     }
@@ -30,7 +56,7 @@ export class ECSDB {
     return toRet;
   }
 
-  private getArchetypeForEntityUuid(uuid: string): Archetype {
+  public getArchetypeForEntityUuid(uuid: string): Archetype {
     if (!this.entityArchetypeMap.has(uuid)) {
       throw new Error(`No Archetype for Entity ${uuid}`);
     }
@@ -48,25 +74,38 @@ export class ECSDB {
     components
   }: AddEntityParameters = {}): Entity {
     let archetype = this.archetypes[0];
-    if (components) {
+    if (components && components.length) {
       // check types, find an archetype that can support it, or modify a smaller archetype to accomodate it
-      const scores = [];
-      for (const archetype of this.archetypes) {
-        const types = archetype.getComponentKeys();
-        
-        scores.push(this.checkTypes(components, types));
-      }
+      const keysPresentInComponents = this.getComponentKeys(components);
 
-      let max = -1, maxIndex = 0;
-      for (let i = 0; i < scores.length; i++) {
-        if (scores[i] > max) {
+      let max = -1, maxIndex = 0, maxTypes: ComponentKeyType[] = [];
+
+      for (let i = 0; i < this.archetypes.length; i++) {
+        const archetype = this.archetypes[i]
+        const types = archetype.getComponentKeys();
+        const score = this.checkTypes(keysPresentInComponents, types);
+        if (score > max) {
+          console.log("score:", score, max);
           maxIndex = i;
+          max = score;
+          maxTypes = types;
+          if (max === keysPresentInComponents.length) {
+            break;
+          }
         }
       }
 
       archetype = this.archetypes[maxIndex];
+
+      // Add any necessary component key types
+      if (keysPresentInComponents.length > maxTypes.length) {
+        const missing = this.getMissingTypes(maxTypes, keysPresentInComponents);
+        console.log({missing, maxTypes, keysPresentInComponents});
+        missing.forEach(type => archetype.registerComponentKey(type));
+      }
     }
-    const entity = archetype.addEntity({uuid, ref, active, temp, mounted, parent, children});
+
+    const entity = archetype.addEntity({uuid, ref, active, temp, mounted, parent, children, components});
 
     this.entityArchetypeMap.set(entity.id, archetype);
 

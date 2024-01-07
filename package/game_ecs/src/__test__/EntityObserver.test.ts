@@ -3,23 +3,26 @@
  */
 
 import test from "ava";
+import { v4 as uuidv4 } from "uuid";
 import { Component } from "../Component";
+import { ECSDB } from "../db";
 import { Entity } from "../Entity";
-import { EntityManager } from "../managers";
 import { Scene } from "../Scene";
 
 const KEY = Symbol.for("key");
 const COMP1 = {test:true};
 
+let ecsdb: ECSDB;
 let scene: Scene;
 let entity: Entity;
 let component: Component;
 
 function ecsSetup() {
-  scene = Scene.build();
+  ecsdb = new ECSDB();
+  scene = new Scene(uuidv4(), ecsdb);
   const em = scene.world.entityManager;
   if (!em) return;
-  component = Component.build(KEY, COMP1);
+  component = new Component(KEY, COMP1);
   entity = em?.createEntity({components: [component]});
 }
 
@@ -36,9 +39,11 @@ test("Scene is built", (t) => {
 });
 
 test("can get component", (t) => {
+  console.log("Entity:", entity.components);
   const result = entity.getComponent<typeof COMP1>(KEY);
+  console.log({result})
   if (result) t.pass();
-  else t.fail();
+  else t.fail("No component returned");
 });
 
 test("can observe a property", (t) => {

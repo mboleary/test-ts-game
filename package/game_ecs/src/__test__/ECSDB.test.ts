@@ -30,5 +30,10 @@ test.serial("Can add Entity", (t) => {
 
   // Entity reference is the same
   const getEntityResult = ecsdb.getEntity(entity.id);
-  t.not(getEntityResult, entity, 'Entity reference is not the same as returned entity');
+
+  if (getEntityResult !== entity) {
+    t.fail('Entity reference is not the same as returned entity');
+  }
+
+  t.pass();
 });

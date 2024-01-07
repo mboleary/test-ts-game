@@ -142,4 +142,12 @@ export class Entity implements Eventable, Observable {
   public setParent(entity: Entity) {
     this.ecsdb.attachChild(entity.id, this.id);
   }
+
+  // /**
+  //  * Clone this entity 
+  //  * @returns 
+  //  */
+  // public clone(): Entity {
+  //   return this;
+  // }
 }

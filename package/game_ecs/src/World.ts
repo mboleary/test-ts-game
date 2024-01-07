@@ -12,12 +12,12 @@ export class World /*implements Serializable, Subscribable*/ {
   // public readonly queryManager: QueryManager;
   private readonly managerMap: Map<Function, Manager> = new Map();
 
-  constructor(ecsdb?: ECSDB, managers?: Manager[]) {
+  constructor(ecsdb?: ECSDB, managers?: ManagerBuilder<any>[]) {
     this.ecsDB = ecsdb || new ECSDB();
-    this.entityManager = new EntityManager(this.ecsDB);
+    this.entityManager = new EntityManager(this.ecsDB, this);
     if (managers) {
       for (const man of managers) {
-        this.managerMap.set(man.constructor, man);
+        this.managerMap.set(man.constructor, this.buildManager(man));
       }
     }
   }
@@ -32,8 +32,12 @@ export class World /*implements Serializable, Subscribable*/ {
   //   // @TODO merge into our ECSDB
   // }
 
+  private buildManager<T extends Manager>(managerBuilder: ManagerBuilder<T>): Manager {
+    return managerBuilder(this.ecsDB, this);
+  }
+
   public addManager<T extends Manager>(managerBuilder: ManagerBuilder<T>) {
-    const manager = managerBuilder(this.ecsDB, this);
+    const manager = this.buildManager(managerBuilder);
     this.managerMap.set(manager.constructor, manager);
   }
 
