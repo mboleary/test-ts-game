@@ -8,6 +8,8 @@ import { ECSDB } from "../db/ECSDB";
 import { Query } from "../query";
 import { Manager } from "./Manager";
 import { World } from "../World";
+import { ComponentKeyType } from "../type/ComponentKey.type";
+import { Archetype } from "../db/Archetype";
 
 export class QueryManager extends Manager {
   constructor(ecsDB: ECSDB, world: World) {
@@ -21,7 +23,7 @@ export class QueryManager extends Manager {
    */
   public query(query: Query): Entity[] {
 
-    const entities = this.getEntities(query.requiredTerms, query.optionalTerms);
+    const entities = this.getEntities(query.terms);
 
     // @TODO when conditions are implemented in Querying, revisit this to correctly handle that
 
@@ -37,9 +39,28 @@ export class QueryManager extends Manager {
 
   }
 
-  private getEntities(requiredComponents: Symbol[], optionalComponents: Symbol[]): Entity[] {
+  private getEntities(terms: ComponentKeyType[]): Entity[] {
     // @TODO implement once components are properly implemented
-    return [];
+    // return [];
+    const archetypes = this.ecsdb.getArchetypes();
+    const matchedArchetypes: Archetype[] = [];
+    for (const archetype of archetypes) {
+      const types = archetype.getComponentKeys();
+      if (this.compareTypes(terms, types)) {
+        matchedArchetypes.push(archetype);
+      }
+    }
+
+    // @TODO make this more efficient
+    for (const archetype of matchedArchetypes) {
+      for (let i = 0; i < archetype.)
+    }
+  }
+
+  private compareTypes(typeA: ComponentKeyType[], typeB: ComponentKeyType[]): boolean {
+    const map = new Map();
+    typeA.map(type => map.set(type, true));
+    return typeB.every(type => map.get(type) === true);
   }
 
   // /**

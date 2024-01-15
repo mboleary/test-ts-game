@@ -16,7 +16,11 @@ export type AddEntityParameters = {
   components?: Component[];
 }
 
-const SLOT_INC = 5;
+export type ForEachCallback = (ref: Entity, index: number) => Entity[];
+
+
+
+const SLOT_INC = 8;
 
 export class Archetype {
   constructor(
@@ -492,23 +496,34 @@ export class Archetype {
     deletedEquals,
     mountedEquals,
     activeEquals,
+    hasComponents,
   }: GetAllEntitiesOptions = {}): Entity[] {
     const toRet = [];
-    for (let i = 0; i < this.matrixLength; i++) {
-      if (this.temp[i]) continue;
-      if (deletedEquals !== undefined && deletedEquals !== this.deleted[i]) {
-        continue;
+    // for (let i = 0; i < this.matrixLength; i++) {
+    //   if (this.temp[i]) continue;
+    //   if (deletedEquals !== undefined && deletedEquals !== this.deleted[i]) {
+    //     continue;
+    //   }
+    //   if (mountedEquals !== undefined && mountedEquals !== this.mounted[i]) {
+    //     continue;
+    //   }
+    //   if (activeEquals !== undefined && activeEquals !== this.active[i]) {
+    //     continue;
+    //   }
+    //   toRet.push(this.ref[i]);
+    // }
+    if (hasComponents) {
+      let indicies = hasComponents.map((val) => this.typeIndex.get(val)).filter(val => val !== undefined).sort() as number[];
+
+      for (const i of indicies) {
+        const compArr = this.components[i];
+
+        
       }
-      if (mountedEquals !== undefined && mountedEquals !== this.mounted[i]) {
-        continue;
-      }
-      if (activeEquals !== undefined && activeEquals !== this.active[i]) {
-        continue;
-      }
-      toRet.push(this.ref[i]);
     }
     return toRet;
   }
+
   /**
    * Splits the Archetype into several smaller Archetypes
    */

@@ -26,3 +26,27 @@ Taking the ideas that came from reading about other implementations, we're going
 - remove Entity.build, as we want to avoid the overriding logic to reduce complexity
     - should be replaced by the use of the entity manager's `createEntity` (name may change or be shortened) method
 - managers should be able to watch for adding and removing entities, as well as watch components on an entity through the use of observers
+
+## 2023-12-25 Notes
+- should probably implement internal filter system for archetype arrays
+    - need way for managers to filter through the entities quickly
+        - iterate through the arrays
+    - Query manager for example will need to see what components each entity has on it
+    - EntityManager will need a way to get all entities with ways to filter by `mounted`, `deleted`, and `active`
+    - likely some kind of filter function that takes in the results of the arrays and spits out a boolean value to represent whether the entity meets the criteria or not
+- need methods to set `mounted` and `active` flags, as well as clear out the temp entries
+- NEED TO TEST EVERYTHING!
+
+## 2024-01-06 Notes
+- Is this overcomplicated?
+- Implement systems
+- implement observers on world so that creation and removal of Entities can be observed
+- have a way to track mounted scene, handle switching scenes and setting the relevant flags
+
+## 2024-01-10 Notes
+### Query
+
+```js
+const q = new Query([ComponentKey1, ComponentKey2, ...]);
+const q1 = new Query(Query.or([Query.and([CK1, CK2]), Query.and([CK2, CK3])]));
+```
