@@ -1,0 +1,44 @@
+{
+  "name": "music_engine",
+  "version": "1.0.0",
+  "description": "A standalone dynamic music engine",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "npm run compile",
+    "clean": "rm ./dist ./build",
+    "compile": "tsc",
+    "postcompile": "npm run rollup",
+    "fix": "gts fix",
+    "lint": "gts lint",
+    "posttest": "npm run lint",
+    "prepare": "npm run compile",
+    "rollup": "rollup -c ./rollup.config.mjs",
+    "serve": "http-server -p 8080 -a 127.0.0.1 ./public",
+    "pretest": "npm run compile",
+    "test": "ava",
+    "prewatch": "http-server -p 8080 -a 127.0.0.1 ./public &",
+    "watch": "nodemon --config nodemon.json",
+    "postwatch": "pkill -f http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@ava/typescript": "^4.1.0",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
+    "ava": "^5.3.1",
+    "eslint-config-prettier": "^8.9.0",
+    "gts": "^5.0.0",
+    "http-server": "^14.1.1",
+    "nodemon": "^3.0.1",
+    "prettier": "3.0.0",
+    "rollup": "^3.28.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
