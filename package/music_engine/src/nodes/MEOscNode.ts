@@ -23,9 +23,12 @@ export class MusicEngineOscillatorNode extends MusicEngineNode implements MidiRe
     arr.push(node)
     this.oscNodes.set(note, arr);
     node.addEventListener('ended', (e) => {
-      node.disconnect();
+      console.log(`node ended ${e.target}`);
+      const t = e.target as OscillatorNode;
+      t.stop();
+      t.disconnect();
       // remove node
-      const idx = arr.indexOf(node);
+      const idx = arr.indexOf(t);
       if (idx >= 0) {
         arr.splice(idx, 1);
       }
@@ -36,20 +39,29 @@ export class MusicEngineOscillatorNode extends MusicEngineNode implements MidiRe
   private getNodeInstance(note: number): OscillatorNode | null {
     const arr = this.oscNodes.get(note);
     if (!arr || arr.length === 0) return null;
+    console.log("arr:", arr);
     return arr[0];
   }
 
   private noteOn(time: number, note: number): void {
+    console.log("note on", time, note);
     const node = this.addNodeInstance(note);
-    node.frequency.value = noteToFrequencyEqualTemperment(note);
+    const freq = noteToFrequencyEqualTemperment(note);
+    console.log("freq:", freq);
+    node.frequency.value = freq;
     // @TODO implement port interface for storing node connection
     node.connect(this.context.destination);
     node.start(time);
   }
 
   private noteOff(time: number, note: number): void {
+    console.log("note off", time, note);
     const node = this.getNodeInstance(note);
-    node?.stop(time);
+    if (node) {
+      node.stop(time);
+    } else {
+      console.log("no node");
+    }
   }
 
   public receive(message: MusicEngineMidiMessage): void {

@@ -10,24 +10,36 @@ let interval: NodeJS.Timer;
 function test() {
   const ac = new AudioContext();
   const node = new MusicEngineOscillatorNode(ac, 'sine', []);
-  const gen = repeatingPulse(beatToTime(120, 1), ac.currentTime);
-  const AHEAD = 100;
+  const gen = repeatingPulse(beatToTime(120, 1.5), ac.currentTime);
+  const AHEAD = 1;
+  const POLL = 250;
+  const NOTE_ARR = [69, 71, 73, 74, 76, 74, 73, 71];
+  let notePos = 0;
+  let currTimePos = 0;
   interval = setInterval(() => {
-    const n = gen.next().value;
-    console.log("gen:", n);
-    if (n) {
-      node.receive({
-        type: MusicEngineMidiMessageType.NOTE_ON,
-        key: 69,
-        time: n
-      });
-      node.receive({
-        type: MusicEngineMidiMessageType.NOTE_OFF,
-        key: 69,
-        time: n + 1
-      });
+    while (currTimePos < ac.currentTime + AHEAD) {
+      let n = gen.next().value;
+      console.log("gen:", n);
+      const note = NOTE_ARR[notePos];
+      notePos = (notePos + 1) % NOTE_ARR.length;
+      if (n) {
+        currTimePos = n;
+        node.receive({
+          type: MusicEngineMidiMessageType.NOTE_ON,
+          key: note,
+          time: n
+        });
+        node.receive({
+          type: MusicEngineMidiMessageType.NOTE_OFF,
+          key: note,
+          time: n + beatToTime(120, 0.25)
+        });
+      } else {
+        gen.return();
+        break;
+      }
     }
-  }, AHEAD);
+  }, POLL);
 }
 
 function testStop() {
