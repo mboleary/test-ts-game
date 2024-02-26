@@ -19,9 +19,9 @@ function test() {
 
   const DURATION = 0.5;
   // Testing one of the AudioParam functions, @TODO doesn't seem to currently work
-  node.detune.linearRampToValueAtTime(
-    1000,
-    ac.currentTime + beatToTime(120, DURATION) + 1);
+  // node.detune.linearRampToValueAtTime(
+  //   1000,
+  //   ac.currentTime + beatToTime(120, DURATION) + 1);
   // repeating pulse, like a metronome
   const gen = repeatingPulse(beatToTime(120, DURATION), ac.currentTime);
   const AHEAD = 1;

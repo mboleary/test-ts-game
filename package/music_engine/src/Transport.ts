@@ -3,19 +3,31 @@
  */
 
 export class Transport {
-  constructor() {}
+  constructor(
+    context: AudioContext,
+    bpm: number = 120,
+    timeSignatureNumerator: number = 4,
+    timeSignatureDenominator: number = 4,
+  ) {
+    this.currentBpm = bpm;
+    this.currentTimeSigNumerator = timeSignatureNumerator;
+    this.currentTimeSigDenominator = timeSignatureDenominator;
+  }
 
   // Current beat info
-  private currentBpm: number = 120;
-  private currentTimeSigNumerator: number = 4;
-  private currentTimeSigDenominator: number = 4;
+  private currentBpm: number;
+  private currentTimeSigNumerator: number;
+  private currentTimeSigDenominator: number;
 
+  // Tracking when playback was stopped and started
   private lastPlayStartTime: number = 0;
   private lastStopTime: number = 0;
-
   private timeOffset: number = 0;
 
-  public play() {}
+  public play(time?: number) {
+    
+  }
+
   public stop() {}
   public set(){}
   public reset() {}
