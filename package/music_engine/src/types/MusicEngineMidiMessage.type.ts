@@ -20,3 +20,7 @@ export interface MidiNoteOnMessage extends MusicEngineMidiMessage {
 export type MidiReceiver = {
   receive(message: MusicEngineMidiMessage): void;
 }
+
+export type MidiTransmitter = {
+  transmit(): MusicEngineMidiMessage;
+}

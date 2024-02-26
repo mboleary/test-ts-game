@@ -1,5 +1,7 @@
-import { MusicEngineOscillatorNode } from "./nodes/MEOscNode";
+import { MusicEngineOscillatorNode } from "./nodes/MusicEngineOscillatorNode";
+import { AudioPort } from "./ports/AudioPort";
 import { MusicEngineMidiMessageType } from "./types/MusicEngineMidiMessage.type";
+import { PortDirection } from "./types/PortDirection.enum";
 import { repeatingPulse } from "./util/beatGenerator";
 import { beatToTime, timeSigToBeat } from "./util/beatToTime";
 import { scheduleNote } from "./util/midiPlaybackScheduler";
@@ -9,8 +11,19 @@ let interval: NodeJS.Timer;
 
 function test() {
   const ac = new AudioContext();
-  const node = new MusicEngineOscillatorNode(ac, 'sine', []);
-  const gen = repeatingPulse(beatToTime(120, 1.5), ac.currentTime);
+  const node = new MusicEngineOscillatorNode(ac);
+  // Destination, wrapped in a port
+  const apDest = new AudioPort('dest', PortDirection.IN);
+  apDest.registerAudioNode(ac.destination);
+  node.audioOut.connect(apDest);
+
+  const DURATION = 0.5;
+  // Testing one of the AudioParam functions, @TODO doesn't seem to currently work
+  node.detune.linearRampToValueAtTime(
+    1000,
+    ac.currentTime + beatToTime(120, DURATION) + 1);
+  // repeating pulse, like a metronome
+  const gen = repeatingPulse(beatToTime(120, DURATION), ac.currentTime);
   const AHEAD = 1;
   const POLL = 250;
   const NOTE_ARR = [69, 71, 73, 74, 76, 74, 73, 71];
@@ -19,7 +32,6 @@ function test() {
   interval = setInterval(() => {
     while (currTimePos < ac.currentTime + AHEAD) {
       let n = gen.next().value;
-      console.log("gen:", n);
       const note = NOTE_ARR[notePos];
       notePos = (notePos + 1) % NOTE_ARR.length;
       if (n) {
@@ -32,7 +44,7 @@ function test() {
         node.receive({
           type: MusicEngineMidiMessageType.NOTE_OFF,
           key: note,
-          time: n + beatToTime(120, 0.25)
+          time: n + beatToTime(120, DURATION)
         });
       } else {
         gen.return();
@@ -40,6 +52,7 @@ function test() {
       }
     }
   }, POLL);
+  return node;
 }
 
 function testStop() {

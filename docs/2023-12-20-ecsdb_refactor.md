@@ -50,3 +50,12 @@ Taking the ideas that came from reading about other implementations, we're going
 const q = new Query([ComponentKey1, ComponentKey2, ...]);
 const q1 = new Query(Query.or([Query.and([CK1, CK2]), Query.and([CK2, CK3])]));
 ```
+
+## 2024-02-24
+
+I think the current implementation is overcomplicated by the strategy of hiding the Archetypes from everything else. By making that more public, it would remove the need for managers in their current form, and probably make having concurrent worlds easier.
+
+- should shift Archetype implementation to make it more public
+- archetypes should contain the ECSDB information
+- maybe the concept of the "ECSDB" should be shifted to be a parent Archetype with no types
+- managers should be transitioned to be more generic classes that don't need to be specialized to the ecsdb internals implementation
