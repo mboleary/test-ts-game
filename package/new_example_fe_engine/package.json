@@ -1,0 +1,49 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "This package may be split out into several packages depending on how the IoC containers are written",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "postcompile": "npm run rollup",
+    "build": "npm run compile",
+    "rollup": "rollup -c ./rollup.config.mjs",
+    "fix": "gts fix",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint",
+    "prestart": "npm run compile",
+    "start": "npm run serve",
+    "serve": "http-server -p 8080 -a 127.0.0.1 ./public",
+    "prewatch": "http-server -p 8080 -a 127.0.0.1 ./public &",
+    "watch": "nodemon --config nodemon.json",
+    "postwatch": "pkill -f http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@ava/typescript": "^4.1.0",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
+    "ava": "^5.3.1",
+    "eslint-config-prettier": "^8.9.0",
+    "gts": "^5.0.0",
+    "http-server": "^14.1.1",
+    "nodemon": "^3.0.1",
+    "prettier": "3.0.0",
+    "rollup": "^3.28.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.0",
+    "winston": "^3.11.0",
+    "winston-transport-browserconsole": "^1.0.5"
+  }
+}
