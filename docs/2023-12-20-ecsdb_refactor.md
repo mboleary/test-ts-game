@@ -19,6 +19,13 @@ Taking the ideas that came from reading about other implementations, we're going
         - parent ref - ref to the parent Entity
         - children refs - array of refs to the child Entities
         - components array
+    - also has mapping of uuid to index for fast lookup
+    - functions:
+        - add entity (temp, ...data)
+        - remove entity
+        - set entity active
+        - set entity mounted
+        - set entity 
 - remove component object class
 - implement type checking for component type (same component object type for each component type)
 - improve the Entity class to make it more efficient, also require world reference so that the logic around overriding an ecsdb can be removed
