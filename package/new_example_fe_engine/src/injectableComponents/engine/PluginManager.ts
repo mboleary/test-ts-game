@@ -96,4 +96,6 @@ export class PluginManager {
                 (lc) => (lc.plugin as Plugin & {destroy: Function}).destroy.bind(lc.plugin)
             );
     }
+
+    // @TODO lockPlugins
 }

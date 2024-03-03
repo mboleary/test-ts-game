@@ -4,8 +4,13 @@
     "rootDir": "src",
     "outDir": "build",
     "lib": [
-      "dom"
-    ]
+      "es6",
+      "DOM"
+    ],
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["reflect-metadata"]
   },
   "include": ["src/**/*.ts"],
   "esModuleInterop": true,

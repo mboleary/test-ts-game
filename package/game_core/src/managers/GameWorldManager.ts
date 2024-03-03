@@ -1,5 +1,7 @@
 import { World, Scene } from "game_ecs";
+import { injectable } from "inversify";
 
+@injectable()
 export class GameWorldManager {
     private _world: World | null = null;
 

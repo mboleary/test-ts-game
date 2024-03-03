@@ -1,11 +1,13 @@
 import { EnginePluginManager, EngineHotloopManager as CoreEngineHotloopManager } from "game_core";
 import { TARGET_MILLIS_PER_FRAME } from "game_core";
 import { GameTimeManager } from "game_core";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class EngineHotloopManager extends CoreEngineHotloopManager {
     constructor(
-        time: GameTimeManager,
-        pluginManager: EnginePluginManager
+        @inject(GameTimeManager) time: GameTimeManager,
+        @inject(EnginePluginManager) pluginManager: EnginePluginManager
     ) {
         super(time, pluginManager)
     }
@@ -24,7 +26,7 @@ export class EngineHotloopManager extends CoreEngineHotloopManager {
     public startLoop(): void {
         if (!this._loopRunning) {
             this._loopRunning = true;
-            this.loopFunctions = ([] as Function[]).concat(this.pluginManager.preloopFunctions, this.pluginManager.loopFunctions, this.pluginManager.postloopFunctions);
+            this.loopFunctions = this.pluginManager.loopFunctions;
             if (this.time.paused) {
                 this.time.unpauseTime();
             } else {

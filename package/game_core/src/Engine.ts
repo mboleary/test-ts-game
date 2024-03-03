@@ -1,47 +1,53 @@
 import { Scene, World } from "game_ecs";
-import { EngineHotloopManager, GameTimeManager, GameWorldManager } from "./managers";
+import { GameTimeManager, GameWorldManager } from "./managers";
 import { EnginePluginManager } from "./plugin";
-import { Plugin } from "./plugin/Plugin";
+import { BuiltPlugin } from "./plugin/Plugin";
 import { EngineSystemManager } from "./system/EngineSystemManager";
+import { Container } from "inversify";
+import { Time } from "./time";
+import { EngineLifecycleManager } from "./managers/EngineLifecycleManager";
 
 export class Engine {
 
-    protected readonly timeManager = new GameTimeManager();
-    // protected readonly hotloopManager = new EngineHotloopManager(this.timeManager, this.pluginManager);
-    protected readonly worldManager = new GameWorldManager();
-    protected readonly systemManager = new EngineSystemManager(this, this.timeManager, this.worldManager);
-    protected readonly pluginManager = new EnginePluginManager(this, this.timeManager, this.worldManager, this.systemManager);
+    private readonly container: Container;
+    private readonly worldManager: GameWorldManager;
+    private readonly pluginManager: EnginePluginManager;
+    private readonly lifecycleManager: EngineLifecycleManager;
 
     private initialized = false;
     private started = false;
 
-    constructor(debug = false) {
-        
+    constructor(container?: Container) {
+        if (container) {
+            this.container = container;
+        } else {
+            this.container = new Container();
+        }
+
+        this.container.bind(EnginePluginManager).toSelf();
+        this.container.bind(EngineSystemManager).toSelf();
+        this.container.bind(GameWorldManager).toSelf();
+        this.container.bind(GameTimeManager).toSelf();
+        this.container.bind(Time).toSelf();
+        this.container.bind(EngineLifecycleManager).toSelf();
+
+        this.pluginManager = this.container.get(EnginePluginManager);
+        this.worldManager = this.container.get(GameWorldManager);
+        this.lifecycleManager = this.container.get(EngineLifecycleManager);
     }
 
-    public initialize(plugins: Plugin<any>[]) {
+    public initialize(plugins: BuiltPlugin[]) {
         if (this.initialized) return;
 
-        for (const plugin of plugins) {
-            this.pluginManager.addPlugin(plugin);
+        for (const pluginModule of plugins) {
+            this.container.load(pluginModule.containerModule);
+            this.pluginManager.addPlugin(this.container.get(pluginModule.plugin));
         }
+
 
         this.pluginManager.lockPlugins();
 
-        // init
-        // for (const initFunc of this.pluginManager.preinitFunctions) {
-        //     initFunc();
-        // }
-
-        // for (const initFunc of this.pluginManager.initFunctions) {
-        //     initFunc();
-        // }
-
-        // for (const initFunc of this.pluginManager.postinitFunctions) {
-        //     initFunc();
-        // }
-
-        // @TODO system manager init lifecycle
+        this.lifecycleManager.init();
 
         this.initialized = true;
     }
@@ -50,20 +56,7 @@ export class Engine {
 
         if (!this.initialized) throw new Error('Engine not initialized!');
         
-        // start
-        // for (const startFunc of this.pluginManager.prestartFunctions) {
-        //     startFunc();
-        // }
-
-        // for (const startFunc of this.pluginManager.startFunctions) {
-        //     startFunc();
-        // }
-
-        // for (const startFunc of this.pluginManager.poststartFunctions) {
-        //     startFunc();
-        // }
-
-        // @TODO system manager start lifecycle
+        this.lifecycleManager.start();
 
         this.started = true;
 
@@ -74,20 +67,7 @@ export class Engine {
 
         if (!this.started) throw new Error('Engine not started!');
 
-        // destroy
-        // for (const destroyFunc of this.pluginManager.predestroyFunctions) {
-        //     destroyFunc();
-        // }
-
-        // for (const destroyFunc of this.pluginManager.destroyFunctions) {
-        //     destroyFunc();
-        // }
-
-        // for (const destroyFunc of this.pluginManager.postdestroyFunctions) {
-        //     destroyFunc();
-        // }
-
-        // @TODO system manager destroy lifecycle
+        this.lifecycleManager.destroy();
 
         this.pluginManager.clear();
 

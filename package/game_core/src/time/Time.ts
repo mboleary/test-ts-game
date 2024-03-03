@@ -1,8 +1,10 @@
+import { inject, injectable } from "inversify";
 import { GameTimeManager } from "../managers/GameTimeManager";
 
+@injectable()
 export class Time {
     constructor(
-        private timeManager: GameTimeManager
+        @inject(GameTimeManager) private timeManager: GameTimeManager
     ) {}
     public getTime() {
         return this.timeManager.getTime();

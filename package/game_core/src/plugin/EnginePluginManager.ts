@@ -1,135 +1,110 @@
-// import { Container } from "inversify";
-import { Engine } from "../Engine";
-import { GameTimeManager, GameWorldManager } from "../managers";
-import { ResourceManager } from "../resource/ResourceManager";
-import { EngineSystemManager } from "../system/EngineSystemManager";
-import { EngineInternals } from "./EngineInternals.type";
+import { Container, injectable } from "inversify";
 import { Plugin } from "./Plugin";
 
+
+export const PLUGIN_MANAGER = "PLUGIN_MANAGER";
+
+type Lifecycle = {
+    plugin: Plugin,
+    priority: number
+};
+
+@injectable()
 export class EnginePluginManager {
+    constructor() {}
 
-    public readonly resourceManager: ResourceManager<symbol> = new ResourceManager();
+    private locked = false;
 
-    constructor(
-        private readonly engine: Engine,
-        private readonly timeManager: GameTimeManager,
-        private readonly worldManager: GameWorldManager,
-        private readonly globalSystemManager: EngineSystemManager
-    ) {
+    private readonly initLifecycle: Lifecycle[] = [];
+    private readonly startLifecycle: Lifecycle[] = [];
+    private readonly loopLifecycle: Lifecycle[] = [];
+    private readonly destroyLifecycle: Lifecycle[] = [];
 
-    }
+    private readonly plugins: Map<Function, Plugin> = new Map();
 
-    public readonly preinitFunctions: Function[] = [];
-    public readonly initFunctions: Function[] = [];
-    public readonly postinitFunctions: Function[] = [];
-    public readonly prestartFunctions: Function[] = [];
-    public readonly startFunctions: Function[] = [];
-    public readonly poststartFunctions: Function[] = [];
-    public readonly preloopFunctions: Function[] = [];
-    public readonly loopFunctions: Function[] = [];
-    public readonly postloopFunctions: Function[] = [];
-    public readonly predestroyFunctions: Function[] = [];
-    public readonly destroyFunctions: Function[] = [];
-    public readonly postdestroyFunctions: Function[] = [];
-
-    // public readonly container: Container = new Container({ defaultScope: "Singleton" });
-    private readonly pluginsMap: Map<Symbol, Plugin<any>> = new Map();
-
-    private _allowPluginLoading = false;
-
-    public get allowPluginLoading(): boolean {
-        return this._allowPluginLoading;
-    }
-
-    public addPlugin<T>(plugin: Plugin<T> | PluginWithLoop<T>): void {
-        // this.container.bind<T>(plugin.instance);
-        this.pluginsMap.set(plugin.token, plugin);
-
-        if (plugin.preinit) {
-            this.preinitFunctions.push(plugin.preinit.bind(plugin));
+    public addPlugin(plugin: Plugin) {
+        if (this.locked) {
+            throw new Error("Plugins are locked");
         }
+
+        if (this.plugins.has(plugin.constructor)) {
+            throw new Error(`Already loaded plugin ${String(plugin.constructor.name)}`);
+        }
+
+        console.log('Adding plugin', plugin);
+        
         if (plugin.init) {
-            this.initFunctions.push(plugin.init.bind(plugin));
-        }
-        if (plugin.postinit) {
-            this.postinitFunctions.push(plugin.postinit.bind(plugin));
-        }
-        if (plugin.prestart) {
-            this.prestartFunctions.push(plugin.prestart.bind(plugin));
+            this.initLifecycle.push({
+                plugin,
+                priority: plugin.initPriority
+            });
         }
         if (plugin.start) {
-            this.startFunctions.push(plugin.start.bind(plugin));
+            this.startLifecycle.push({
+                plugin,
+                priority: plugin.startPriority
+            });
         }
-        if (plugin.poststart) {
-            this.poststartFunctions.push(plugin.poststart.bind(plugin));
-        }
-        if (plugin instanceof PluginWithLoop && plugin.preloop) {
-            this.preloopFunctions.push(plugin.preloop.bind(plugin));
-        }
-        if (plugin instanceof PluginWithLoop && plugin.loop) {
-            this.loopFunctions.push(plugin.loop.bind(plugin));
-        }
-        if (plugin instanceof PluginWithLoop && plugin.postloop) {
-            this.postloopFunctions.push(plugin.postloop.bind(plugin));
-        }
-        if (plugin.predestroy) {
-            this.predestroyFunctions.push(plugin.predestroy.bind(plugin));
+        if (plugin.loop) {
+            this.loopLifecycle.push({
+                plugin,
+                priority: plugin.loopPriority
+            });
         }
         if (plugin.destroy) {
-            this.destroyFunctions.push(plugin.destroy.bind(plugin));
+            this.destroyLifecycle.push({
+                plugin,
+                priority: plugin.destroyPriority
+            });
         }
-        if (plugin.postdestroy) {
-            this.postdestroyFunctions.push(plugin.postdestroy.bind(plugin));
-        }
-
-        plugin.build(this.getEngineInternals());
+        this.plugins.set(plugin.constructor, plugin);
     }
 
-    public lockPlugins(): void {
-        this._allowPluginLoading = false;
-    }
-
-    public getPluginInstanceByToken<T>(token: Symbol): T | null {
-        // this.container.get<T>(token);
-        const plugin = this.pluginsMap.get(token);
-        if (plugin === undefined) return null;
-
-        if (!plugin.instance) {
-            return plugin.build(this.getEngineInternals());
-        }
-
-        return plugin.instance;
-    }
-
-    /**
-     * Clears all plugins from the Plugin Manager
-     */
     public clear() {
-        this.preinitFunctions.splice(0, this.preinitFunctions.length);
-        this.initFunctions.splice(0, this.initFunctions.length);
-        this.postinitFunctions.splice(0, this.postinitFunctions.length);
-        this.prestartFunctions.splice(0, this.prestartFunctions.length);
-        this.startFunctions.splice(0, this.startFunctions.length);
-        this.poststartFunctions.splice(0, this.poststartFunctions.length);
-        this.preloopFunctions.splice(0, this.preloopFunctions.length);
-        this.loopFunctions.splice(0, this.loopFunctions.length);
-        this.postloopFunctions.splice(0, this.postloopFunctions.length);
-        this.predestroyFunctions.splice(0, this.predestroyFunctions.length);
-        this.destroyFunctions.splice(0, this.destroyFunctions.length);
-        this.postdestroyFunctions.splice(0, this.postdestroyFunctions.length);
-
-        this.pluginsMap.clear();
+        this.initLifecycle.splice(0, this.initLifecycle.length);
+        this.startLifecycle.splice(0, this.startLifecycle.length);
+        this.loopLifecycle.splice(0, this.loopLifecycle.length);
+        this.destroyLifecycle.splice(0, this.destroyLifecycle.length);
     }
 
-    private getEngineInternals(): EngineInternals {
-        return {
-            get: (token: Symbol) => {
-                return this.getPluginInstanceByToken(token);
-            },
-            engine: this.engine,
-            timeManager: this.timeManager,
-            worldManager: this.worldManager,
-            resourceManager: this.resourceManager
-        }
+    public get initFunctions(): Function[] {
+        return this.initLifecycle
+            .sort((a, b) => a.priority - b.priority)
+            .filter(lc => lc.plugin.init !== undefined)
+            .map(
+                (lc) => (lc.plugin as Plugin & {init: Function}).init.bind(lc.plugin)
+            );
+    }
+
+    public get startFunctions(): Function[] {
+        return this.startLifecycle
+            .sort((a, b) => a.priority - b.priority)
+            .filter(lc => lc.plugin.start !== undefined)
+            .map(
+                (lc) => (lc.plugin as Plugin & {start: Function}).start.bind(lc.plugin)
+            );
+    }
+
+    public get loopFunctions(): Function[] {
+        return this.loopLifecycle
+            .sort((a, b) => a.priority - b.priority)
+            .filter(lc => lc.plugin.loop !== undefined)
+            .map(
+                (lc) => (lc.plugin as Plugin & {loop: Function}).loop.bind(lc.plugin)
+            );
+    }
+
+    public get destroyFunctions(): Function[] {
+        return this.destroyLifecycle
+            .sort((a, b) => a.priority - b.priority)
+            .filter(lc => lc.plugin.destroy !== undefined)
+            .map(
+                (lc) => (lc.plugin as Plugin & {destroy: Function}).destroy.bind(lc.plugin)
+            );
+    }
+
+    // @TODO lockPlugins
+    public lockPlugins() {
+        this.locked = true;
     }
 }

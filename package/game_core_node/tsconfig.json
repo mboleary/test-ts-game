@@ -4,8 +4,13 @@
     "rootDir": "src",
     "outDir": "build",
     "lib": [
-      "es2020"
-    ]
+      "es2023"
+    ],
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["reflect-metadata", "node"],
+
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "esModuleInterop": true,

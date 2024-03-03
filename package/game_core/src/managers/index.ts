@@ -1,3 +1,3 @@
-export * from "./GameHotloopManager";
+export * from "./EngineHotloopManager";
 export * from "./GameTimeManager";
 export * from "./GameWorldManager";

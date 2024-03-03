@@ -12,4 +12,5 @@
     "types": ["reflect-metadata"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
+  "esModuleInterop": true,
 }

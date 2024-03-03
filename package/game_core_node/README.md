@@ -1,4 +1,4 @@
-# Core
+# Node Core
 
-This package contains the main implementation of the game engine, but is environment-agnostic.
+Package contains Node-specific plugins for engine.
 

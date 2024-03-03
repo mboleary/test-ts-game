@@ -2,8 +2,10 @@
  * This interfaces with the time class to set values such as delta time and advancing time while paused for debugging
  */
 
+import { injectable } from "inversify";
 import { TARGET_MILLIS_PER_FRAME as target } from "../time/const";
 
+@injectable()
 export class GameTimeManager {
     protected timeDiff: number = 0; // Difference between the actual time, and what should be reported to the game
     protected timePaused = 0;

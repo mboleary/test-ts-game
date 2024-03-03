@@ -1,6 +1,7 @@
 import { System, SystemManager, SystemLifecycle } from "game_ecs";
 import { Engine } from "../Engine";
 import { GameTimeManager, GameWorldManager } from "../managers";
+import { inject, injectable } from "inversify";
 
 export enum GlobalSystemLifecycle {
     GLOBAL_INIT = "GLOBAL_INIT",
@@ -9,12 +10,11 @@ export enum GlobalSystemLifecycle {
     GLOBAL_DESTROY = "GLOBAL_DESTROY",
 };
 
+@injectable()
 export class EngineSystemManager {
     private systems: Map<string, System> = new Map();
     constructor(
-        private readonly engine: Engine,
-        private readonly timeManager: GameTimeManager,
-        private readonly worldManager: GameWorldManager
+        @inject(GameWorldManager) private readonly worldManager: GameWorldManager
     ) {
 
     }
