@@ -20,7 +20,7 @@ export class Hotloop extends Plugin {
         this.engineHotloopManager.stopLoop();
     }
 
-    static build(options: PluginOptions) {
+    static build(options: PluginOptions = {}) {
         const containerModule = new ContainerModule((bind) => {
             bind(Hotloop).toSelf();
             bind(HOTLOOP_OPTIONS).toConstantValue(options);

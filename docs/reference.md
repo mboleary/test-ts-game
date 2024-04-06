@@ -20,3 +20,5 @@
 - https://github.com/excaliburjs/Excalibur/blob/main/src/engine/Events.ts
 - https://github.com/AlaSQL/alasql/wiki/Getting-started
     - Might move SQL Query Manager out into separate package later as it seems like it brings a lot of dependencies with it
+- https://stackoverflow.com/questions/49699067/property-has-no-initializer-and-is-not-definitely-assigned-in-the-construc
+    - Add compiler option to allow not setting properties on class, useful for data objects

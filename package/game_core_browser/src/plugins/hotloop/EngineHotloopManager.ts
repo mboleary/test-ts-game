@@ -1,6 +1,4 @@
-import { EnginePluginManager, EngineHotloopManager as CoreEngineHotloopManager } from "game_core";
-import { TARGET_MILLIS_PER_FRAME } from "game_core";
-import { GameTimeManager } from "game_core";
+import { EnginePluginManager, EngineHotloopManager as CoreEngineHotloopManager, TARGET_MILLIS_PER_FRAME, GameTimeManager } from "game_core";
 import { inject, injectable } from "inversify";
 
 @injectable()

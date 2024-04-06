@@ -2,7 +2,8 @@ import "reflect-metadata";
 import { buildContainer } from "./container";
 import { Types } from "./containerTypes.enum";
 import { Logger } from "./injectableComponents/logger/logger";
-import { Engine } from "./engine/Engine";
+import { Engine } from "game_core";
+import { Hotloop } from "game_core_browser";
 import { Graphics2DPlugin } from "./plugins/graphics2d_example/Graphics2D.plugin";
 
 async function main() {
@@ -22,6 +23,7 @@ async function main() {
   }
 
   engine.initialize([
+    Hotloop.build(),
     Graphics2DPlugin.build({
       canvasTarget: canvasEl as HTMLCanvasElement
     }),

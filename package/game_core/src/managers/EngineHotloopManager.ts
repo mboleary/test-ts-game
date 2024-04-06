@@ -1,6 +1,8 @@
+import { injectable } from "inversify";
 import {EnginePluginManager} from "../plugin/EnginePluginManager";
 import { GameTimeManager } from "./GameTimeManager";
 
+@injectable()
 export abstract class EngineHotloopManager {
     constructor(
         protected readonly time: GameTimeManager,
