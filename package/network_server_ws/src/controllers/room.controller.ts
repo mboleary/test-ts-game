@@ -10,10 +10,14 @@ export class RoomController {
   constructor(
     @inject(CONFIG_TOKEN) private readonly config: Config,
     @inject(Logger) private readonly logger: Logger
-  ) {}
+  ) {
+    console.log("Instantiate RoomController", config, logger);
+  }
 
   @Get('/')
   public getAll() {
+    console.log("getAll this:", this);
+    this.logger.debug(`get all ${this.config.listenAddr}`);
     return [];
   }
 

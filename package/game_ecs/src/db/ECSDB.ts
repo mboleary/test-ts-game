@@ -6,16 +6,23 @@ import { Component } from "../Component";
 import { Entity } from "../Entity";
 import { ComponentKeyType } from "../type/ComponentKey.type";
 import { GetAllEntitiesOptions } from "../type/GetAllEntitiesOptions.type";
+import { sameKeys } from "./archetypeGraph/util/compareKeys";
 import { AddEntityParameters, Archetype } from "./Archetype";
+import { Graph } from "./archetypeGraph/Graph";
+import { GraphNode } from "./archetypeGraph/GraphNode";
 
 export class ECSDB {
 
   // new implementation
-  private readonly archetypes: Archetype[] = [];
+  // private readonly archetypes: Archetype[] = [];
+  // private readonly archetypeRoot: Archetype;
+  private readonly archetypeGraph: Graph<Archetype, ComponentKeyType>;
   private readonly entityArchetypeMap: Map<string, Archetype> = new Map();  
 
   constructor() {
-    this.archetypes.push(new Archetype(this));
+    // this.archetypeRoot = ;
+    // this.archetypes.push(this.archetypeRoot);
+    this.archetypeGraph = new Graph(new Archetype(this, []));
   }
 
   private getComponentKeys(components: Component[]): ComponentKeyType[] {
@@ -56,6 +63,50 @@ export class ECSDB {
     return toRet;
   }
 
+  /**
+   * Traverse the ArchetypeGraph to find an Archetype to use or create one
+   * @param componentKeys 
+   */
+  private findOrCreateArchetypeByComponentKeys(componentKeys: ComponentKeyType[]): Archetype {
+    const root = this.archetypeGraph.getRootNode();
+    if (!root) {
+      throw new Error('ArchetypeGraph is empty, this shouldn\'t happen');
+    }
+
+    let curr = root, prev = null;
+    for (const key of componentKeys) {
+      const next = curr.getGraphNode(key);
+      if (next) {
+        curr = next;
+      } else {
+        // No node exists for this collection of keytypes, create one
+        const arch = new Archetype(this, componentKeys);
+        const graphNode: GraphNode<Archetype, ComponentKeyType> = new GraphNode(arch, componentKeys);
+
+        // Connect graph
+        curr.addGraphNode(key, graphNode);
+
+        // This is the case of the existing graph not having a specific-enough graph node (archetype) for the given keys
+        return arch;
+      }
+    }
+
+    // Check archetype keys against componentkeys
+    const archKeys = curr.value.getComponentKeys();
+
+    const same = sameKeys(componentKeys, archKeys);
+
+    if (same) {
+      return curr.value;
+    } else {
+      // This is the case of the existing archetype having too many keys compared to the given keys
+      // Need to make a new Archetype and insert it into the graph
+      const arch = new Archetype(this, componentKeys);
+      // @TODO insert into graph
+      return arch;
+    }
+  }
+
   public getArchetypeForEntityUuid(uuid: string): Archetype {
     if (!this.entityArchetypeMap.has(uuid)) {
       throw new Error(`No Archetype for Entity ${uuid}`);
@@ -73,36 +124,24 @@ export class ECSDB {
     children,
     components
   }: AddEntityParameters = {}): Entity {
-    let archetype = this.archetypes[0];
+    const archetypeNode = this.archetypeGraph.getRootNode();
+    // @TODO handle this properly
+    if (!archetypeNode) throw new Error('no root archetype');
+    const archetype = archetypeNode?.value;
     if (components && components.length) {
       // check types, find an archetype that can support it, or modify a smaller archetype to accomodate it
       const keysPresentInComponents = this.getComponentKeys(components);
 
-      let max = -1, maxIndex = 0, maxTypes: ComponentKeyType[] = [];
+      // Start at root, add components
 
-      for (let i = 0; i < this.archetypes.length; i++) {
-        const archetype = this.archetypes[i]
-        const types = archetype.getComponentKeys();
-        const score = this.checkTypes(keysPresentInComponents, types);
-        if (score > max) {
-          console.log("score:", score, max);
-          maxIndex = i;
-          max = score;
-          maxTypes = types;
-          if (max === keysPresentInComponents.length) {
-            break;
-          }
-        }
-      }
-
-      archetype = this.archetypes[maxIndex];
+      // archetype = this.archetypes[maxIndex];
 
       // Add any necessary component key types
-      if (keysPresentInComponents.length > maxTypes.length) {
-        const missing = this.getMissingTypes(maxTypes, keysPresentInComponents);
-        console.log({missing, maxTypes, keysPresentInComponents});
-        missing.forEach(type => archetype.registerComponentKey(type));
-      }
+      // if (keysPresentInComponents.length > maxTypes.length) {
+      //   const missing = this.getMissingTypes(maxTypes, keysPresentInComponents);
+      //   console.log({missing, maxTypes, keysPresentInComponents});
+      //   missing.forEach(type => archetype.registerComponentKey(type));
+      // }
     }
 
     const entity = archetype.addEntity({uuid, ref, active, temp, mounted, parent, children, components});
@@ -253,6 +292,6 @@ export class ECSDB {
   // }
 
   public getArchetypes(): Archetype[] {
-    return this.archetypes;
+    return this.archetypeGraph.getNodes().map(node => node.value);
   }
 }

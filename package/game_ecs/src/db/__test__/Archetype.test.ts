@@ -11,7 +11,7 @@ let ecsdb: ECSDB;
 
 function ecsSetup() {
   ecsdb = new ECSDB();
-  archetype = new Archetype(ecsdb);
+  archetype = new Archetype(ecsdb, []);
 }
 
 test.beforeEach(() => {

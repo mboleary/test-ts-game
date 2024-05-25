@@ -23,11 +23,13 @@ export class QueryManager extends Manager {
    */
   public query(query: Query): Entity[] {
 
-    const entities = this.getEntities(query.terms);
+    // const entities = this.getEntities(query.terms);
 
     // @TODO when conditions are implemented in Querying, revisit this to correctly handle that
 
-    return entities;
+    // return entities;
+    // @TODO temp
+    return [];
   };
 
   /**
@@ -42,19 +44,22 @@ export class QueryManager extends Manager {
   private getEntities(terms: ComponentKeyType[]): Entity[] {
     // @TODO implement once components are properly implemented
     // return [];
-    const archetypes = this.ecsdb.getArchetypes();
-    const matchedArchetypes: Archetype[] = [];
-    for (const archetype of archetypes) {
-      const types = archetype.getComponentKeys();
-      if (this.compareTypes(terms, types)) {
-        matchedArchetypes.push(archetype);
-      }
-    }
+    // const archetypes = this.ecsdb.getArchetypes();
+    // const matchedArchetypes: Archetype[] = [];
+    // for (const archetype of archetypes) {
+    //   const types = archetype.getComponentKeys();
+    //   if (this.compareTypes(terms, types)) {
+    //     matchedArchetypes.push(archetype);
+    //   }
+    // }
 
-    // @TODO make this more efficient
-    for (const archetype of matchedArchetypes) {
-      for (let i = 0; i < archetype.)
-    }
+    // // @TODO make this more efficient
+    // for (const archetype of matchedArchetypes) {
+    //   for (let i = 0; i < archetype.)
+    // }
+    
+    // @TODO temp
+    return [];
   }
 
   private compareTypes(typeA: ComponentKeyType[], typeB: ComponentKeyType[]): boolean {

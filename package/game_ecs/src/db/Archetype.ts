@@ -18,13 +18,10 @@ export type AddEntityParameters = {
 
 export type ForEachCallback = (ref: Entity, index: number) => Entity[];
 
-
-
-const SLOT_INC = 8;
-
 export class Archetype {
   constructor(
-    private readonly ecsdb: ECSDB
+    private readonly ecsdb: ECSDB,
+    private readonly componentTypes: any[]
   ) { }
 
   // Entity-related arrays
@@ -49,8 +46,6 @@ export class Archetype {
   // Index of where in the component array the component lives
   private readonly typeIndex: Map<ComponentKeyType, number> = new Map();
   private matrixLength: number = 0;
-  private firstFreeSlotIndex: number = -1;
-  private deletedEntities: number = 0;
 
   private insertExistingEntity(
     ref: Entity,
@@ -62,22 +57,17 @@ export class Archetype {
     children: Entity[],
     components?: Component[]
   ): Entity {
-    let slotIndex = this.getFirstFreeSlot();
 
-    if (slotIndex === -1) {
-      // New slots need to be added
-      slotIndex = this.matrixLength; // will definitionally be first available slot
-      this.alloc(SLOT_INC);
-    }
+    const entityIndex = this.matrixLength;
 
-    this.uuid[slotIndex] = uuid;
-    this.ref[slotIndex] = ref;
-    this.active[slotIndex] = active;
-    this.temp[slotIndex] = temp;
-    this.mounted[slotIndex] = mounted;
-    this.deleted[slotIndex] = false;
-    this.parent[slotIndex] = parent;
-    this.children[slotIndex] = children;
+    this.uuid.push(uuid);
+    this.ref.push(ref);
+    this.active.push(active);
+    this.temp.push(temp);
+    this.mounted.push(mounted);
+    this.deleted.push(false);
+    this.parent.push(parent);
+    this.children.push(children);
 
     if (components) {
       for (const comp of components) {
@@ -86,13 +76,15 @@ export class Archetype {
           console.warn(`No component type index available for type ${String(comp.key)} on entity uuid ${uuid}. Skipping...`);
           continue;
         }
-        this.components[idx][slotIndex] = comp.data;
+        this.components[idx].push(comp.data);
       }
     }
 
     // @TODO may need to update ref
 
-    this.uuidMap.set(uuid, slotIndex);
+    this.uuidMap.set(uuid, entityIndex);
+
+    this.matrixLength += 1;
 
     return ref;
   }
@@ -109,22 +101,16 @@ export class Archetype {
     // @TODO update Entity constructor
     const newEntity = new Entity(this.ecsdb, uuid, children);
 
-    let slotIndex = this.getFirstFreeSlot();
+    const entityIndex = this.matrixLength;
 
-    if (slotIndex === -1) {
-      // New slots need to be added
-      slotIndex = this.matrixLength; // will definitionally be first available slot
-      this.alloc(SLOT_INC);
-    }
-
-    this.uuid[slotIndex] = uuid;
-    this.ref[slotIndex] = newEntity;
-    this.active[slotIndex] = active;
-    this.temp[slotIndex] = temp;
-    this.mounted[slotIndex] = mounted;
-    this.deleted[slotIndex] = false;
-    this.parent[slotIndex] = parent;
-    this.children[slotIndex] = children;
+    this.uuid.push(uuid);
+    this.ref.push(newEntity);
+    this.active.push(active);
+    this.temp.push(temp);
+    this.mounted.push(mounted);
+    this.deleted.push(false);
+    this.parent.push(parent);
+    this.children.push(children);
 
     if (components) {
       for (const comp of components) {
@@ -133,139 +119,13 @@ export class Archetype {
           console.warn(`No component type index available for type ${String(comp.key)} on entity uuid ${uuid}. Skipping...`);
           continue;
         }
-        this.components[idx][slotIndex] = comp.data;
+        this.components[idx].push(comp.data);
       }
     }
 
-    // @TODO may need to update ref
-
-    this.uuidMap.set(uuid, slotIndex);
+    this.uuidMap.set(uuid, entityIndex);
 
     return newEntity;
-  }
-
-  private getFirstFreeSlot() {
-    // @TODO store first slot value
-    const index = this.deleted.findIndex((val) => !val);
-    return index;
-  }
-
-  /**
-   * Increase the number of slots
-   * @param slots number of slots
-   */
-  private alloc(slots: number) {
-    this.uuid = this.uuid.concat(Array(slots).fill(null));
-    this.ref = this.ref.concat(Array(slots).fill(null));
-    this.active = this.active.concat(Array(slots).fill(false));
-    this.temp = this.temp.concat(Array(slots).fill(false));
-    this.mounted = this.mounted.concat(Array(slots).fill(false));
-    this.deleted = this.deleted.concat(Array(slots).fill(true));
-    this.parent = this.parent.concat(Array(slots).fill(null));
-    this.children = this.children.concat(Array(slots).fill([]));
-    this.components.forEach((compArr, idx) => {
-      this.components[idx] = compArr.concat(Array(slots).fill(null));
-    }, this);
-
-    this.matrixLength += slots;
-  }
-
-  /**
-   * Shift all non-deleted entities to the left in the array
-   */
-  private defragment() {
-    let currIndex = 0;
-
-    const firstOpenIndex = this.getFirstFreeSlot();
-
-    if (firstOpenIndex === -1) return;
-
-    currIndex = firstOpenIndex;
-
-    for (let i = firstOpenIndex + 1; i < this.matrixLength; i++) {
-      if (this.deleted[i]) {
-        continue;
-      } else {
-        // Swap deleted slot (earlier in the array) with a non-deleted slot (later in array)
-        this.swapIndex(i, currIndex);
-        currIndex = i;
-      }
-    }
-  }
-
-  /**
-   * Swap the values stored in 2 indexes
-   * @param indexA Index A
-   * @param indexB Index B
-   */
-  private swapIndex(indexA: number, indexB: number) {
-    const uuid = this.uuid[indexA];
-    const ref = this.ref[indexA];
-    const active = this.active[indexA];
-    const temp = this.temp[indexA];
-    const mounted = this.mounted[indexA];
-    const deleted = this.deleted[indexA];
-    const parent = this.parent[indexA];
-    const children = this.children[indexA];
-
-    this.uuid[indexA] = this.uuid[indexB];
-    this.ref[indexA] = this.ref[indexB];
-    this.active[indexA] = this.active[indexB];
-    this.temp[indexA] = this.temp[indexB];
-    this.mounted[indexA] = this.mounted[indexB];
-    this.deleted[indexA] = this.deleted[indexB];
-    this.parent[indexA] = this.parent[indexB];
-    this.children[indexA] = this.children[indexB];
-
-    this.uuid[indexB] = uuid;
-    this.ref[indexB] = ref;
-    this.active[indexB] = active;
-    this.temp[indexB] = temp;
-    this.mounted[indexB] = mounted;
-    this.deleted[indexB] = deleted;
-    this.parent[indexB] = parent;
-    this.children[indexB] = children;
-
-    // Also update uuidMap
-    this.uuidMap.set(uuid, indexB);
-    this.uuidMap.set(this.uuid[indexB], indexA);
-  }
-
-  /**
-   * Remove slots from the arrays. Does not check if they are deleted first
-   * @param slots number of slots to remove
-   */
-  private dealloc(slots: number) {
-    this.uuid = this.uuid.slice(0, this.matrixLength - slots);
-    this.ref = this.ref.slice(0, this.matrixLength - slots);
-    this.active = this.active.slice(0, this.matrixLength - slots);
-    this.temp = this.temp.slice(0, this.matrixLength - slots);
-    this.mounted = this.mounted.slice(0, this.matrixLength - slots);
-    this.deleted = this.deleted.slice(0, this.matrixLength - slots);
-    this.parent = this.parent.slice(0, this.matrixLength - slots);
-    this.children = this.children.slice(0, this.matrixLength - slots);
-    this.components.forEach((compArr, idx) => {
-      this.components[idx] = compArr.slice(0, this.matrixLength - slots);;
-    }, this);
-
-    this.matrixLength -= slots;
-  }
-
-  /**
-   * Check all component types to see if an array can be trimmed
-   */
-  private trimComponentArray() {
-    for (let i = 0; i < this.components.length; i++) {
-      const comp = this.components[i];
-      if (comp.every((value) => value === null)) {
-        for (const key of this.typeIndex.keys()) {
-          if (this.typeIndex.get(key) === i) {
-            this.trimComponentType(key);
-            break;
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -369,9 +229,6 @@ export class Archetype {
     }
 
     this.uuidMap.delete(uuid);
-
-    // @TODO track deletions
-    this.deletedEntities += 1;
   }
 
   public getEntity(uuid: string): Entity | null {
@@ -406,6 +263,7 @@ export class Archetype {
 
     this.parent[index] = parentRef;
   }
+
   public setEntityComponent(
     uuid: string, 
     componentKey: ComponentKeyType, 
@@ -461,10 +319,18 @@ export class Archetype {
     return Array.from(this.typeIndex.keys());
   }
 
-  public registerComponentKey(key: ComponentKeyType) {
+  public addComponentKey(key: ComponentKeyType) {
     if (this.typeIndex.has(key)) return;
 
     this.allocComponentType(key);
+  }
+
+  public removeComponentKey(key: ComponentKeyType) {
+    if (!this.typeIndex.has(key)) {
+      return;
+    }
+
+    this.trimComponentType(key);
   }
 
   public getEntityChildrenArray(uuid: string): Entity[] {
@@ -498,7 +364,7 @@ export class Archetype {
     activeEquals,
     hasComponents,
   }: GetAllEntitiesOptions = {}): Entity[] {
-    const toRet = [];
+    const toRet: Entity[] = [];
     // for (let i = 0; i < this.matrixLength; i++) {
     //   if (this.temp[i]) continue;
     //   if (deletedEquals !== undefined && deletedEquals !== this.deleted[i]) {
@@ -523,27 +389,4 @@ export class Archetype {
     }
     return toRet;
   }
-
-  /**
-   * Splits the Archetype into several smaller Archetypes
-   */
-  // public split(): Archetype[] {
-  //   // First minimise the components that aren't being used anymore
-  //   this.trimComponentArray();
-
-  //   // Next, find out how many of each component are still being used
-  //   const numberOfComponentsMap: Map<ComponentKeyType, number> = new Map();
-
-  //   for (const type of this.typeIndex.keys()) {
-  //     const index = this.typeIndex.get(type);
-  //     if (!index) continue;
-  //     const compArr = this.components[index];
-  //     const score = compArr.map<number>(c => c ? 1 : 0).reduce((prev, curr) => prev + curr);
-  //     if (score === this.matrixLength) continue;
-  //     numberOfComponentsMap.set(type, score);
-  //   }
-
-  //   // Then use those numbers to determine ways that we can split up the Archetypes
-
-  // }
 }
