@@ -4,7 +4,7 @@ import { PortType } from "../types/PortType";
 import { MidiSendPort } from "./MidiSendPort";
 import { MusicEnginePort } from "./Port";
 
-export type MidiMessageReceiver = (message: MusicEngineMidiMessage) => void;
+export type MidiMessageReceiver = (message: MusicEngineMidiMessage, id?: string) => void;
 
 /**
  * This port is for sending midi signals
@@ -13,6 +13,7 @@ export class MidiReceivePort extends MusicEnginePort {
   constructor(
     name: string,
     private readonly receiveHandler: MidiMessageReceiver,
+    public readonly id?: string
   ) {
     super(name, PortDirection.IN, PortType.MIDI);
   }
@@ -29,6 +30,6 @@ export class MidiReceivePort extends MusicEnginePort {
   }
 
   public receive(message: MusicEngineMidiMessage) {
-    this.receiveHandler(message);
+    this.receiveHandler(message, this.id);
   }
 }

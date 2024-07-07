@@ -26,7 +26,7 @@ export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
     if (message.type === MusicEngineMidiMessageType.NOTE_ON && message.time !== undefined && message.key !== undefined) {
       this.noteOn(message.time, message.key);
     }
-    if(message.type === MusicEngineMidiMessageType.NOTE_OFF && message.time !== undefined && message.key !== undefined) {
+    if (message.type === MusicEngineMidiMessageType.NOTE_OFF && message.time !== undefined && message.key !== undefined) {
       this.noteOff(message.time, message.key);
     }
   }

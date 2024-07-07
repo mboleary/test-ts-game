@@ -1,6 +1,8 @@
 import { MusicEngineOscillatorNode } from "./nodes/MusicEngineOscillatorNode";
 import { AudioPort } from "./ports/AudioPort";
 import { MidiSendPort } from "./ports/MidiSendPort";
+import { MidiAccess } from "./subsystem/midi/MidiAccess";
+import { MidiOutputNode } from "./subsystem/midi/nodes/MidiOutputNode";
 import { MusicEngineMidiMessageType } from "./types/MusicEngineMidiMessage.type";
 import { PortDirection } from "./types/PortDirection.enum";
 import { repeatingPulse } from "./util/beatGenerator";
@@ -10,7 +12,7 @@ import { timeToBeat } from "./util/timeToBeat";
 
 let interval: NodeJS.Timer;
 
-function test() {
+async function test() {
   const ac = new AudioContext();
   const node = new MusicEngineOscillatorNode(ac);
   // Destination, wrapped in a port
@@ -19,7 +21,11 @@ function test() {
   node.audioOut.connect(apDest);
 
   const midiOut = new MidiSendPort('send');
-  midiOut.connect(node.midiIn);
+  // midiOut.connect(node.midiIn);
+
+  const midiAccess = await MidiAccess.start(ac);
+  const devicePort = midiAccess.midiOutputNode.getMidiPorts()[0];
+  if (devicePort) midiOut.connect(devicePort);
 
   const DURATION = 0.5;
   // Testing one of the AudioParam functions, @TODO doesn't seem to currently work
@@ -43,11 +49,13 @@ function test() {
         midiOut.send({
           type: MusicEngineMidiMessageType.NOTE_ON,
           key: note,
+          velocity: 0x7F,
           time: n
         });
         midiOut.send({
           type: MusicEngineMidiMessageType.NOTE_OFF,
           key: note,
+          velocity: 0x00,
           time: n + beatToTime(120, DURATION)
         });
       } else {

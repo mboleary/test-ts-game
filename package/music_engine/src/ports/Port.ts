@@ -61,4 +61,11 @@ export abstract class MusicEnginePort {
     const idx = this.connections.indexOf(port);
     this.connections.splice(idx, 1);
   }
+
+  public disconnectAll() {
+    for (const connection of this.connections) {
+      this.handleDisconnect(connection);
+    }
+    this.connections.splice(0, this.connections.length);
+  }
 }
