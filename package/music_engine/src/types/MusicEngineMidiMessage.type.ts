@@ -17,10 +17,10 @@ export interface MidiNoteOnMessage extends MusicEngineMidiMessage {
   type: MusicEngineMidiMessageType.NOTE_ON;
 }
 
-export type MidiReceiver = {
-  receive(message: MusicEngineMidiMessage): void;
-}
+// export type MidiReceiver = {
+//   receive(message: MusicEngineMidiMessage): void;
+// }
 
-export type MidiTransmitter = {
-  transmit(): MusicEngineMidiMessage;
-}
+// export type MidiTransmitter = {
+//   transmit(): MusicEngineMidiMessage;
+// }

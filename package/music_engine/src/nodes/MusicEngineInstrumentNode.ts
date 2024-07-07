@@ -2,10 +2,11 @@
  * Implements a controller for note playback
  */
 
-import { MidiReceiver, MusicEngineMidiMessage, MusicEngineMidiMessageType } from "../types/MusicEngineMidiMessage.type";
+import { MidiReceivePort } from "../ports/MidiReceivePort";
+import { MusicEngineMidiMessage, MusicEngineMidiMessageType } from "../types/MusicEngineMidiMessage.type";
 import { MusicEngineNode } from "./MusicEngineNode";
 
-export abstract class MusicEngineInstrumentNode extends MusicEngineNode implements MidiReceiver {
+export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
   constructor(
     context: AudioContext,
     name: string,
@@ -15,11 +16,13 @@ export abstract class MusicEngineInstrumentNode extends MusicEngineNode implemen
     super(context, name, type, labels);
   }
 
+  public readonly midiIn: MidiReceivePort = new MidiReceivePort('in', this.receive.bind(this));
+
   protected abstract noteOn(time: number, note: number): void;
 
   protected abstract noteOff(time: number, note: number): void;
 
-  public receive(message: MusicEngineMidiMessage): void {
+  private receive(message: MusicEngineMidiMessage): void {
     if (message.type === MusicEngineMidiMessageType.NOTE_ON && message.time !== undefined && message.key !== undefined) {
       this.noteOn(message.time, message.key);
     }

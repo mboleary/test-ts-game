@@ -31,16 +31,16 @@ export abstract class MusicEnginePort {
       throw new Error('destination port has incorrect direction');
     }
 
-    if (this.direction === PortDirection.IN) {
-      return port.connect(this);
-    }
-
     if (this.type !== port.type) {
       throw new Error('Ports are not the same type');
     }
 
     if (this.hasConnection(port)) {
       throw new Error('already connected');
+    }
+
+    if (this.direction === PortDirection.IN) {
+      return port.connect(this);
     }
 
     this.handleConnect(port);
