@@ -2,6 +2,8 @@ import { MusicEngineOscillatorNode } from "./nodes/MusicEngineOscillatorNode";
 import { AudioPort } from "./ports/AudioPort";
 import { MidiSendPort } from "./ports/MidiSendPort";
 import { MidiAccess } from "./subsystem/midi/MidiAccess";
+import { MidiNoteOffMessage } from "./subsystem/midi/message/MidiNoteOffMessage";
+import { MidiNoteOnMessage } from "./subsystem/midi/message/MidiNoteOnMessage";
 import { MidiOutputNode } from "./subsystem/midi/nodes/MidiOutputNode";
 import { MusicEngineMidiMessageType } from "./types/MusicEngineMidiMessage.type";
 import { PortDirection } from "./types/PortDirection.enum";
@@ -21,14 +23,14 @@ async function test() {
   node.audioOut.connect(apDest);
 
   const midiOut = new MidiSendPort('send');
-  // midiOut.connect(node.midiIn);
+  midiOut.connect(node.midiIn);
 
   const midiAccess = await MidiAccess.start(ac);
   const devicePort = midiAccess.midiOutputNode.getMidiPorts()[0];
   if (devicePort) midiOut.connect(devicePort);
 
   const DURATION = 0.5;
-  // Testing one of the AudioParam functions, @TODO doesn't seem to currently work
+  // Testing one of the AudioParam functions
   // node.detune.linearRampToValueAtTime(
   //   1000,
   //   ac.currentTime + beatToTime(120, DURATION) + 1);
@@ -46,18 +48,16 @@ async function test() {
       notePos = (notePos + 1) % NOTE_ARR.length;
       if (n) {
         currTimePos = n;
-        midiOut.send({
-          type: MusicEngineMidiMessageType.NOTE_ON,
+        midiOut.send(MidiNoteOnMessage.from({
           key: note,
           velocity: 0x7F,
           time: n
-        });
-        midiOut.send({
-          type: MusicEngineMidiMessageType.NOTE_OFF,
+        }));
+        midiOut.send(MidiNoteOffMessage.from({
           key: note,
           velocity: 0x00,
           time: n + beatToTime(120, DURATION)
-        });
+        }));
       } else {
         gen.return();
         break;

@@ -1,4 +1,5 @@
-import { MusicEngineMidiMessage } from "../types/MusicEngineMidiMessage.type";
+// import { MusicEngineMidiMessage } from "../types/MusicEngineMidiMessage.type";
+import { MusicEngineMidiMessage } from "../subsystem/midi/message/MusicEngineMidiMessage";
 import { PortDirection } from "../types/PortDirection.enum";
 import { PortType } from "../types/PortType";
 import { MidiSendPort } from "./MidiSendPort";

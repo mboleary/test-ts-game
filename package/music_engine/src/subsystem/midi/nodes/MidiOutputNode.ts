@@ -1,6 +1,7 @@
 import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
-import { MusicEngineMidiMessage } from "../../../types/MusicEngineMidiMessage.type";
+import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";
+// import { MusicEngineMidiMessage } from "../../../types/MusicEngineMidiMessage.type";
 import { buildMidiBytes } from "../util/buildMidiBytes";
 
 const TYPE = "midi_output_node";
