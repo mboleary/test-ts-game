@@ -14,29 +14,6 @@ export abstract class MusicEngineMidiMessage implements MusicEngineMidiMessageOb
     public readonly channel: number = 0,
   ) {}
 
-  public static from(json: MusicEngineMidiMessageObjectType): MusicEngineMidiMessage {
-    switch(json.type) {
-      // case MusicEngineMidiMessageType.NOTE_ON:
-      //   return MidiNoteOnMessage.from(json);
-      // case MusicEngineMidiMessageType.NOTE_OFF:
-      //   return MidiNoteOffMessage.from(json);
-      default:
-        throw new Error(`Unknown message type ${json.type}`);
-    }
-  }
-
-  public static fromBytes(bytes: Uint8Array): MusicEngineMidiMessage {
-    const statusByte = bytes[0] >> 1;
-    switch(statusByte) {
-      // case 0x8:
-      //   return MidiNoteOffMessage.fromBytes(bytes);
-      // case 0x9:
-      //   return MidiNoteOnMessage.fromBytes(bytes);
-      default:
-        throw new Error(`Unknown status code ${statusByte}`);
-    }
-  }
-
   public abstract toBytes(): Uint8Array;
 
   public toString(): string {

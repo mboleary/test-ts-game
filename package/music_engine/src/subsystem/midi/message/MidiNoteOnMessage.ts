@@ -9,7 +9,6 @@ export class MidiNoteOnMessage extends MusicEngineMidiMessage {
     channel?: number
   ) {
     super(MusicEngineMidiMessageType.NOTE_ON, time, channel);
-    console.log(this);
   }
 
   public toBytes(): Uint8Array {

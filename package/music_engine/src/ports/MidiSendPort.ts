@@ -10,7 +10,8 @@ import { MusicEnginePort } from "./Port";
  */
 export class MidiSendPort extends MusicEnginePort {
   constructor(
-    name: string
+    name: string,
+    public readonly id?: string
   ) {
     super(name, PortDirection.OUT, PortType.MIDI);
   }

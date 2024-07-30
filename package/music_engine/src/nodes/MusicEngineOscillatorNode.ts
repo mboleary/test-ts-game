@@ -65,7 +65,7 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
       // Remove node from scheduling map
       this.oscNodes.delete(note);
     } else {
-      console.log("no node for note", note, time);
+      console.warn("no node for note", note, time);
     }
   }
 }

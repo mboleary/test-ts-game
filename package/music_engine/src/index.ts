@@ -14,6 +14,21 @@ import { timeToBeat } from "./util/timeToBeat";
 
 let interval: NodeJS.Timer;
 
+async function midiInputTest() {
+  const ac = new AudioContext();
+  const node = new MusicEngineOscillatorNode(ac, 'sawtooth', 'midi synth', ['midi', 'synth']);
+  const apDest = new AudioPort('dest', PortDirection.IN);
+  apDest.registerAudioNode(ac.destination);
+  node.audioOut.connect(apDest);
+
+  const midiAccess = await MidiAccess.start(ac);
+  const devicePort = midiAccess.midiInputNode.getMidiPorts().filter(port => port.name.indexOf('Port-0') === -1)[0];
+  if (devicePort) {
+    devicePort.connect(node.midiIn);
+  }
+  console.log("port:", devicePort, devicePort.name);
+}
+
 async function test() {
   const ac = new AudioContext();
   const node = new MusicEngineOscillatorNode(ac);
@@ -79,5 +94,6 @@ Object.assign(window, {
   scheduleNote,
   MusicEngineOscillatorNode,
   test,
-  testStop
+  testStop,
+  midiInputTest
 });

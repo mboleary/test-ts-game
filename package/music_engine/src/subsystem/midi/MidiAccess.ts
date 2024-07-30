@@ -1,14 +1,15 @@
+import { MidiInputNode } from "./nodes/MidiInputNode";
 import { MidiOutputNode } from "./nodes/MidiOutputNode";
 
 export class MidiAccess { 
   public readonly midiOutputNode: MidiOutputNode;
+  public readonly midiInputNode: MidiInputNode;
   private constructor(
     public readonly access: MIDIAccess,
     private readonly audioContext: AudioContext
   ) {
     this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs');
-    // this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs');
-    console.log(this);
+    this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs');
   }
 
   static async prompt(): Promise<boolean> {

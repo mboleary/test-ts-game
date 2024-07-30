@@ -1,8 +1,6 @@
 import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
 import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";
-// import { MusicEngineMidiMessage } from "../../../types/MusicEngineMidiMessage.type";
-import { buildMidiBytes } from "../util/buildMidiBytes";
 
 const TYPE = "midi_output_node";
 
@@ -25,10 +23,10 @@ export class MidiOutputNode extends MusicEngineNode {
     midiAccess.addEventListener("statechange", (event: Event) => {
       if (event && (event as MIDIConnectionEvent).port) {
         const port = (event as MIDIConnectionEvent).port;
-        if (port.state === "connected") {
+        if (port.state === "connected" && !this.outputMidiMap.has(port.id)) {
           const toAdd = this.buildMidiPort(port);
           this.outputMidiMap.set(port.id, toAdd);
-        } else {
+        } else if (port.state !== "connected") {
           const toDelete = this.outputMidiMap.get(port.id);
           if (toDelete) {
             toDelete.disconnectAll();
@@ -48,7 +46,7 @@ export class MidiOutputNode extends MusicEngineNode {
 
   private midiHandler(message: MusicEngineMidiMessage, id?: string) {
     if (id) {
-      const bytes = buildMidiBytes(message);
+      const bytes = message.toBytes();
       const output = (this.midiAccess.outputs as Map<any, any>).get(id);
       if (output && message.time) {
         // Note that the time is relative to performance.now(), which is measured in ms

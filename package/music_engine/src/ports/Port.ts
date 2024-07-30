@@ -22,7 +22,7 @@ export abstract class MusicEnginePort {
   protected abstract handleConnect(port: MusicEnginePort): void;
   protected abstract handleDisconnect(port: MusicEnginePort): void;
 
-  protected getConnectedPorts(): MusicEnginePort[] {
+  public getConnectedPorts(): MusicEnginePort[] {
     return this.connections;
   }
 
@@ -36,15 +36,21 @@ export abstract class MusicEnginePort {
     }
 
     if (this.hasConnection(port)) {
-      throw new Error('already connected');
+      // throw new Error('already connected');
+      return;
     }
+
+    this.connections.push(port);
 
     if (this.direction === PortDirection.IN) {
       return port.connect(this);
+    } else {
+      // This adds this port to the connections list of the other then when it attempts to add itself to this one again, it returns
+      port.connect(this);
     }
 
     this.handleConnect(port);
-    this.connections.push(port);
+    
   }
 
   public disconnect(port: MusicEnginePort) {
