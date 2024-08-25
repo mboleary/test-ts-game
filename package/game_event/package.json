@@ -12,7 +12,8 @@
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "docs": "typedoc --out ./gen_docs src"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,8 @@
     "eslint-config-prettier": "^8.9.0",
     "gts": "^5.0.0",
     "prettier": "3.0.0",
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-markdown": "^4.0.3",
     "typescript": "^5.1.6"
   },
   "dependencies": {

@@ -1,8 +1,20 @@
 
+packages = game_event game_ecs game_core game_core_node game_core_browser example_2d_engine example_nodejs_engine
+
 all: example_2d_engine example_nodejs_engine
 
+web_docs: docs
+    cd web_docs && \
+    zola build
+
+docs: $(packages)
+    for package in $(packages); do \
+        cd package/$$package && \
+        npm run doc \
+    done
+
 # Core game libraries
-game_event:
+game_event: game_event
 	cd package/game_event && \
 	npm i && \
 	npm run build
@@ -42,6 +54,8 @@ example_nodejs_engine: game_core_node
 # 	cd package/example_game_pong && \
 # 	npm i && \
 # 	npm run build
+
+.PHONY: clean
 
 clean:
 	cd package/game_event && rm -rf build node_modules

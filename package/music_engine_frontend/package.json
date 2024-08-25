@@ -1,0 +1,41 @@
+{
+  "name": "music_engine_frontend",
+  "version": "1.0.0",
+  "description": "This is a react application that exposes the nodes of Music Engine to build a graph.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "tsc",
+    "postcompile": "npm run rollup",
+    "rollup": "rollup -c ./rollup.config.mjs",
+    "start": "npm run serve",
+    "serve": "http-server -p 8080 -a 127.0.0.1 ./public",
+    "prewatch": "http-server -p 8080 -a 127.0.0.1 ./public &",
+    "watch": "nodemon --config nodemon.json",
+    "postwatch": "pkill -f http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-replace": "^5.0.7",
+    "dotenv": "^16.4.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "music_engine": "../music_engine"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-react-app": "^7.0.1",
+    "gts": "^5.0.0",
+    "http-server": "^14.1.1",
+    "nodemon": "^3.0.1",
+    "prettier": "3.3.3",
+    "rollup": "^3.28.0",
+    "typescript": "^5.1.6"
+  }
+}
