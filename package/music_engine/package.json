@@ -2,7 +2,7 @@
   "name": "music_engine",
   "version": "1.0.0",
   "description": "A standalone dynamic music engine",
-  "main": "index.js",
+  "main": "build/index.js",
   "type": "module",
   "scripts": {
     "build": "npm run compile",

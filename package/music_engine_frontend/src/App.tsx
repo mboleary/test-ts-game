@@ -1,4 +1,6 @@
 import React from "react";
+import { GraphView } from "./views/GraphView";
+import { NodeStateProvider } from "./state/nodes/NodeStateProvider";
 
 function MyButton({ title }: { title: string }) {
     return (
@@ -6,12 +8,9 @@ function MyButton({ title }: { title: string }) {
     );
   }
   
-  export default function MyApp() {
-    return (
-      <div>
-        <h1>Welcome to my app</h1>
-        <MyButton title="I'm a button" />
-      </div>
-    );
+  export function App() {
+    return <NodeStateProvider>
+        <GraphView />
+    </NodeStateProvider>
   }
   
