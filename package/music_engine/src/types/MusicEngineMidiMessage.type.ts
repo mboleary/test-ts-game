@@ -1,10 +1,10 @@
-export enum MusicEngineMidiMessageType {
+export const enum MusicEngineMidiMessageType {
   NOTE_ON = 'NOTE_ON',
   NOTE_OFF = 'NOTE_OFF',
   CONTROL_CHANGE = 'CONTROL_CHANGE'
 };
 
-export interface MusicEngineMidiMessage {
+export interface MusicEngineMidiMessageInterface {
   time?: number;
   type: MusicEngineMidiMessageType;
   key?: number;
@@ -13,7 +13,7 @@ export interface MusicEngineMidiMessage {
   channel?: number;
 }
 
-export interface MidiNoteOnMessage extends MusicEngineMidiMessage {
+export interface MidiNoteOnMessageInterface extends MusicEngineMidiMessageInterface {
   type: MusicEngineMidiMessageType.NOTE_ON;
 }
 

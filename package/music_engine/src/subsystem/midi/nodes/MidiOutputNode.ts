@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
 import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";
@@ -9,10 +10,11 @@ export class MidiOutputNode extends MusicEngineNode {
   constructor(
     private readonly midiAccess: MIDIAccess,
     context: AudioContext,
-    name: string,
+    name: string = '',
+    id: string = nanoid(),
     labels: string[] = []
   ) {
-    super(context, name, TYPE, labels);
+    super(context, name, id, TYPE, labels);
 
     // Generate Midi Ports based on Midi Map
     for (const entry of (this.midiAccess.outputs as unknown as Map<any, MIDIPort>)) {

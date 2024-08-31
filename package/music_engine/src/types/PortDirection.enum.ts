@@ -1,4 +1,4 @@
 export enum PortDirection {
-  IN,
-  OUT
+  IN = 'IN',
+  OUT = 'OUT'
 };

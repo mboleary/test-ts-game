@@ -2,6 +2,7 @@
  * This node has an array to define the notes that will be played
  */
 
+import { nanoid } from "nanoid";
 import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiSendPort } from "../../../ports/MidiSendPort";
 import { TriggerReceivePort } from "../../../ports/TriggerReceivePort";
@@ -15,11 +16,12 @@ const TYPE = "sequencer_node"
 export class SequenceNode extends MusicEngineNode {
   constructor(
     context: AudioContext,
-    name: string,
+    name: string = '',
+    id: string = nanoid(),
     public readonly noteArr: number[],
     labels: string[] = []
   ) {
-    super(context, name, TYPE, labels);
+    super(context, name, id, TYPE, labels);
   }
 
   private currIndex = 0;

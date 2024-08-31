@@ -1,4 +1,4 @@
-import { MusicEngineMidiMessage as MusicEngineMidiMessageObjectType, MusicEngineMidiMessageType } from "../../../types/MusicEngineMidiMessage.type";
+import { MusicEngineMidiMessageInterface as MusicEngineMidiMessageObjectType, MusicEngineMidiMessageType } from "../../../types/MusicEngineMidiMessage.type";
 import { MidiNoteOffMessage } from "./MidiNoteOffMessage";
 import { MidiNoteOnMessage } from "./MidiNoteOnMessage";
 import { MusicEngineMidiMessage } from "./MusicEngineMidiMessage";

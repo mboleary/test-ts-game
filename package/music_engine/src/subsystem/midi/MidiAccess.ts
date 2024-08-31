@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { MidiInputNode } from "./nodes/MidiInputNode";
 import { MidiOutputNode } from "./nodes/MidiOutputNode";
 
@@ -8,8 +9,8 @@ export class MidiAccess {
     public readonly access: MIDIAccess,
     private readonly audioContext: AudioContext
   ) {
-    this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs');
-    this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs');
+    this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs', nanoid());
+    this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs', nanoid());
   }
 
   static async prompt(): Promise<boolean> {

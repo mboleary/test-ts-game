@@ -2,11 +2,11 @@
  * Contains functions to schedule notes on a AudioScheduledSourceNode
  */
 
-import { MusicEngineMidiMessage, MusicEngineMidiMessageType } from "../types/MusicEngineMidiMessage.type";
+import { MusicEngineMidiMessageInterface, MusicEngineMidiMessageType } from "../types/MusicEngineMidiMessage.type";
 import { noteToFrequencyEqualTemperment } from "./noteToFrequency";
 
 export function scheduleNote(
-  midiMessage: MusicEngineMidiMessage, 
+  midiMessage: MusicEngineMidiMessageInterface, 
   context: AudioContext,
   node: AudioScheduledSourceNode & {frequency: AudioParam},
 ): void {

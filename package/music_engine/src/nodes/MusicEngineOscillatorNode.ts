@@ -2,6 +2,7 @@
  * Oscillator Node for Music engine
  */
 
+import { nanoid } from "nanoid";
 import { AudioParamPort } from "../ports/AudioParamPort";
 import { AudioPort } from "../ports/AudioPort";
 import { PortDirection } from "../types/PortDirection.enum";
@@ -19,9 +20,10 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
     context: AudioContext,
     private readonly oscType: OscillatorType = 'sine',
     name: string = '',
+    id: string = nanoid(),
     labels: string[] = [],
   ) {
-    super(context, name, TYPE, labels);
+    super(context, name, id, TYPE, labels);
     this.gainNode = context.createGain();
     this.gain = this.gainNode.gain;
     this.audioOut.registerAudioNode(this.gainNode);
@@ -53,7 +55,6 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
       this.detune.unregisterAudioParam(t.detune);
       t.disconnect();
     });
-    // @TODO implement port interface for storing node connection
     node.connect(this.gainNode);
     node.start(time);
   }

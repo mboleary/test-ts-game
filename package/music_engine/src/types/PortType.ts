@@ -1,6 +1,6 @@
 export enum PortType {
-  PARAM,
-  TRIGGER,
-  AUDIO,
-  MIDI
+  PARAM = 'PARAM',
+  TRIGGER = 'TRIGGER',
+  AUDIO = 'AUDIO',
+  MIDI = 'MIDI'
 }

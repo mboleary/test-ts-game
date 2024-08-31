@@ -1,6 +1,6 @@
-import { MusicEngineMidiMessage, MusicEngineMidiMessageType } from "../../../types/MusicEngineMidiMessage.type";
+import { MusicEngineMidiMessageInterface, MusicEngineMidiMessageType } from "../../../types/MusicEngineMidiMessage.type";
 
-export function buildMidiBytes(message: MusicEngineMidiMessage): Uint8Array {
+export function buildMidiBytes(message: MusicEngineMidiMessageInterface): Uint8Array {
   switch (message.type) {
     case MusicEngineMidiMessageType.NOTE_ON: 
       return noteOn(message);
@@ -12,12 +12,12 @@ export function buildMidiBytes(message: MusicEngineMidiMessage): Uint8Array {
   }
 }
 
-function noteOn(message: MusicEngineMidiMessage) {
+function noteOn(message: MusicEngineMidiMessageInterface) {
   const statusByte = 0x90 + ((message.channel || 0) & 0xF);
   return new Uint8Array([statusByte, message.key || 0x00, message.velocity || 0x00]);
 }
 
-function noteOff(message: MusicEngineMidiMessage) {
+function noteOff(message: MusicEngineMidiMessageInterface) {
   const statusByte = 0x80 + ((message.channel || 0) & 0xF);
   return new Uint8Array([statusByte, message.key || 0x00, message.velocity || 0x00]);
 }

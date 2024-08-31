@@ -1,5 +1,5 @@
 import { NodeElement } from "./NodeElement";
 
 export const nodeTypes = {
-    Node: NodeElement
+    default: NodeElement
 }

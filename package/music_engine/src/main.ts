@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { MusicEngineOscillatorNode } from "./nodes/MusicEngineOscillatorNode";
 import { AudioPort } from "./ports/AudioPort";
 import { MidiSendPort } from "./ports/MidiSendPort";
@@ -16,7 +17,7 @@ let interval: NodeJS.Timer;
 
 async function midiInputTest() {
   const ac = new AudioContext();
-  const node = new MusicEngineOscillatorNode(ac, 'sawtooth', 'midi synth', ['midi', 'synth']);
+  const node = new MusicEngineOscillatorNode(ac, 'sawtooth', 'midi synth', nanoid(), ['midi', 'synth']);
   const apDest = new AudioPort('dest', PortDirection.IN);
   apDest.registerAudioNode(ac.destination);
   node.audioOut.connect(apDest);
