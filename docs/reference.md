@@ -6,6 +6,8 @@
 - https://github.com/prettier/eslint-config-prettier#installation
 - https://www.typescriptlang.org/tsconfig
     - adding support for DOM types
+- https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html
+    - exports and tsconfig options
 
 ## Inspiration
 - https://excaliburjs.com/docs/

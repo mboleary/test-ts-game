@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A standalone dynamic music engine",
   "main": "build/index.js",
-  "type": "module",
   "scripts": {
     "build": "npm run compile",
     "clean": "rm ./dist ./build",
