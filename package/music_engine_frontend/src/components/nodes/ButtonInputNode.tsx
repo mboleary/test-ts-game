@@ -3,11 +3,11 @@ import React, { useMemo } from "react";
 import { Node, Handle, Position, NodeProps } from "@xyflow/react";
 import { MENodeRepresentation } from "../../types/MENodeRepresentation.type";
 import { PORT_SPACING } from "../../constants";
-import { PortTypeColors, PortTypeKey } from "../../types/PortTypeColors.enum";
+import { PortTypeColors } from "../../types/PortTypeColors.enum";
 import { getHandleIdFromPort } from "../../util/getHandleIdFromPort";
 import { PortDirection } from "music_engine";
 
-export function NodeElement({ data, selected, isConnectable, ...props }: NodeProps<Node<MENodeRepresentation>>) {
+export function ButtonInputNode({ data, selected, isConnectable, ...props }: NodeProps<Node<MENodeRepresentation>>) {
     const leftHandles = useMemo(() => {
         return data.inPorts?.map((item, index) => <Handle 
             key={getHandleIdFromPort(data.id, PortDirection.IN, item.name)}
@@ -42,13 +42,16 @@ export function NodeElement({ data, selected, isConnectable, ...props }: NodePro
 
     // const mode = leftHandles.length === 0 && rightHandles.length > 0 ? "input" : leftHandles.length > 0 && rightHandles.length === 0 ? "output" : "default";
 
-    return <div style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
+    return <div className="react-flow__node-default" style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
         {leftHandles}
         <div>
             <b>{data.type}</b>
         </div>
         <div>
             <i>{data.name}</i>
+        </div>
+        <div>
+            <button type="button" onClick={() => {}} > {data.name} </button>
         </div>
         {rightHandles}
     </div>

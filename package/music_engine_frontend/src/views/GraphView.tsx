@@ -2,16 +2,33 @@ import React, { useContext } from "react";
 import  { Background, BackgroundVariant, ControlButton, Controls, MiniMap, ReactFlow, ReactFlowProvider, ViewportPortal } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { NodeContext, NodeEdgesContext } from "../state/nodes/context";
 import { nodeTypes } from "../components/nodes/nodeTypes";
+import { NodeStore, useNodeStore } from "../state/store";
+
+const selector = (store: NodeStore) => ({
+    nodes: store.nodes,
+    edges: store.edges,
+    onNodesChange: store.onNodesChange,
+    onEdgesChange: store.onEdgesChange,
+    addEdge: store.addEdge,
+});
 
 export function GraphView() {
-    const nodes = useContext(NodeContext);
-    const edges = useContext(NodeEdgesContext);
+    // const nodes = useContext(NodeContext);
+    // const edges = useContext(NodeEdgesContext);
+
+    const store = useNodeStore(selector);
 
     return <>
         <ReactFlowProvider>
-            <ReactFlow nodes={nodes} nodeTypes={nodeTypes}>
+            <ReactFlow 
+                nodeTypes={nodeTypes}
+                nodes={store.nodes} 
+                edges={store.edges}
+                onNodesChange={store.onNodesChange}
+                onEdgesChange={store.onEdgesChange}
+                onConnect={store.addEdge}
+            >
                 <Background variant={BackgroundVariant.Dots} />
                 <Controls>
                     <ControlButton></ControlButton>

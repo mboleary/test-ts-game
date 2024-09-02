@@ -16,3 +16,25 @@ code {
 #root {
     height: 100%
 }
+
+.react-flow__handle.react-flow__handle-left::after {
+    content: attr(title);
+    font-size: 6px;
+    color: currentColor;
+    margin-left: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: monospace;
+}
+
+.react-flow__handle.react-flow__handle-right::before {
+    content: attr(title);
+    font-size: 6px;
+    color: currentColor;
+    margin-right: 8px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: monospace;
+}
