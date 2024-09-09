@@ -2,7 +2,7 @@
  * Oscillator Node for Music engine
  */
 
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { AudioParamPort } from "../ports/AudioParamPort";
 import { AudioPort } from "../ports/AudioPort";
 import { PortDirection } from "../types/PortDirection.enum";

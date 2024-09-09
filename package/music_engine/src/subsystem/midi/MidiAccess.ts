@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { MidiInputNode } from "./nodes/MidiInputNode";
 import { MidiOutputNode } from "./nodes/MidiOutputNode";
 

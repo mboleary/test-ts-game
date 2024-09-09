@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
 import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";

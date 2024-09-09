@@ -6,7 +6,10 @@
     "lib": [
       "dom",
       "es2020"
-    ]
+    ],
+    "paths": {
+      "nanoid/index.js": ["./node_modules/nanoid/index.browser.js"]
+    }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
