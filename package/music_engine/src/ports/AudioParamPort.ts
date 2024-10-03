@@ -1,3 +1,4 @@
+import { MusicEngineNode } from "../nodes";
 import { PortDirection } from "../types/PortDirection.enum";
 import { PortType } from "../types/PortType";
 import { MusicEnginePort } from "./Port";
@@ -5,11 +6,13 @@ import { MusicEnginePort } from "./Port";
 export class AudioParamPort extends MusicEnginePort implements AudioParam {
   
   constructor(
+    id: string,
+    node: MusicEngineNode | null,
     name: string,
     direction: PortDirection,
     defaultValue: number,
   ) {
-    super(name, direction, PortType.PARAM);
+    super(id, node, name, direction, PortType.PARAM);
     this._defaultValue = defaultValue;
     this._value = defaultValue;
   }

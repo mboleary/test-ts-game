@@ -17,7 +17,7 @@ export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
     super(context, name, id, type, labels);
   }
 
-  public readonly midiIn: MidiReceivePort = new MidiReceivePort('in', this.receive.bind(this));
+  public readonly midiIn: MidiReceivePort = new MidiReceivePort('in', this, 'Midi In', this.receive.bind(this));
 
   protected abstract noteOn(time: number, note: number): void;
 

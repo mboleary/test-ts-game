@@ -1,4 +1,4 @@
-import {MusicEnginePort, MusicEngineNode} from "music_engine";
+import {MusicEnginePort, MusicEngineNode} from "../";
 
 export function getPortArray(node: MusicEngineNode): MusicEnginePort[] {
     const ports = [];

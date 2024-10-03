@@ -1,4 +1,5 @@
 // import { MusicEngineMidiMessage } from "../types/MusicEngineMidiMessage.type";
+import { MusicEngineNode } from "../nodes";
 import { MusicEngineMidiMessage } from "../subsystem/midi/message/MusicEngineMidiMessage";
 import { PortDirection } from "../types/PortDirection.enum";
 import { PortType } from "../types/PortType";
@@ -12,11 +13,13 @@ export type MidiMessageReceiver = (message: MusicEngineMidiMessage, id?: string)
  */
 export class MidiReceivePort extends MusicEnginePort {
   constructor(
+    id: string,
+    node: MusicEngineNode | null,
     name: string,
     private readonly receiveHandler: MidiMessageReceiver,
-    public readonly id?: string
+    public readonly midiId?: string
   ) {
-    super(name, PortDirection.IN, PortType.MIDI);
+    super(id, node, name, PortDirection.IN, PortType.MIDI);
   }
 
   /**
@@ -31,6 +34,6 @@ export class MidiReceivePort extends MusicEnginePort {
   }
 
   public receive(message: MusicEngineMidiMessage) {
-    this.receiveHandler(message, this.id);
+    this.receiveHandler(message, this.midiId);
   }
 }

@@ -42,16 +42,22 @@ export function ButtonInputNode({ data, selected, isConnectable, ...props }: Nod
 
     // const mode = leftHandles.length === 0 && rightHandles.length > 0 ? "input" : leftHandles.length > 0 && rightHandles.length === 0 ? "output" : "default";
 
-    return <div className="react-flow__node-default" style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
+    return <div className="music-engine-node" style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
         {leftHandles}
-        <div>
-            <b>{data.type}</b>
+        <div className="padding">
+            <div>
+                <b>{data.type}</b>
+            </div>
+            <div>
+                <i>{data.name}</i>
+            </div>
+            <div>
+                <button type="button" onClick={() => {}} > {data.name} </button>
+            </div>
         </div>
-        <div>
-            <i>{data.name}</i>
-        </div>
-        <div>
-            <button type="button" onClick={() => {}} > {data.name} </button>
+        <div className="statusbar">
+            {props.id}
+            {props.type}
         </div>
         {rightHandles}
     </div>

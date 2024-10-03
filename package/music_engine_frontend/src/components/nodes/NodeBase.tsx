@@ -1,15 +1,20 @@
-import React, { useMemo } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 
 import { Node, Handle, Position, NodeProps } from "@xyflow/react";
-import { MENodeRepresentation } from "../../types/MENodeRepresentation.type";
+import { MENodePortRepresentation, MENodeRepresentation } from "../../types/MENodeRepresentation.type";
 import { PORT_SPACING } from "../../constants";
 import { PortTypeColors, PortTypeKey } from "../../types/PortTypeColors.enum";
 import { getHandleIdFromPort } from "../../util/getHandleIdFromPort";
 import { PortDirection } from "music_engine";
 
-export function NodeElement({ data, selected, isConnectable, id, type, ...props }: NodeProps<Node<MENodeRepresentation>>) {
+export type NodeBaseProps = {
+    inPorts?: MENodePortRepresentation[],
+    outPorts?: MENodePortRepresentation[],
+}
+
+export function NodeBase({ children, inPorts, outPorts, data, selected, isConnectable, id, type, ...props }: NodeProps<Node<MENodeRepresentation>> & PropsWithChildren & NodeBaseProps) {
     const leftHandles = useMemo(() => {
-        return data.inPorts?.map((item, index) => <Handle 
+        return inPorts?.map((item, index) => <Handle 
             key={getHandleIdFromPort(data.id, PortDirection.IN, item.name)}
             id={item.name}
             type="target"
@@ -25,7 +30,7 @@ export function NodeElement({ data, selected, isConnectable, id, type, ...props 
     }, [data.inPorts, isConnectable]);
 
     const rightHandles = useMemo(() => {
-        return data.outPorts?.map((item, index) => <Handle 
+        return outPorts?.map((item, index) => <Handle 
             key={getHandleIdFromPort(data.id, PortDirection.IN, item.name)}
             id={item.name}
             type="source"
@@ -42,15 +47,18 @@ export function NodeElement({ data, selected, isConnectable, id, type, ...props 
 
     // const mode = leftHandles.length === 0 && rightHandles.length > 0 ? "input" : leftHandles.length > 0 && rightHandles.length === 0 ? "output" : "default";
 
-    return <div style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
+    return <div className="music-engine-node" style={{ minHeight: PORT_SPACING * Math.max(leftHandles.length, rightHandles.length)}}>
         {leftHandles}
-        <div>
-            <b>{data.type}</b>
+        {children}
+        <div className="padding">
+            <div>
+                <b>{data.type}</b>
+            </div>
+            <div>
+                <i>{data.name}</i>
+                {id}
+            </div>
         </div>
-        <div>
-            <i>{data.name}</i>
-        </div>
-        {id}
         {rightHandles}
     </div>
 }

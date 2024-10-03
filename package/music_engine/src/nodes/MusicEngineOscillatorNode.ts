@@ -33,9 +33,9 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
   private readonly gainNode: GainNode;
 
   public readonly gain: AudioParam;
-  public readonly detune: AudioParamPort = new AudioParamPort('detune', PortDirection.IN, 0);
+  public readonly detune: AudioParamPort = new AudioParamPort('detune', this, 'Detune', PortDirection.IN, 0);
 
-  public readonly audioOut: AudioPort = new AudioPort('audio', PortDirection.OUT);
+  public readonly audioOut: AudioPort = new AudioPort('audio', this, 'Audio', PortDirection.OUT);
 
   protected noteOn(time: number, note: number): void {
     const node = new OscillatorNode(this.context);

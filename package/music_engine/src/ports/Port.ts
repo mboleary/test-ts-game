@@ -2,11 +2,14 @@
  * Abstraction on AudioParams that allow connecting many nodes together
  */
 
+import { MusicEngineNode } from "../nodes";
 import { PortDirection } from "../types/PortDirection.enum";
 import { PortType } from "../types/PortType";
 
 export abstract class MusicEnginePort {
   constructor(
+    public id: string,
+    public node: MusicEngineNode | null,
     public name: string = '',
     public readonly direction: PortDirection,
     public readonly type: PortType

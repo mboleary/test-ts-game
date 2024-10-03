@@ -1,13 +1,16 @@
+import { MusicEngineNode } from "../nodes";
 import { PortDirection } from "../types/PortDirection.enum";
 import { PortType } from "../types/PortType";
 import { MusicEnginePort } from "./Port";
 
 export class AudioPort extends MusicEnginePort {
   constructor(
+    id: string,
+    node: MusicEngineNode | null,
     name: string,
     direction: PortDirection,
   ) {
-    super(name, direction, PortType.AUDIO);
+    super(id, node, name, direction, PortType.AUDIO);
   }
 
   private registeredAudioNodes: AudioNode[] = [];
