@@ -21,9 +21,8 @@
 }
 
 .react-flow__node .music-engine-node {
-    /* padding: 10px; */
     border-radius: var(--xy-node-border-radius, var(--xy-node-border-radius-default));
-    width: 150px;
+    min-width: 150px;
     font-size: 12px;
     color: var(--xy-node-color, var(--xy-node-color-default));
     text-align: center;
@@ -57,5 +56,17 @@
     left: 0;
     width: 100%;
     font-family: monospace;
-    
+    font-size: 10px;
+    /* background-color: #111111AF; */
+    /* color: white; */
+}
+
+.react-flow__node .music-engine-node .statusbar .left {
+    text-align: left;
+    padding-left: 5px;
+}
+
+.react-flow__node .music-engine-node .statusbar .right {
+    text-align: right;
+    padding-right: 5px;
 }

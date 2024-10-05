@@ -43,7 +43,7 @@ export class MidiInputNode extends MusicEngineNode {
   }
 
   private buildMidiPort(port: MIDIPort): MidiSendPort {
-    const sendPort = new MidiSendPort(port.name || port.id, port.id);
+    const sendPort = new MidiSendPort(nanoid(), this, port.name || port.id, port.id);
     port.addEventListener('midimessage', this.handleMidiMessage.bind(this));
     return sendPort;
   }

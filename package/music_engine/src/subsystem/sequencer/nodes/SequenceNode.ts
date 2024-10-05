@@ -26,9 +26,9 @@ export class SequenceNode extends MusicEngineNode {
 
   private currIndex = 0;
 
-  public readonly noteTriggerPort = new TriggerReceivePort('in', this.noteTriggerPortHandler.bind(this));
+  public readonly noteTriggerPort = new TriggerReceivePort(nanoid(), this, 'in', this.noteTriggerPortHandler.bind(this));
 
-  public readonly midiOutPort = new MidiSendPort('out');
+  public readonly midiOutPort = new MidiSendPort(nanoid(), this, 'out');
 
   // @TODO make this a parameter
   public velocity: number = 127;

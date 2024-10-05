@@ -18,7 +18,7 @@ let interval: NodeJS.Timer;
 async function midiInputTest() {
   const ac = new AudioContext();
   const node = new MusicEngineOscillatorNode(ac, 'sawtooth', 'midi synth', nanoid(), ['midi', 'synth']);
-  const apDest = new AudioPort('dest', PortDirection.IN);
+  const apDest = new AudioPort(nanoid(), null, 'dest', PortDirection.IN);
   apDest.registerAudioNode(ac.destination);
   node.audioOut.connect(apDest);
 
@@ -34,11 +34,11 @@ async function test() {
   const ac = new AudioContext();
   const node = new MusicEngineOscillatorNode(ac);
   // Destination, wrapped in a port
-  const apDest = new AudioPort('dest', PortDirection.IN);
+  const apDest = new AudioPort(nanoid(), null, 'dest', PortDirection.IN);
   apDest.registerAudioNode(ac.destination);
   node.audioOut.connect(apDest);
 
-  const midiOut = new MidiSendPort('send');
+  const midiOut = new MidiSendPort(nanoid(), null, 'send');
   midiOut.connect(node.midiIn);
 
   const midiAccess = await MidiAccess.start(ac);

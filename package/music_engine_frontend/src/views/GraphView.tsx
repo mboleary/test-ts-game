@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useCallback, useContext } from "react";
 import  { Background, BackgroundVariant, ControlButton, Controls, MiniMap, ReactFlow, ReactFlowProvider, ViewportPortal } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -19,6 +19,11 @@ export function GraphView() {
 
     const store = useNodeStore(selector);
 
+    const onDragOver = useCallback((event: React.DragEvent) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }, []);
+
     return <>
         <ReactFlowProvider>
             <ReactFlow 
@@ -28,6 +33,7 @@ export function GraphView() {
                 onNodesChange={store.onNodesChange}
                 onEdgesChange={store.onEdgesChange}
                 onConnect={store.addEdge}
+                onDragOver={onDragOver}
             >
                 <Background variant={BackgroundVariant.Dots} />
                 <Controls>

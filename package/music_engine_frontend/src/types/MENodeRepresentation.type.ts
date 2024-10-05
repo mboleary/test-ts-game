@@ -1,17 +1,18 @@
-import { PortDirection } from "music_engine";
+import { MusicEngineNode, MusicEnginePort, PortDirection } from "music_engine";
 import { PortType } from "music_engine/build/types/PortType";
 
-export type MENodeRepresentation = {
-    id: string;
+export type MENode<T extends MusicEngineNode = MusicEngineNode> = {
     name: string;
-    type: string;
-    labels?: string[];
-    inPorts?: MENodePortRepresentation[];
-    outPorts?: MENodePortRepresentation[];
-}
+    nodeType: string;
+    labels: string[];
+    ports: MENodePortRepresentation[];
+};
 
 export type MENodePortRepresentation = {
+    id: string;
     type: PortType;
     name: string;
     direction: PortDirection;
-}
+};
+
+// export type MENodePortRepresentation = typeof MusicEnginePort;
