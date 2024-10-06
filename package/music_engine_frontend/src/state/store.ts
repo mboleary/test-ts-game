@@ -3,16 +3,27 @@
  */
 
 import { applyNodeChanges, applyEdgeChanges, NodeChange, Connection, Node, EdgeChange, Edge, Position } from '@xyflow/react';
-import { PortDirection, PortType } from 'music_engine';
+import { MusicEngineNode, MusicEngineOscillatorNode, PortDirection, PortType, SequenceNode } from 'music_engine';
 import { nanoid } from 'nanoid';
 import { create } from 'zustand';
-import { MENode } from '../types/MENodeRepresentation.type';
+import { MENode, PropType } from '../types/MENodeRepresentation.type';
+import { PortTypeColors } from '../types/PortTypeColors.enum';
+
+export type PropNodeType = {
+    type: string;
+    assetName?: string;
+    displayValue: string;
+}
+
+// @TODO might need to store prop nodes separately
+
+type NodeType = MENode<MusicEngineNode | MusicEngineOscillatorNode | SequenceNode>;
 
 export type NodeStore = {
-    nodes: Node<MENode>[],
+    nodes: Node<NodeType>[],
     edges: Edge[],
 
-    onNodesChange: (changes: NodeChange<Node<MENode>>[]) => void,
+    onNodesChange: (changes: NodeChange<Node<NodeType>>[]) => void,
     onEdgesChange: (changes: EdgeChange[]) => void,
     addEdge: (data: Connection) => void,
 };
@@ -30,11 +41,14 @@ export const useNodeStore = create<NodeStore>()((set, get) => ({
             {id: '8', type: PortType.TRIGGER, name: 'trg_out', direction: PortDirection.OUT},
             {id: '9', type: PortType.PARAM, name: 'prm_out', direction: PortDirection.OUT},
             {id: '0', type: 'invalid' as PortType, name: 'inv', direction: PortDirection.OUT}
-        ], }, position: { x: 0, y: 0 }},
-        { id: 'b', type: 'ButtonInputNode', data: { nodeType: 'gain', name: 'test', labels: [], ports: [] }, position: { x: 50, y: 50 } },
+        ], props: [
+            {key: 'type', type: PropType.SELECT, possibleValues: ['sine', 'saw', 'square', 'triangle'], value: 'sine'},
+            {key: 'velocity' as keyof MusicEngineNode, type: PropType.RANGE, min: 0, max: 100, value: 10}
+        ] }, position: { x: 0, y: 0 }},
+        { id: 'b', type: 'ButtonInputNode', data: { nodeType: 'gain', name: 'test', labels: [], ports: [], props: [] }, position: { x: 50, y: 50 } },
         { id: 'c', type: 'CanvasNode', data: { nodeType: 'output', name: 'test', labels: [], ports: [
             {id: '2', type: PortType.AUDIO, name: 'aud_in', direction: PortDirection.IN},
-        ] }, position: { x: -50, y: 100 } },
+        ], props: [] }, position: { x: -50, y: 100 } },
         // {id: 'd', type: 'input', data: {id: 'x', name: 'test', type: 'test'}, position: {x: 100, y: 100}},
         // {id: 'e', type: 'output', data: {id: 'x', name: 'test', type: 'test'}, position: {x: 100, y: 100}},
         // {id: 'f', type: 'group', data: {id: 'x', name: 'test', type: 'test'}, position: {x: 100, y: 100}},
@@ -43,12 +57,14 @@ export const useNodeStore = create<NodeStore>()((set, get) => ({
     edges: [],
 
     onNodesChange(changes) {
+        console.log("node change", changes);
         set({
             nodes: applyNodeChanges(changes, get().nodes),
         });
     },
 
     onEdgesChange(changes) {
+        console.log(changes);
         set({
             edges: applyEdgeChanges(changes, get().edges),
         });
@@ -56,8 +72,21 @@ export const useNodeStore = create<NodeStore>()((set, get) => ({
 
     addEdge(data) {
         const id = nanoid(6);
-        const edge = { id, ...data };
+        const sourceNode = get().nodes.filter(node => node.id === data.source)[0];
+        const sourcePort = sourceNode?.data.ports.filter(port => port.id === data.sourceHandle)[0];
+        const targetNode = get().nodes.filter(node => node.id === data.target)[0];
+        const targetPort = targetNode?.data.ports.filter(port => port.id === data.targetHandle)[0];
 
-        set({ edges: [edge, ...get().edges] });
+        console.log(sourceNode, sourcePort, targetNode, targetPort, data);
+
+        if (!(sourceNode && sourcePort && targetNode && targetPort)) return;
+
+        if (sourcePort.type === targetPort.type || (sourcePort.type === PortType.AUDIO && targetPort.type === PortType.PARAM)) {
+            const edge = { id, ...data, style: {
+                // Set the color based on the source port type
+                stroke: PortTypeColors[sourcePort.type]
+            } };
+            set({ edges: [edge, ...get().edges] });
+        }
     },
 }));

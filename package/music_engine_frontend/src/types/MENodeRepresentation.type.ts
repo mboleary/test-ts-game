@@ -6,6 +6,7 @@ export type MENode<T extends MusicEngineNode = MusicEngineNode> = {
     nodeType: string;
     labels: string[];
     ports: MENodePortRepresentation[];
+    props: MENodeProp<T, any>[]
 };
 
 export type MENodePortRepresentation = {
@@ -14,5 +15,22 @@ export type MENodePortRepresentation = {
     name: string;
     direction: PortDirection;
 };
+
+export enum PropType {
+    TEXT = 'TEXT',
+    SELECT = 'SELECT',
+    PORT = 'PORT',
+    RANGE = 'RANGE'
+}
+
+export type MENodeProp<NodeType, ValueType> = {
+    key: keyof NodeType,
+    type: PropType,
+    possibleValues?: ValueType[],
+    portId?: string;
+    value: ValueType;
+    rangeMin?: number;
+    rangeMax?: number;
+}
 
 // export type MENodePortRepresentation = typeof MusicEnginePort;

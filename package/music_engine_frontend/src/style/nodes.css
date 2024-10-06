@@ -28,6 +28,7 @@
     text-align: center;
     border: var(--xy-node-border, var(--xy-node-border-default));
     background-color: var(--xy-node-background-color, var(--xy-node-background-color-default));
+    resize: both;
 }
 
 .react-flow__node.selectable:hover .music-engine-node {
@@ -45,9 +46,29 @@
 }
 
 .react-flow__node .music-engine-node .titlebar {
+    /* position: absolute;
+    left: 0;
+    top: 0; */
+    /* width: 100%; */
     background-color: var(--xy-resize-background-color-default);
     color: white;
     height: 1.5em;
+}
+
+.react-flow__node .music-engine-node .titlebar .title {
+    position: absolute;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    
+}
+
+.react-flow__node .music-engine-node .titlebar .icon {
+    padding: 2px 0 0 2px;
+}
+
+.react-flow__node .music-engine-node .titlebar .right-slot {
+    padding: 2px 2px 0 0;
 }
 
 .react-flow__node .music-engine-node .statusbar {
@@ -69,4 +90,8 @@
 .react-flow__node .music-engine-node .statusbar .right {
     text-align: right;
     padding-right: 5px;
+}
+
+.react-flow__viewport-portal {
+    color: var(--xy-node-color, var(--xy-node-color-default));
 }
