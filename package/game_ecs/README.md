@@ -1,3 +1,4 @@
-# Default package for test game
+# Entity Component System (ECS) for the game framework
 
-This package may be split out into several packages depending on how the IoC containers are written
+This package implements an ECS, and provides some additional functionality with relationships.
+

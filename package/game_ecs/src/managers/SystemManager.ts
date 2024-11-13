@@ -1,15 +1,11 @@
 import { System } from "../System";
-import { ECSDB } from "../db";
-import { Manager } from "./Manager";
 import { World } from "../World";
 
-export class SystemManager extends Manager {
+export class SystemManager{
   private systems: Map<string, System> = new Map();
   constructor(
-    ecsDB: ECSDB,
-    world: World
+    private readonly world: World
   ) {
-    super(ecsDB, world);
   }
 
   public add(systems: System[]) {

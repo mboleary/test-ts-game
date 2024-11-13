@@ -1,25 +1,12 @@
-import { ECSDB } from "./db/ECSDB";
+import { v4 as uuidv4 } from "uuid";
 import { Entity } from "./Entity";
-import { EntityManager } from "./managers/EntityManager";
-import { Manager } from "./managers/Manager";
-// import { QueryManager } from "./QueryManager";
+import { ComponentAndKey, ECSWorldInternals } from "./db/ECSWorldInternals";
 
-export type ManagerBuilder<T extends Manager> = (ecsdb: ECSDB, world: World) => T;
+export class World {
+  protected readonly internals = new ECSWorldInternals();
 
-export class World /*implements Serializable, Subscribable*/ {
-  private readonly ecsDB: ECSDB;
-  public readonly entityManager: EntityManager;
-  // public readonly queryManager: QueryManager;
-  private readonly managerMap: Map<Function, Manager> = new Map();
-
-  constructor(ecsdb?: ECSDB, managers?: ManagerBuilder<any>[]) {
-    this.ecsDB = ecsdb || new ECSDB();
-    this.entityManager = new EntityManager(this.ecsDB, this);
-    if (managers) {
-      for (const man of managers) {
-        this.managerMap.set(man.constructor, this.buildManager(man));
-      }
-    }
+  constructor() {
+    
   }
 
   public get root(): Entity | null {
@@ -28,24 +15,15 @@ export class World /*implements Serializable, Subscribable*/ {
     // return this.ecsDB.
   }
 
-  // public merge(world: World) {
-  //   // @TODO merge into our ECSDB
-  // }
-
-  private buildManager<T extends Manager>(managerBuilder: ManagerBuilder<T>): Manager {
-    return managerBuilder(this.ecsDB, this);
+  public createEntity(id?: string, components?: ComponentAndKey[]): Entity {
+    return this.internals.entityCreate(id || uuidv4(), components || []);
   }
 
-  public addManager<T extends Manager>(managerBuilder: ManagerBuilder<T>) {
-    const manager = this.buildManager(managerBuilder);
-    this.managerMap.set(manager.constructor, manager);
+  public getEntity(id: string): Entity | undefined {
+    return this.internals.entityGet(id || uuidv4());
   }
 
-  public getManager<T extends Manager>(managerConstructor: Function): T | null {
-    return this.managerMap.get(managerConstructor) as T || null;
-  }
-
-  public getAllManagers() {
-    return Array.from(this.managerMap.values());
+  public deleteEntity(id: string) {
+    this.internals.entityDelete(id);
   }
 }

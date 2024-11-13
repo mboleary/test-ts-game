@@ -1,22 +1,27 @@
 import { v4 as uuidv4 } from "uuid";
-import { ECSDB } from "./db/ECSDB";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable, Observable, Observer, ObserverManager } from "game_event";
-import { Component } from "./Component";
-import { mergeECSDB } from "./util/ecsdbOverrideHelper";
 import { buildProxy } from "./util/buildProxy";
 import { ComponentKeyType } from "./type/ComponentKey.type";
+import { ECSWorldInternals } from "./db/ECSWorldInternals";
+import { BuiltInRelationships } from "./db/builtInRelationships.const";
+import { EntityRelationship } from "./db/EntityRelationship";
+
+export type HydratedEntityRelationship = Omit<EntityRelationship, "entityAId" | "entityBId"> & {entity: Entity};
 
 export class Entity implements Eventable, Observable {
-  protected readonly _eventEmitter: GameEventTreeEmitter =
-    new GameEventTreeEmitter(() => this.parent?._eventEmitter);
-  protected readonly _observerManager: ObserverManager = new ObserverManager();
-
   constructor(
-    protected ecsdb: ECSDB,
+    protected readonly internals: ECSWorldInternals,
     public readonly id: string,
-    private readonly _children: Entity[]
   ) {
   }
+
+  /* Event and Observer Implementations */
+
+  protected readonly _eventEmitter: GameEventTreeEmitter =
+    new GameEventTreeEmitter(() => {
+      const rel = this.internals.relationshipManager.relationGet(this.id, undefined, BuiltInRelationships.PARENT);
+    });
+  protected readonly _observerManager: ObserverManager = new ObserverManager();
 
   /**
    * Observe a property
@@ -71,59 +76,22 @@ export class Entity implements Eventable, Observable {
     this._eventEmitter.once(type, handler);
   }
 
-  /**
-   * Use this to absorb an entity into another ECSDB if using a temporary one
-   * @TODO figure out how to not duplicate this
-   * @param ecsdb 
-   */
-  // public overrideECSDB(ecsdb: ECSDB) {
-  //   if (this._ecsdb.canBeOverridden()) {
-  //     const override = this._ecsdb.canOnlyBeOverriddenBy()
-  //     if (override && override !== ecsdb) {
-  //       throw new Error("Entity ECSDB Cannot be overridden by this ECSDB as it is not the parent");
-  //     }
-  //     mergeECSDB(this._ecsdb, ecsdb);
-  //     this._ecsdb = ecsdb;
-  //   } else {
-  //     throw new Error("Entity ECSDB is not overridable");
-  //   }
-  // }
-
-  get parent(): Entity | null {
-    // return this._ecsdb.entityDB.getParentOfEntity(this);
-    return this.ecsdb.getParentOfEntity(this.id);
-  }
-
-  get children(): Entity[] {
-    return this._children.slice();
-  }
-
-  public attachChild(entity: Entity) {
-    this.ecsdb.attachChild(this.id, entity.id);
-  }
-
-  public detachChild(entity: Entity): boolean {
-    return this.ecsdb.detachChild(this.id, entity.id);
-  }
+  /* Component Handling */
 
   get components(): ComponentKeyType[] {
-    return this.ecsdb.getComponentsOfEntity(this.id);
-  }
-
-  public attachComponent(comp: Component) {
-    this.ecsdb.attachComponent(this.id, comp.key, comp.data);
+    return this.internals.entityGetComponentKeys(this.id);
   }
 
   public setComponent<T>(key: ComponentKeyType, componentData: T) {
-    this.ecsdb.setComponent(this.id, key, componentData);
+    return this.internals.entitySetComponent(this.id, key, componentData);
   }
 
-  public detachComponent(comp: ComponentKeyType): boolean {
-    return this.ecsdb.detachComponent(this.id, comp);
+  public unsetComponent(key: ComponentKeyType) {
+    this.internals.entityUnsetComponent(this.id, key);
   }
 
   public getComponent<T>(type: ComponentKeyType): T | null {
-    const comp = this.ecsdb.getComponentFromEntity<T>(this.id, type);
+    const comp = this.internals.entityGetComponent(this.id, type);
     if (comp) {
       if (typeof comp === 'object') {
         return buildProxy<any>(comp, this._observerManager, type);
@@ -136,18 +104,45 @@ export class Entity implements Eventable, Observable {
   }
 
   public getComponentWithoutProxy<T>(type: ComponentKeyType): T | null {
-    return this.ecsdb.getComponentFromEntity<T>(this.id, type);
+    return this.internals.entityGetComponent(this.id, type);
   }
 
-  public setParent(entity: Entity) {
-    this.ecsdb.attachChild(entity.id, this.id);
+  /* Relationship Handling */
+
+  public get relationships(): HydratedEntityRelationship[] {
+    return this.internals.relationshipManager.relationGet(this.id).map(rel => ({
+      id: rel.id,
+      type: rel.type,
+      entity: this.internals.entityGet(rel.entityBId) as Entity
+    }), this).filter(rel => rel.entity !== undefined);
   }
 
-  // /**
-  //  * Clone this entity 
-  //  * @returns 
-  //  */
-  // public clone(): Entity {
-  //   return this;
-  // }
+  public addRelation(entity: Entity, type: string) {
+    if (this.internals.relationshipManager.relationHas(this.id, entity.id, type)) return;
+
+    this.internals.relationshipManager.relationCreate(this.id, entity.id, type);
+  }
+
+  public hasRelation(entity: Entity, type: string): boolean {
+    return this.internals.relationshipManager.relationHas(this.id, entity.id, type);
+  }
+
+  public removeRelation(entity: Entity, type: string) {
+    if (!this.internals.relationshipManager.relationHas(this.id, entity.id, type)) return;
+
+    this.internals.relationshipManager.relationDelete(this.id, entity.id, type);
+  }
+
+  /* Misc Functionality */
+
+  /**
+   * Clone this entity 
+   * @returns new Entity with cloned components
+   */
+  public clone(): Entity {
+    const componentsWithKey = this.components.map(key => ({ key, value: this.internals.entityGetComponent(this.id, key) }));
+    const newEntity = this.internals.entityCreate(uuidv4(), componentsWithKey);
+
+    return newEntity;
+  }
 }
