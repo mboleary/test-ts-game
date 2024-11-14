@@ -4,7 +4,7 @@
   "description": "ECS Library for game engine",
   "main": "build/index.js",
   "scripts": {
-    "test": "ava",
+    "test": "vitest",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
@@ -17,14 +17,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ava/typescript": "^4.1.0",
+    "@types/chance": "^1.1.6",
     "@types/node": "^20.4.5",
     "@types/uuid": "^9.0.2",
-    "ava": "^5.3.1",
+    "chance": "^1.1.12",
+    "concurrently": "^9.1.0",
     "eslint-config-prettier": "^8.9.0",
     "gts": "^5.0.0",
     "prettier": "3.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^2.1.5"
   },
   "dependencies": {
     "game_event": "file:../game_event",

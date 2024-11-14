@@ -1,12 +1,12 @@
-import { World } from "../World";
+// import { World } from "../World";
 
-export class SerializationManager {
-  constructor(private readonly world: World) {
-  }
+// export class SerializationManager {
+//   constructor(private readonly world: World) {
+//   }
 
-  public serialize() {
+//   public serialize() {
 
-  }
+//   }
 
-  public deserialize() {}
-}
+//   public deserialize() {}
+// }
