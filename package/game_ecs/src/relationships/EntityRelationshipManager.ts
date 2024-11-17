@@ -1,11 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 import { EntityRelationship } from "./EntityRelationship";
+import { ECSWorldInternals } from "../db";
+import { ENTITY_DELETE_EVENT_TYPE, EntityDeleteEvent } from "../db/events/EntityDelete.event";
+import { RelationshipCreateEvent } from "./events/RelationshipCreate.event";
+import { RelationshipDeleteEvent } from "./events/RelationshipDelete.event";
 
 export class EntityRelationshipManager {
   public readonly relationshipsById: Map<string, EntityRelationship> = new Map();
   // Map Types below are Entity ID to Relationship ID
   public readonly relationshipsByEntityA: Map<string, string[]> = new Map();
   public readonly relationshipsByEntityB: Map<string, string[]> = new Map();
+
+  constructor(
+    private readonly internals: ECSWorldInternals,
+  ) {
+    // Need to keep in sync with ECS World DB
+    internals.subscribe(ENTITY_DELETE_EVENT_TYPE, (e: EntityDeleteEvent) => {
+      this.entityDelete(e.target.id);
+    });
+  }
 
   /**
    * Create a relation between 2 entities
@@ -36,6 +49,9 @@ export class EntityRelationshipManager {
       this.relationshipsByEntityB.set(entityBId, entityBArr);
     }
     entityBArr.push(id);
+
+    const evt = new RelationshipCreateEvent(entityAId, entityBId, type);
+    this.internals.emit(evt.type, evt);
 
     return ref;
   }
@@ -100,6 +116,9 @@ export class EntityRelationshipManager {
       const idxB = entityB.indexOf(ref.id);
       if (idxB > 0) entityB.splice(idxB, 1);
     }
+
+    const evt = new RelationshipDeleteEvent(entityAId, entityBId, type);
+    this.internals.emit(evt.type, evt);
   }
 
   /**

@@ -1,14 +1,21 @@
+import { EmitOptions, Eventable, GameEvent, GameEventEmitter, GameEventLinearEmitter } from "game_event";
 import { Entity } from "../Entity";
 import { ComponentKeyType } from "../type/ComponentKey.type";
-import { EntityRelationshipManager } from "./EntityRelationshipManager";
+import { EntityRelationshipManager } from "../relationships/EntityRelationshipManager";
+import { EntityCreateEvent } from "./events/EntityCreate.event";
+import { EntityComponentSetEvent } from "./events/EntityComponentSet.event";
+import { EntityComponentUnsetEvent } from "./events/EntityComponentUnset.event";
+import { EntityDeleteEvent } from "./events/EntityDelete.event";
 
 export type ComponentAndKey = {
   key: ComponentKeyType,
   value: any
 };
 
-export class ECSWorldInternals {
-  public readonly relationshipManager = new EntityRelationshipManager();
+export class ECSWorldInternals implements Eventable {
+  protected readonly _eventEmitter = new GameEventLinearEmitter();
+
+  public readonly relationshipManager = new EntityRelationshipManager(this);
 
   // Stores entities by their uuid
   public readonly entityReferenceMap = new Map<string, Entity>();
@@ -34,6 +41,9 @@ export class ECSWorldInternals {
     this.entityMap.set(id, keys);
     const ref = new Entity(this, id);
     this.entityReferenceMap.set(id, ref);
+
+    const evt = new EntityCreateEvent(id, components);
+    this.emit(evt.type, evt);
     
     return ref;
   }
@@ -55,6 +65,9 @@ export class ECSWorldInternals {
     }
 
     this.registerComponent(key, component, id);
+
+    const evt = new EntityComponentSetEvent(id, key, component);
+    this.emit(evt.type, evt);
   }
 
   public entityGetComponentKeys(id: string): ComponentKeyType[] {
@@ -97,6 +110,9 @@ export class ECSWorldInternals {
     }
 
     componentTypeMap.delete(id);
+
+    const evt = new EntityComponentUnsetEvent(id, key);
+    this.emit(evt.type, evt);
   }
 
   public entityDelete(id: string) {
@@ -118,7 +134,10 @@ export class ECSWorldInternals {
     this.entityMap.delete(id);
 
     // Keep relationships in sync
-    this.relationshipManager.entityDelete(id);
+    // this.relationshipManager.entityDelete(id);
+
+    const evt = new EntityDeleteEvent(id);
+    this.emit(evt.type, evt);
   }
 
   private registerComponent(key: ComponentKeyType, component: any, entityId: string) {
@@ -133,7 +152,56 @@ export class ECSWorldInternals {
     map.set(entityId, component);
   }
 
-  
+  /**
+   * Hooks are used to sync data between the ECS internals and other managers so that it's easier to extend the ECS functionality.
+   * For example, the relationships manager needs to know when an entity is deleted, so that can be added as a hook.
+   * 
+   * Hooks use events to notify these extensions about these events
+   */
+
+  /**
+   * Emit an event on this Entity
+   * @param type event type
+   * @param event event
+   * @param options Emitter Options
+   */
+  public emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {
+    this._eventEmitter.emit(type, event, options);
+  }
+
+  /**
+   * Subscribe to events
+   * @param type event type
+   * @param handler event handler
+   */
+  public subscribe(type: string, handler: Function): void {
+    this._eventEmitter.subscribe(type, handler);
+  }
+
+  /**
+   * Unsubscribe a handler from receiving events
+   * @param handler event handler
+   */
+  public unsubscribe(handler: Function): void {
+    this._eventEmitter.unsubscribe(handler);
+  }
+
+  /**
+   * Unsubscribe all handlers from an event type
+   * @param type 
+   */
+  public unsubscribeAll(type: string): void {
+    this._eventEmitter.unsubscribeAll(type);
+  }
+
+  /**
+   * Subscribe to an event to handle one instance of it
+   * @param type event type
+   * @param handler event handler
+   */
+  public once(type: string, handler: Function): void {
+    this._eventEmitter.once(type, handler);
+  }
 
 
 }

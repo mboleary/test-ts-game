@@ -1,4 +1,4 @@
-export * from "./builtInRelationships.const";
+export * from "../relationships/builtInRelationships.const";
 export * from "./ECSWorldInternals";
-export * from "./EntityRelationship";
-export * from "./EntityRelationshipManager";
+export * from "../relationships/EntityRelationship";
+export * from "../relationships/EntityRelationshipManager";

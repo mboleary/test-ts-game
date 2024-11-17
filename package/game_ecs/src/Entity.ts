@@ -3,8 +3,8 @@ import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable, Observable, Ob
 import { buildProxy } from "./util/buildProxy";
 import { ComponentKeyType } from "./type/ComponentKey.type";
 import { ECSWorldInternals } from "./db/ECSWorldInternals";
-import { BuiltInRelationships } from "./db/builtInRelationships.const";
-import { EntityRelationship } from "./db/EntityRelationship";
+import { BuiltInRelationships } from "./relationships/builtInRelationships.const";
+import { EntityRelationship } from "./relationships/EntityRelationship";
 
 export type HydratedEntityRelationship = Omit<EntityRelationship, "entityAId" | "entityBId"> & {entity: Entity};
 
@@ -12,7 +12,7 @@ export class Entity implements Eventable, Observable {
   constructor(
     protected readonly internals: ECSWorldInternals,
     public readonly id: string,
-    public readonly uuid: string,
+    // public readonly uuid: string,
   ) {
   }
 

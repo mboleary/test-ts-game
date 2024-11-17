@@ -3,6 +3,7 @@ import { Entity } from "./Entity";
 import { ComponentAndKey, ECSWorldInternals } from "./db/ECSWorldInternals";
 import { QueryManager } from "./query/QueryManager";
 import { QueryObject } from "./query/type/Query.type";
+import { EntityRelationshipManager } from "./db";
 
 export class World {
   protected readonly internals = new ECSWorldInternals();
