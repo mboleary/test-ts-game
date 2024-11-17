@@ -106,7 +106,22 @@ describe("World benchmark", () => {
     test('Check for REL1 by id', () => {
       const results = world.query(Q.RELATIONSHIP(REL1, Q.ID(relEntities[0].id)));
       expect(results.length).toBe(1);
-      // expect(results)
+      // Causes Out-of-memory errors
+      // expect(results[0].relationships).toContain(expect.objectContaining({relationship: REL1}));
     });
-  })
-})
+
+    test('Check for REL2 by id', () => {
+      const results = world.query(Q.RELATIONSHIP(REL2, Q.ID(relEntities[1].id)));
+      expect(results.length).toBe(1);
+      // Causes Out-of-memory errors
+      // expect(results[0].relationships).toContain(expect.objectContaining({relationship: REL1}));
+    });
+
+    test('Check for REL3 by id', () => {
+      const results = world.query(Q.RELATIONSHIP(REL3, Q.ID(relEntities[2].id)));
+      expect(results.length).toBe(1);
+      // Causes Out-of-memory errors
+      // expect(results[0].relationships).toContain(expect.objectContaining({relationship: REL1}));
+    });
+  });
+});

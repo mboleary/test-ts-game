@@ -12,6 +12,7 @@ export class Entity implements Eventable, Observable {
   constructor(
     protected readonly internals: ECSWorldInternals,
     public readonly id: string,
+    public readonly uuid: string,
   ) {
   }
 

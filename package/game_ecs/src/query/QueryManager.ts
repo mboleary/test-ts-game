@@ -10,12 +10,35 @@ export class QueryManager {
   public runQuery(queryObject: QueryObject): Entity[] {
     // Dig through the query object
 
-    console.log("query object", JSON.stringify(queryObject, null, 4));
+    const normalizedQueryObject = this.findAndReplaceSubqueries(queryObject);
 
     return Array.from(this.internals.entityMap.entries())
-      .filter(this.processQueryObject(queryObject))
+      .filter(this.processQueryObject(normalizedQueryObject))
       .map(ekv => this.internals.entityReferenceMap.get(ekv[0]))
       .filter(e => !!e) as Entity[];
+  }
+
+  private findAndReplaceSubqueries(queryObject: QueryObject): QueryObject {
+    if (queryObject.type === QueryObjectType.RELATIONSHIP && !(isComponentKeyType(queryObject.children[0]) && (queryObject.children[0] as QueryObject).type === QueryObjectType.ID)) {
+      const toRet: QueryObject = {type: QueryObjectType.OR, children: []};
+      // Need to run child QueryObject or Component Key as Subquery
+      const ids = this.subQuery(queryObject.children[0]);
+      for (const id of ids) {
+        // Change to 
+        toRet.children.push({type: QueryObjectType.RELATIONSHIP, value: queryObject.value, children: [{type: QueryObjectType.ID, value: id, children: []}]});
+      }
+      return toRet;
+    } else {
+      const toRet: QueryObject = {type: queryObject.type, children: [], value: queryObject.value};
+      for (const child of queryObject.children) {
+        if (isComponentKeyType(child)) {
+          toRet.children.push(child);
+        } else {
+          toRet.children.push(this.findAndReplaceSubqueries(child as QueryObject));
+        }
+      }
+      return toRet;
+    }
   }
 
   private subQuery(queryObject: QueryObject | ComponentKeyType): string[] {
@@ -94,6 +117,7 @@ export class QueryManager {
             );
           } else {
             // Run subquery, since we need all of the results from it to accurately check the relationships
+            console.warn("Relationship query did not have its subquery computed beforehand");
             // @TODO this is hilariously inefficient, as it runs this every iteration. Fix it
             const subqueryIds = this.subQuery(c);
             console.log("subquery ids", subqueryIds);
