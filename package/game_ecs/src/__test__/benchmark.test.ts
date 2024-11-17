@@ -9,6 +9,7 @@ import { Entity } from "../Entity";
 import { randInt } from "./util/random";
 import { genComponents } from "./util/genComponents";
 import { Chance } from "chance";
+import { Q } from "../query/Q";
 
 const COUNT = 1000000;
 const GET_COUNT = 10;
@@ -17,7 +18,7 @@ describe("World benchmark", () => {
   let world: World;
   let uuids: string[] = [];
 
-  const chance = new Chance()
+  const chance = new Chance();
 
   world = new World();
   uuids = [];
@@ -73,4 +74,39 @@ describe("World benchmark", () => {
       });
     }
   });
+  describe('Query benchmarking', () => {
+    const REL1 = 'REL1';
+    const REL2 = 'REL2';
+    const REL3 = 'REL3';
+
+    const relEntities: Entity[] = [];
+
+    let interestingEntityArr: Entity[];
+
+    beforeEach(() => {
+      // Make some relationships
+      const rel1 = chance.pickset(uuids, 2);
+      const rel2 = chance.pickset(uuids, 2);
+      const rel3 = chance.pickset(uuids, 2);
+
+      world.getEntity(rel1[0])?.addRelation(world.getEntity(rel1[1]) as Entity, REL1);
+      world.getEntity(rel2[0])?.addRelation(world.getEntity(rel2[1]) as Entity, REL2);
+      world.getEntity(rel3[0])?.addRelation(world.getEntity(rel3[1]) as Entity, REL3);
+
+      relEntities.push(
+        world.getEntity(rel1[1]) as Entity, 
+        world.getEntity(rel2[1]) as Entity,
+        world.getEntity(rel3[1]) as Entity,
+      );
+
+      // Find some interesting entities
+      interestingEntityArr = chance.pickset(uuids, 3).map(id => world.getEntity(id) as Entity);
+    });
+
+    test('Check for REL1 by id', () => {
+      const results = world.query(Q.RELATIONSHIP(REL1, Q.ID(relEntities[0].id)));
+      expect(results.length).toBe(1);
+      // expect(results)
+    });
+  })
 })

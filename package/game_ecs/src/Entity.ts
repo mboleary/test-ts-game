@@ -118,17 +118,17 @@ export class Entity implements Eventable, Observable {
   }
 
   public addRelation(entity: Entity, type: string) {
-    if (this.internals.relationshipManager.relationHas(this.id, entity.id, type)) return;
+    if (this.internals.relationshipManager.relationHas(this.id, type, entity.id)) return;
 
     this.internals.relationshipManager.relationCreate(this.id, entity.id, type);
   }
 
   public hasRelation(entity: Entity, type: string): boolean {
-    return this.internals.relationshipManager.relationHas(this.id, entity.id, type);
+    return this.internals.relationshipManager.relationHas(this.id, type, entity.id);
   }
 
   public removeRelation(entity: Entity, type: string) {
-    if (!this.internals.relationshipManager.relationHas(this.id, entity.id, type)) return;
+    if (!this.internals.relationshipManager.relationHas(this.id, type, entity.id)) return;
 
     this.internals.relationshipManager.relationDelete(this.id, entity.id, type);
   }
@@ -140,6 +140,7 @@ export class Entity implements Eventable, Observable {
    * @returns new Entity with cloned components
    */
   public clone(): Entity {
+    // @TODO separate the references using serialization, when it's implemented
     const componentsWithKey = this.components.map(key => ({ key, value: this.internals.entityGetComponent(this.id, key) }));
     const newEntity = this.internals.entityCreate(uuidv4(), componentsWithKey);
 

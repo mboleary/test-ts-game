@@ -14,7 +14,7 @@ export class EntityRelationshipManager {
    * @param type relationship type
    */
   public relationCreate(entityAId: string, entityBId: string, type: string): EntityRelationship {
-    if (this.relationHas(entityAId, entityBId, type)) {
+    if (this.relationHas(entityAId, type, entityBId)) {
       throw new Error("A relationship of this type between these entities already exists!");
     }
 
@@ -43,10 +43,10 @@ export class EntityRelationshipManager {
   /**
    * Check if there is a relationship of a given type between 2 entities
    * @param entityAId ID of Entity A
-   * @param entityBId ID of Entity B
    * @param type relationship type
+   * @param entityBId ID of Entity B
    */
-  public relationHas(entityAId: string, entityBId: string, type: string): boolean {
+  public relationHas(entityAId: string, type: string, entityBId?: string): boolean {
     const relationshipIds = this.relationshipsByEntityA.get(entityAId);
 
     if (relationshipIds === undefined) return false;

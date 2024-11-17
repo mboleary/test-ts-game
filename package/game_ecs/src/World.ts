@@ -1,9 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { Entity } from "./Entity";
 import { ComponentAndKey, ECSWorldInternals } from "./db/ECSWorldInternals";
+import { QueryManager } from "./query/QueryManager";
+import { QueryObject } from "./query/type/Query.type";
 
 export class World {
   protected readonly internals = new ECSWorldInternals();
+  protected readonly queryManager = new QueryManager(this.internals);
 
   constructor() {
     
@@ -25,5 +28,9 @@ export class World {
 
   public deleteEntity(id: string) {
     this.internals.entityDelete(id);
+  }
+
+  public query(queryObject: QueryObject): Entity[] {
+    return this.queryManager.runQuery(queryObject);
   }
 }
