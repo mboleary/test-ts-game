@@ -13,4 +13,4 @@ ids => unique => Hydrate() => Entity[]
 
 
 Top-level Query Singleton (NOT, ID, RELATIONSHIP)
-```
+

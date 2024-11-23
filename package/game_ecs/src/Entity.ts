@@ -124,6 +124,13 @@ export class Entity implements Eventable, Observable {
     this.internals.relationshipManager.relationCreate(this.id, entity.id, type);
   }
 
+  public getRelation(type: string): Entity[] {
+    return this.internals.relationshipManager
+      .relationGet(this.id, undefined, type)
+      .map(rel => this.internals.entityGet(rel.entityBId))
+      .filter(e => !!e) as Entity[];
+  }
+
   public hasRelation(entity: Entity, type: string): boolean {
     return this.internals.relationshipManager.relationHas(this.id, type, entity.id);
   }
