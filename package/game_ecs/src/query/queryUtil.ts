@@ -1,12 +1,6 @@
 import { ComponentKeyType } from "../type/ComponentKey.type";
 import { EntityMappingValues, QueryObject, QueryObjectType } from "./type/Query.type";
 
-// export function buildAnd(queryObject: QueryObject<QueryObjectType.AND>) {
-//   return (entityMapKeyValueArray: EntityMappingValues) => {
-//     return queryObject.children.reduce((compKey) => );
-//   }
-// };
-
 export function isComponentKeyType(c: any): boolean {
   return typeof c === 'string' || typeof c === 'symbol' || typeof c === 'function';
 }
