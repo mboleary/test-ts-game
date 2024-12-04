@@ -66,7 +66,7 @@ export class ECSWorldInternals implements Eventable {
 
     this.registerComponent(key, component, id);
 
-    const evt = new EntityComponentSetEvent(id, key, component);
+    const evt = new EntityComponentSetEvent(id, key, component, entityComponentArray);
     this.emit(evt.type, evt);
   }
 
@@ -111,7 +111,7 @@ export class ECSWorldInternals implements Eventable {
 
     componentTypeMap.delete(id);
 
-    const evt = new EntityComponentUnsetEvent(id, key);
+    const evt = new EntityComponentUnsetEvent(id, key, entityComponentArray);
     this.emit(evt.type, evt);
   }
 

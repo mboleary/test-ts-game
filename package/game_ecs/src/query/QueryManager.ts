@@ -18,6 +18,12 @@ export class QueryManager {
       .filter(e => !!e) as Entity[];
   }
 
+  public queryOne(queryObject: QueryObject, entityId: string, componentKeys: ComponentKeyType[]): boolean {
+    const normalizedQueryObject = this.findAndReplaceSubqueries(queryObject);
+    const results = [[entityId, componentKeys] as [string, ComponentKeyType[]]].filter(this.processQueryObject(normalizedQueryObject));
+    return results.length > 0;
+  }
+
   private findAndReplaceSubqueries(queryObject: QueryObject): QueryObject {
     if (queryObject.type === QueryObjectType.RELATIONSHIP && !(isComponentKeyType(queryObject.children[0]) && (queryObject.children[0] as QueryObject).type === QueryObjectType.ID)) {
       const toRet: QueryObject = {type: QueryObjectType.OR, children: []};
