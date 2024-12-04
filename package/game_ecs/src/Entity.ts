@@ -20,7 +20,11 @@ export class Entity implements Eventable, Observable {
 
   protected readonly _eventEmitter: GameEventTreeEmitter =
     new GameEventTreeEmitter(() => {
-      const rel = this.internals.relationshipManager.relationGet(this.id, undefined, BuiltInRelationships.PARENT);
+      const rel = this.internals.relationshipManager.relationGet(this.id, undefined, BuiltInRelationships.PARENT)[0];
+      if (!rel) return;
+      const e = this.internals.entityGet(rel.entityBId);
+      if (!e) return;
+      return e._eventEmitter;
     });
   protected readonly _observerManager: ObserverManager = new ObserverManager();
 
@@ -122,6 +126,8 @@ export class Entity implements Eventable, Observable {
     if (this.internals.relationshipManager.relationHas(this.id, type, entity.id)) return;
 
     this.internals.relationshipManager.relationCreate(this.id, entity.id, type);
+
+
   }
 
   public getRelation(type: string): Entity[] {
