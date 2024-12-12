@@ -13,6 +13,7 @@ export class CachedQueryManager {
   public generateCachedQuery(queryObject: QueryObject): CachedQuery {
     const toRet = new CachedQuery(this.internals, this.queryManager, queryObject);
     this.cachedQueries.push(toRet);
+    toRet.startListening();
     return toRet;
   }
 

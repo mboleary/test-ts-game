@@ -16,7 +16,7 @@ export class System {
     public readonly id: string,
     public readonly lifecycle: string,
     public readonly queryObject: QueryObject,
-    protected readonly update: UpdateActionCallback,
+    public readonly update: UpdateActionCallback,
     public readonly priority: number = 0
   ) { }
 

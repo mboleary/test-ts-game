@@ -83,18 +83,37 @@ export class Entity implements Eventable, Observable {
 
   /* Component Handling */
 
+  /**
+   * Gets all component keys
+   */
   get components(): ComponentKeyType[] {
     return this.internals.entityGetComponentKeys(this.id);
   }
 
+  /**
+   * Sets a component to a value
+   * @param key Component Key
+   * @param componentData Value
+   */
   public setComponent<T>(key: ComponentKeyType, componentData: T) {
-    return this.internals.entitySetComponent(this.id, key, componentData);
+    this.internals.entitySetComponent(this.id, key, componentData);
+    this._observerManager.notify(key, componentData);
   }
 
+  /**
+   * Removes a component
+   * @param key Component Key to remove
+   */
   public unsetComponent(key: ComponentKeyType) {
     this.internals.entityUnsetComponent(this.id, key);
+    this._observerManager.notify(key, undefined);
   }
 
+  /**
+   * Gets a component and for objects, creates a proxy to automatically notify observers of changes
+   * @param type Component Key
+   * @returns Value or null
+   */
   public getComponent<T>(type: ComponentKeyType): T | null {
     const comp = this.internals.entityGetComponent(this.id, type);
     if (comp) {
@@ -108,12 +127,20 @@ export class Entity implements Eventable, Observable {
     }
   }
 
+  /**
+   * Gets a component without adding a proxy to update observers
+   * @param type Component Key
+   * @returns Value or null
+   */
   public getComponentWithoutProxy<T>(type: ComponentKeyType): T | null {
     return this.internals.entityGetComponent(this.id, type);
   }
 
   /* Relationship Handling */
 
+  /**
+   * Gets all relationships, including the Entity
+   */
   public get relationships(): HydratedEntityRelationship[] {
     return this.internals.relationshipManager.relationGet(this.id).map(rel => ({
       id: rel.id,
@@ -122,14 +149,22 @@ export class Entity implements Eventable, Observable {
     }), this).filter(rel => rel.entity !== undefined);
   }
 
+  /**
+   * Adds a relation to this entity
+   * @param entity Entity to be related to
+   * @param type relationship type
+   */
   public addRelation(entity: Entity, type: string) {
     if (this.internals.relationshipManager.relationHas(this.id, type, entity.id)) return;
 
     this.internals.relationshipManager.relationCreate(this.id, entity.id, type);
-
-
   }
 
+  /**
+   * Gets all entities that have a relation to this entity
+   * @param type relationship type
+   * @returns Entity array of related entities
+   */
   public getRelation(type: string): Entity[] {
     return this.internals.relationshipManager
       .relationGet(this.id, undefined, type)
@@ -137,10 +172,21 @@ export class Entity implements Eventable, Observable {
       .filter(e => !!e) as Entity[];
   }
 
+  /**
+   * Test if an entity has a relationship with this entity
+   * @param entity Entity to test
+   * @param type relationship type
+   * @returns true if there is a relationship of the correct type
+   */
   public hasRelation(entity: Entity, type: string): boolean {
     return this.internals.relationshipManager.relationHas(this.id, type, entity.id);
   }
 
+  /**
+   * Removes a relationship between this entity and another
+   * @param entity Entity to remove relationship from
+   * @param type relationship type
+   */
   public removeRelation(entity: Entity, type: string) {
     if (!this.internals.relationshipManager.relationHas(this.id, type, entity.id)) return;
 

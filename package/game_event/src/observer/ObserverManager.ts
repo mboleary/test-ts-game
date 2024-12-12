@@ -7,6 +7,11 @@ export class ObserverManager {
   private observerMap: Map<any, Observer<any>[]> = new Map();
   constructor() {}
 
+  /**
+   * Create a subscription on a type
+   * @param type Type to subscribe to
+   * @returns an Observer
+   */
   public subscribe<T>(type: any): Observer<T> {
     const observer = new Observer<T>(type);
 
@@ -23,6 +28,11 @@ export class ObserverManager {
     return observer;
   }
 
+  /**
+   * Notify observers of a change
+   * @param type Type to notify
+   * @param data new Data
+   */
   public notify<T>(type: any, data: T) {
     // const observers = getAllHandlers<Observer<T>>(eventPath, this.observerMap);
     const observers = this.observerMap.get(type);
@@ -36,6 +46,9 @@ export class ObserverManager {
     }
   }
 
+  /**
+   * Closes all observers
+   */
   public complete() {
     for (const [, handlerArray] of this.observerMap.entries()) {
       handlerArray.forEach(o => {

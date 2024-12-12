@@ -1,4 +1,4 @@
-import { GameEvent } from "game_event";
+import { EmitOptions, Eventable, GameEvent, GameEventLinearEmitter } from "game_event";
 import { Entity } from "../Entity";
 import { ECSWorldInternals } from "../db";
 import { ENTITY_CREATE_EVENT_TYPE, EntityCreateEvent, } from "../db/events/EntityCreate.event";
@@ -8,8 +8,11 @@ import { ComponentKeyType } from "../type/ComponentKey.type";
 import { ENTITY_DELETE_EVENT_TYPE, EntityDeleteEvent } from "../db/events/EntityDelete.event";
 import { ENTITY_COMPONENT_SET_EVENT_TYPE, EntityComponentSetEvent } from "../db/events/EntityComponentSet.event";
 import { ENTITY_COMPONENT_UNSET_EVENT_TYPE, EntityComponentUnsetEvent } from "../db/events/EntityComponentUnset.event";
+import { CachedQueryAddEntityEvent, CACHED_QUERY_ADD_ENTITY_EVENT_TYPE } from "./events/CachedQueryAddEntity.event";
+import { CachedQueryRemoveEntityEvent, CACHED_QUERY_REMOVE_ENTITY_EVENT_TYPE } from "./events/CachedQueryRemoveEntity.event";
+import { CachedQueryUpdateEntityEvent, CACHED_QUERY_UPDATE_ENTITY_EVENT_TYPE } from "./events/CachedQueryUpdateEntity.event";
 
-export class CachedQuery {
+export class CachedQuery implements Eventable {
   private readonly matchedEntityIds: Set<string> = new Set();
   private isListening: boolean = false;
 
@@ -63,8 +66,12 @@ export class CachedQuery {
     const result = this.queryManager.queryOne(this.queryObject, id, componentKeys);
     if (result && !this.matchedEntityIds.has(id)) {
       this.matchedEntityIds.add(id);
+      this.emit(CACHED_QUERY_ADD_ENTITY_EVENT_TYPE, new CachedQueryAddEntityEvent(id));
     } else if (!result && this.matchedEntityIds.has(id)) {
       this.matchedEntityIds.delete(id);
+      this.emit(CACHED_QUERY_REMOVE_ENTITY_EVENT_TYPE, new CachedQueryRemoveEntityEvent(id));
+    } else {
+      this.emit(CACHED_QUERY_UPDATE_ENTITY_EVENT_TYPE, new CachedQueryUpdateEntityEvent(id));
     }
   }
 
@@ -88,5 +95,27 @@ export class CachedQuery {
     this.internals.unsubscribe(this.handleEntityDelete);
     this.internals.unsubscribe(this.handleEntityComponentSet);
     this.internals.unsubscribe(this.handleEntityComponentUnset);
+  }
+
+  /**
+   * Handle Events
+   */
+
+  private readonly eventEmitter: GameEventLinearEmitter = new GameEventLinearEmitter();
+
+  emit<T>(type: string, event: GameEvent<T>, options: EmitOptions = {}): void {
+    this.eventEmitter.emit(type, event, options);
+  }
+  subscribe(type: string, handler: Function): void {
+    this.eventEmitter.subscribe(type, handler);
+  }
+  unsubscribe(handler: Function): void {
+    this.eventEmitter.unsubscribe(handler);
+  }
+  unsubscribeAll(type: string): void {
+    this.eventEmitter.unsubscribeAll(type);
+  }
+  once(type: string, handler: Function): void {
+    this.eventEmitter.once(type, handler);
   }
 }

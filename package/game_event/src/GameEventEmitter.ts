@@ -9,7 +9,7 @@ export abstract class GameEventEmitter {
   abstract emit<T>(
     type: string,
     event: GameEvent<T>,
-    options: EmitOptions,
+    options?: EmitOptions,
   ): void;
   abstract subscribe(type: string, handler: Function): void;
   abstract unsubscribe(handler: Function): void;
