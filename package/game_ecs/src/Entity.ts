@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { GameEvent, GameEventTreeEmitter, EmitOptions, Eventable, Observable, Observer, ObserverManager } from "game_event";
 import { buildProxy } from "./util/buildProxy";
-import { ComponentKeyType } from "./type/ComponentKey.type";
+import { ComponentKeyType } from "./type/types";
 import { ECSWorldInternals } from "./db/ECSWorldInternals";
 import { BuiltInRelationships } from "./relationships/builtInRelationships.const";
 import { EntityRelationship } from "./relationships/EntityRelationship";

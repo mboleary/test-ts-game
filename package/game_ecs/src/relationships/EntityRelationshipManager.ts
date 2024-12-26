@@ -121,6 +121,8 @@ export class EntityRelationshipManager {
     this.internals.emit(evt.type, evt);
   }
 
+  /* Event Handlers */
+
   /**
    * Removes an entity from the relationship graph
    * @param entityId Entity ID
@@ -171,5 +173,45 @@ export class EntityRelationshipManager {
         console.warn(`Entity Relationships might be out of sync. Entity B ${rel.entityBId} isn't in the relationship map`)
       }
     }
+  }
+
+  /* Misc */
+
+  /**
+   * Merges relationships from another relationshipManager into this one
+   * @param targetRelationshipManager Relationship Manager to pull relationships from
+   */
+  public merge(targetRelationshipManager: EntityRelationshipManager) {
+    // Relationships
+    const addedRelationships = [];
+    for (const [relationshipId, relationship] of targetRelationshipManager.relationshipsById) {
+      // Skip pre-existing relationships (either by id or by name)
+      if (!(this.relationshipsById.has(relationshipId) && this.relationHas(relationship.entityAId, relationship.type, relationship.entityBId))) {
+        addedRelationships.push(relationship);
+        this.relationshipsById.set(relationshipId, relationship);
+      }
+    }
+
+    for (const relationship of addedRelationships) {
+      // Entity A to Relationships
+      let entityAArr = this.relationshipsByEntityA.get(relationship.entityAId);
+      if (!entityAArr) {
+        entityAArr = [];
+        this.relationshipsByEntityA.set(relationship.entityAId, entityAArr);
+      }
+      entityAArr.push(relationship.id);
+
+      // Entity B to Relationships
+      let entityBArr = this.relationshipsByEntityB.get(relationship.entityBId);
+      if (!entityBArr) {
+        entityBArr = [];
+        this.relationshipsByEntityB.set(relationship.entityBId, entityBArr);
+      }
+      entityBArr.push(relationship.id);
+    }
+  }
+
+  public clear() {
+    // @TODO
   }
 }

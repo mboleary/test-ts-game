@@ -4,7 +4,7 @@ import { ECSWorldInternals } from "../db";
 import { ENTITY_CREATE_EVENT_TYPE, EntityCreateEvent, } from "../db/events/EntityCreate.event";
 import { QueryManager } from "./QueryManager";
 import { QueryObject } from "./type/Query.type";
-import { ComponentKeyType } from "../type/ComponentKey.type";
+import { ComponentKeyType } from "../type/types";
 import { ENTITY_DELETE_EVENT_TYPE, EntityDeleteEvent } from "../db/events/EntityDelete.event";
 import { ENTITY_COMPONENT_SET_EVENT_TYPE, EntityComponentSetEvent } from "../db/events/EntityComponentSet.event";
 import { ENTITY_COMPONENT_UNSET_EVENT_TYPE, EntityComponentUnsetEvent } from "../db/events/EntityComponentUnset.event";

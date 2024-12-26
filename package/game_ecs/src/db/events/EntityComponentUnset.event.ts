@@ -1,5 +1,5 @@
 import { GameEvent } from "game_event";
-import { ComponentKeyType } from "../../type/ComponentKey.type";
+import { ComponentKeyType } from "../../type/types";
 
 export const ENTITY_COMPONENT_UNSET_EVENT_TYPE = 'entity.component.unset';
 

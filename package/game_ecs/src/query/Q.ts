@@ -2,7 +2,7 @@
  * Builder for generating the query objects used to build the query pipeline
  */
 
-import { ComponentKeyType } from "../type/ComponentKey.type";
+import { ComponentKeyType } from "../type/types";
 import { QueryObject, QueryObjectType } from "./type/Query.type";
 
 export class Q {

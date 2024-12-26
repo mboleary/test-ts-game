@@ -1,6 +1,6 @@
 import { ECSWorldInternals } from "../db";
 import { Entity } from "../Entity";
-import { ComponentKeyType } from "../type/ComponentKey.type";
+import { ComponentKeyType } from "../type/types";
 import { isComponentKeyType } from "./queryUtil";
 import { EntityMappingValues, QueryObject, QueryObjectType, QueryPipelineFilter } from "./type/Query.type";
 

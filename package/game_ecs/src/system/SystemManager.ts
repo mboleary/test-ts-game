@@ -9,13 +9,13 @@ import { SystemLifecycle } from "./type/SystemLifecycle.enum";
 
 export class SystemManager {
   // Store system refs by id
-  private readonly systemMap: Map<string, System> = new Map();
+  protected readonly systemMap: Map<string, System> = new Map();
   // Store system ids by lifecycle
-  private readonly systemsByLifecycle: Map<string, string[]> = new Map();
+  protected readonly systemsByLifecycle: Map<string, string[]> = new Map();
   // Store all known system lifecycles
-  private readonly knownLifecycles: Set<string> = new Set([SystemLifecycle.INIT, SystemLifecycle.UPDATE, SystemLifecycle.DESTROY]);
+  protected readonly knownLifecycles: Set<string> = new Set([SystemLifecycle.INIT, SystemLifecycle.UPDATE, SystemLifecycle.DESTROY]);
   // Store cached queries for systems
-  private readonly systemIdToCachedQueryMap: Map<string, CachedQuery> = new Map();
+  protected readonly systemIdToCachedQueryMap: Map<string, CachedQuery> = new Map();
 
   constructor(
     private readonly internals: ECSWorldInternals,
@@ -149,6 +149,10 @@ export class SystemManager {
     this.activateEventDrivenLifecycle(SystemLifecycle.DESTROY);
   }
 
+  /**
+   * Runs systems on internal events by subscribing them
+   * @param lifecycle Lifecycle to activate
+   */
   private activateEventDrivenLifecycle(lifecycle: string) {
     const systems = this.systemsByLifecycle.get(lifecycle);
     if (!systems) return;
@@ -185,6 +189,9 @@ export class SystemManager {
     }
   }
 
+  /**
+   * Clear all systems from this System Manager
+   */
   public clearSystems() {
     // Unsubscribe all cached queries
     for (const cachedQuery of this.systemIdToCachedQueryMap.values()) {
@@ -196,5 +203,22 @@ export class SystemManager {
     // Remove all systems
     this.systemMap.clear();
     this.systemsByLifecycle.clear();
+  }
+
+  /**
+   * Merge another System Manager into this one
+   * @param targetSystemManager 
+   */
+  public merge(targetSystemManager: SystemManager) {
+    for (const lifecycle of targetSystemManager.knownLifecycles) {
+      if (!this.knownLifecycles.has(lifecycle)) {
+        this.registerLifecycle(lifecycle);
+      }
+    }
+    for (const [systemId, system] of targetSystemManager.systemMap) {
+      if (!this.systemMap.has(systemId)) {
+        this.addSystem(system);
+      }
+    }
   }
 }

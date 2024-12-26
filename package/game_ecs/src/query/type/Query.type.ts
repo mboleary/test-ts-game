@@ -1,4 +1,4 @@
-import { ComponentKeyType } from "../../type/ComponentKey.type"
+import { ComponentKeyType } from "../../type/types"
 
 export type QueryObject<T = QueryObjectType> = {
   type: T,

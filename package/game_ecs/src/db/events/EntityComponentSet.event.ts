@@ -1,6 +1,6 @@
 import { GameEvent } from "game_event";
 import { Entity } from "../../Entity";
-import { ComponentKeyType } from "../../type/ComponentKey.type";
+import { ComponentKeyType } from "../../type/types";
 
 export const ENTITY_COMPONENT_SET_EVENT_TYPE = 'entity.component.set';
 

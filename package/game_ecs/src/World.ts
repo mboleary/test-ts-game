@@ -18,12 +18,6 @@ export class World {
     
   }
 
-  public get root(): Entity | null {
-    // @TODO implement this when adding flags
-    return null;
-    // return this.ecsDB.
-  }
-
   /* Entity-related Methods */
 
   public createEntity(id?: string, components?: ComponentAndKey[]): Entity {
@@ -31,7 +25,7 @@ export class World {
   }
 
   public getEntity(id: string): Entity | undefined {
-    return this.internals.entityGet(id || uuidv4());
+    return this.internals.entityGet(id);
   }
 
   public deleteEntity(id: string) {
@@ -67,6 +61,15 @@ export class World {
   }
 
   /* Misc */
+
+  /**
+   * Merges another world into this one. This has the effect of clearing out the old world and breaking any references to the old entities.
+   * @param targetWorld World to merge into this one
+   */
+  public merge(targetWorld: World) {
+    this.internals.merge(targetWorld.internals);
+    this.systemManager.merge(targetWorld.systemManager);
+  }
 
   public clear() {
     

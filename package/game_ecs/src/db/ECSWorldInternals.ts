@@ -1,6 +1,6 @@
 import { EmitOptions, Eventable, GameEvent, GameEventEmitter, GameEventLinearEmitter } from "game_event";
 import { Entity } from "../Entity";
-import { ComponentKeyType } from "../type/ComponentKey.type";
+import { ComponentKeyType } from "../type/types";
 import { EntityRelationshipManager } from "../relationships/EntityRelationshipManager";
 import { EntityCreateEvent } from "./events/EntityCreate.event";
 import { EntityComponentSetEvent } from "./events/EntityComponentSet.event";
@@ -25,6 +25,8 @@ export class ECSWorldInternals implements Eventable {
 
   // Stores components by their key and then entity uuid
   public readonly componentMap = new Map<ComponentKeyType, Map<string, any>>();
+
+  /* Entity and Component Methods */
 
   public entityCreate(id: string, components: ComponentAndKey[]): Entity {
     if (this.entityMap.has(id)) {
@@ -140,6 +142,12 @@ export class ECSWorldInternals implements Eventable {
     this.emit(evt.type, evt);
   }
 
+  /**
+   * Sets a component on an Entity
+   * @param key Component Key
+   * @param component Component Data
+   * @param entityId Entity ID to set data on
+   */
   private registerComponent(key: ComponentKeyType, component: any, entityId: string) {
     let map: Map<string, any>;
     if (this.componentMap.has(key)) {
@@ -203,5 +211,39 @@ export class ECSWorldInternals implements Eventable {
     this._eventEmitter.once(type, handler);
   }
 
+  /* Misc Functions */
+
+  /**
+   * Merges the Entities and Components from another internals object and re-creates references to the Entities in the targetInternals object.
+   * @param targetInternals Internals of world to merge
+   */
+  public merge(targetInternals: ECSWorldInternals) {
+    // Entities, also re-create references
+    for (const entityUuid of targetInternals.entityMap.keys()) {
+      // Given that these are uuids, don't recreate the entities in this internals object that have the same uuid
+      if (!this.entityMap.has(entityUuid)) {
+        this.entityCreate(entityUuid, []);
+      }
+    }
+
+    // Components
+    for (const [componentKey, targetComponentEntityMap] of targetInternals.componentMap.entries()) {
+      let componentEntityMap = this.componentMap.get(componentKey);
+      if (!componentEntityMap) {
+        componentEntityMap = new Map();
+        this.componentMap.set(componentKey, componentEntityMap);
+      }
+      for (const [entityUuid, value] of targetComponentEntityMap.values()) {
+        componentEntityMap.set(entityUuid, value);
+      }
+    }
+
+    // Relationships
+    this.relationshipManager.merge(targetInternals.relationshipManager);
+  }
+
+  public clear() {
+    // @TODO
+  }
 
 }

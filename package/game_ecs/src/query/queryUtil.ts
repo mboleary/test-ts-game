@@ -1,4 +1,4 @@
-import { ComponentKeyType } from "../type/ComponentKey.type";
+import { ComponentKeyType } from "../type/types";
 import { EntityMappingValues, QueryObject, QueryObjectType } from "./type/Query.type";
 
 export function isComponentKeyType(c: any): boolean {
