@@ -1,8 +1,7 @@
-import { ComponentAndKey } from "game_ecs/db";
-import { Entity } from "game_ecs/Entity";
-import { System } from "game_ecs/system/System";
-import { ComponentKeyType, EntityIdType } from "game_ecs/type/types";
-import { World } from "game_ecs/World";
+import { Entity } from "game_ecs";
+import { System } from "game_ecs";
+import { EntityIdType } from "game_ecs";
+import { World } from "game_ecs";
 import { TransactionInternals } from "./TransactionInternals";
 
 export class Transaction extends World {

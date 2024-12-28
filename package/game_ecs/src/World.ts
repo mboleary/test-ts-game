@@ -3,7 +3,6 @@ import { Entity } from "./Entity";
 import { ComponentAndKey, ECSWorldInternals } from "./db/ECSWorldInternals";
 import { QueryManager } from "./query/QueryManager";
 import { QueryObject } from "./query/type/Query.type";
-import { EntityRelationshipManager } from "./db";
 import { SystemManager } from "./system/SystemManager";
 import { CachedQueryManager } from "./query/CachedQueryManager";
 import { System } from "./system/System";

@@ -1,6 +1,6 @@
-import { ComponentAndKey, ECSWorldInternals } from "../../db";
-import { Entity } from "../../Entity";
-import { ComponentKeyType, EntityIdType } from "../../type/types";
+import { ComponentAndKey, ECSWorldInternals } from "game_ecs";
+import { Entity } from "game_ecs";
+import { ComponentKeyType, EntityIdType } from "game_ecs";
 import { TransactionEntity } from "./TransactionEntity";
 
 export class TransactionInternals implements Partial<ECSWorldInternals> {
@@ -73,7 +73,12 @@ export class TransactionInternals implements Partial<ECSWorldInternals> {
     public entityUpdateComponent(entityId: EntityIdType, key: ComponentKeyType, value: any, propertyPath: string[]) {}
 
     public entityUnsetComponent(entityId: EntityIdType, key: ComponentKeyType) {
-        if (!this.targetWorldInternals.entityComp)
+        if (this.targetWorldInternals.entityMap.has(entityId)) {
+            
+        }
+        if (!this.targetWorldInternals.entityHasComponent(entityId, key)) {
+
+        }
     }
 
     public entityGetComponent(id: string, key: ComponentKeyType) {

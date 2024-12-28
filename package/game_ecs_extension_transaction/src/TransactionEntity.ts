@@ -1,6 +1,6 @@
-import { ECSWorldInternals } from "../../db";
-import { Entity } from "../../Entity";
-import { ComponentKeyType, EntityIdType } from "../../type/types";
+import { ECSWorldInternals } from "game_ecs";
+import { Entity } from "game_ecs";
+import { ComponentKeyType, EntityIdType } from "game_ecs";
 import { TransactionInternals } from "./TransactionInternals";
 
 /**

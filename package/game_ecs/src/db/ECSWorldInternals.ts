@@ -92,6 +92,16 @@ export class ECSWorldInternals implements Eventable {
     return componentTypeMap.get(id) || null;
   }
 
+  public entityHasComponent(id: string, key: ComponentKeyType): boolean {
+    const entityComponentArray = this.entityMap.get(id);
+
+    if (!entityComponentArray) {
+      throw new Error(`Entity ${id} doesn't exist`);
+    }
+
+    return entityComponentArray.indexOf(key) >= 0;
+  }
+
   public entityUnsetComponent(id: string, key: ComponentKeyType) {
     const entityComponentArray = this.entityMap.get(id);
 
