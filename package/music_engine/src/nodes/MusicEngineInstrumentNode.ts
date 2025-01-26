@@ -4,7 +4,7 @@
 
 import { MidiReceivePort } from "../ports/MidiReceivePort";
 import { MusicEngineMidiMessageInterface, MusicEngineMidiMessageType } from "../types/MusicEngineMidiMessage.type";
-import { MusicEngineNode } from "./MusicEngineNode";
+import { MusicEngineNode, SerializedMusicEngineNode } from "./MusicEngineNode";
 
 export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
   constructor(
@@ -14,7 +14,8 @@ export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
     type: string,
     labels: string[]
   ) {
-    super(context, name, id, type, labels);
+    super(context, name, id, type, labels,);
+    this.ports.push(this.midiIn);
   }
 
   public readonly midiIn: MidiReceivePort = new MidiReceivePort('in', this, 'Midi In', this.receive.bind(this));
@@ -31,4 +32,6 @@ export abstract class MusicEngineInstrumentNode extends MusicEngineNode {
       this.noteOff(message.time, message.key);
     }
   }
+
+  public abstract toJSON(): SerializedMusicEngineNode;
 }

@@ -8,10 +8,18 @@ import { AudioPort } from "../ports/AudioPort";
 import { PortDirection } from "../types/PortDirection.enum";
 import { noteToFrequencyEqualTemperment } from "../util/noteToFrequency";
 import { MusicEngineInstrumentNode } from "./MusicEngineInstrumentNode";
+import { SerializedMusicEngineNode } from "./MusicEngineNode";
 
 const TYPE = 'oscillator_node';
 
+export type SerializedMusicEngineOscillatorNode = SerializedMusicEngineNode & {
+  type: typeof TYPE,
+  oscType: OscillatorType,
+};
+
 export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
+
+  static type = TYPE;
 
   private readonly oscNodes: Map<number, OscillatorNode> = new Map();
   private readonly activeNotes: OscillatorNode[] = [];
@@ -27,7 +35,12 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
     this.gainNode = context.createGain();
     this.gain = this.gainNode.gain;
     this.audioOut.registerAudioNode(this.gainNode);
+
+    // Ports
+    this.ports.push(this.audioOut, this.detune);
   }
+
+  
 
   // public readonly volume: AudioParam = new AudioParamPort('volume', PortDirection.IN, 0.5);
   private readonly gainNode: GainNode;
@@ -68,5 +81,19 @@ export class MusicEngineOscillatorNode extends MusicEngineInstrumentNode {
     } else {
       console.warn("no node for note", note, time);
     }
+  }
+
+  public toJSON(): SerializedMusicEngineOscillatorNode {
+    return {
+      type: TYPE,
+      oscType: this.oscType,
+      name: this.name,
+      id: this.id,
+      labels: this.labels
+    };
+  }
+
+  static fromJSON(json: SerializedMusicEngineOscillatorNode, audioContext: AudioContext): MusicEngineOscillatorNode {
+    return new MusicEngineOscillatorNode(audioContext, json.oscType, json.name, json.id, json.labels);
   }
 }

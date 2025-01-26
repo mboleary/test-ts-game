@@ -2,6 +2,9 @@ import { nanoid } from "nanoid/non-secure";
 import { MidiInputNode } from "./nodes/MidiInputNode";
 import { MidiOutputNode } from "./nodes/MidiOutputNode";
 
+export const MIDI_OUTPUT_NODE_ID = 'midi_output_node';
+export const MIDI_INPUT_NODE_ID = 'midi_input_node';
+
 export class MidiAccess { 
   public readonly midiOutputNode: MidiOutputNode;
   public readonly midiInputNode: MidiInputNode;
@@ -9,8 +12,8 @@ export class MidiAccess {
     public readonly access: MIDIAccess,
     private readonly audioContext: AudioContext
   ) {
-    this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs', nanoid());
-    this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs', nanoid());
+    this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs', MIDI_OUTPUT_NODE_ID);
+    this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs', MIDI_INPUT_NODE_ID);
   }
 
   static async prompt(): Promise<boolean> {

@@ -3,11 +3,12 @@
  */
 
 import { applyNodeChanges, applyEdgeChanges, NodeChange, Connection, Node, EdgeChange, Edge, Position } from '@xyflow/react';
-import { MusicEngineNode, MusicEngineOscillatorNode, PortDirection, PortType, SequenceNode } from 'music_engine';
+import { MusicEngineNode, MusicEngineOscillatorNode, PortDirection, PortType, SequenceNode, Container, SerializedMusicEngineNode, MusicEnginePort } from 'music_engine';
 import { nanoid } from 'nanoid';
 import { create } from 'zustand';
 import { MENode, PropType } from '../types/MENodeRepresentation.type';
 import { PortTypeColors } from '../types/PortTypeColors.enum';
+import { nodeBuilder } from './musicEngineNodeBuilder';
 
 export type PropNodeType = {
     type: string;
@@ -23,9 +24,14 @@ export type NodeStore = {
     nodes: Node<NodeType>[],
     edges: Edge[],
 
+    container: Container,
+
     onNodesChange: (changes: NodeChange<Node<NodeType>>[]) => void,
     onEdgesChange: (changes: EdgeChange[]) => void,
     addEdge: (data: Connection) => void,
+    removeEdge: (id: string) => void,
+    addNode: (data: any) => void,
+    removeNode: (id: string) => void,
 };
 
 export const useNodeStore = create<NodeStore>()((set, get) => ({
@@ -55,6 +61,8 @@ export const useNodeStore = create<NodeStore>()((set, get) => ({
         
     ],
     edges: [],
+
+    container: new Container(nodeBuilder),
 
     onNodesChange(changes) {
         console.log("node change", changes);
@@ -88,5 +96,39 @@ export const useNodeStore = create<NodeStore>()((set, get) => ({
             } };
             set({ edges: [edge, ...get().edges] });
         }
+    },
+
+    removeEdge(id) {
+        const edges = [...get().edges];
+        // @TODO actually remove connection from node
+        set({edges: edges.filter(edge => edge.id !== id)});
+    },
+
+    addNode<T extends SerializedMusicEngineNode>(data: T) {
+        const node = get().container.buildAndRegisterNode(data);
+        const nodeData: Node<NodeType> = {
+            id: node.id,
+            type: 'defaultNode',
+            data: {
+                nodeType: node.type,
+                name: node.name,
+                labels: node.labels,
+                ports: (node.getPorts() as MusicEnginePort[]).map(port => ({
+                    id: port.id,
+                    type: port.type,
+                    name: port.name,
+                    direction: port.direction,
+                })),
+                props: [],
+            },
+            position: {x: 0, y: 0},
+        }
+        set({ nodes: [nodeData, ...get().nodes]});
+    },
+
+    removeNode(id: string) {
+        const nodes = [...get().nodes];
+        get().container.deleteNode(id);
+        set({nodes: nodes.filter(node => node.id !== id)});
     },
 }));

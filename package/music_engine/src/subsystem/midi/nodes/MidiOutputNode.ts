@@ -1,9 +1,13 @@
 import { nanoid } from "nanoid/non-secure";
-import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
+import { MusicEngineNode, SerializedMusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
 import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";
 
 const TYPE = "midi_output_node";
+
+export type SerializedMidiOutputNode = SerializedMusicEngineNode & {
+  type: typeof TYPE,
+}
 
 export class MidiOutputNode extends MusicEngineNode {
   private readonly outputMidiMap: Map<string, MidiReceivePort> = new Map();
@@ -25,6 +29,7 @@ export class MidiOutputNode extends MusicEngineNode {
     midiAccess.addEventListener("statechange", (event: Event) => {
       if (event && (event as MIDIConnectionEvent).port) {
         const port = (event as MIDIConnectionEvent).port;
+        if (!port) return;
         if (port.state === "connected" && !this.outputMidiMap.has(port.id)) {
           const toAdd = this.buildMidiPort(port);
           this.outputMidiMap.set(port.id, toAdd);
@@ -61,4 +66,17 @@ export class MidiOutputNode extends MusicEngineNode {
       }
     }
   }
+
+  /**
+     * NOTE: building this port from JSON isn't going to work due to the MidiAccess requirement
+     * @returns SerializedMidiOutputNode
+     */
+    public toJSON(): SerializedMidiOutputNode {
+      return {
+        type: TYPE,
+        name: this.name,
+        id: this.id,
+        labels: this.labels
+      };
+    }
 }

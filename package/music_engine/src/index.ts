@@ -7,3 +7,6 @@ export * from "./util/index";
 export * from "./ports/index";
 export * from "./subsystem/index";
 export * from "./types/index";
+export * from "./Container";
+export * from "./NodeBuilder";
+export * from "./const/nodeFactories";
