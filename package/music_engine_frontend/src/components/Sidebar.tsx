@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { useDnD } from './DndContext';
 import { NodeStore, useNodeStore } from '../state/store';
-import { MusicEngineOscillatorNode, SerializedMusicEngineOscillatorNode } from 'music_engine';
+import { defaultDrawingOptions, GraphicalAnalyserNode, GraphicalDataType, MusicEngineOscillatorNode, SerializedMusicEngineOscillatorNode } from 'music_engine';
 import { nanoid } from 'nanoid';
 
 const selector = (store: NodeStore) => ({
-    addNode: store.addNode
+    addNode: store.addNode,
+    setupMidi: store.setupMidi
 });
 
 export default () => {
@@ -28,11 +29,28 @@ export default () => {
     });
   }, [store]);
 
+  const addCanvasTest = useCallback(() => {
+    store.addNode({
+      id: nanoid(),
+      type: GraphicalAnalyserNode.type,
+      name: 'Waveform',
+      labels: [],
+      dataType: GraphicalDataType.WAVEFORM,
+      drawingOptions: defaultDrawingOptions
+    });
+  }, [store]);
+
+  const setupMidi = useCallback(() => {
+    store.setupMidi();
+  }, [store]);
+
   return (
     <aside>
       <div className="description">You can drag these nodes to the pane on the right.</div>
       <div>
         <button onClick={addNodeTest}>Add an actual Node</button>
+        <button onClick={addCanvasTest}>Add a canvas</button>
+        <button onClick={setupMidi}>Setup Midi</button>
       </div>
       <div className="dndnode input" onDragStart={(event) => onDragStart(event, 'input')} draggable>
         Input Node

@@ -10,7 +10,7 @@ export class MidiAccess {
   public readonly midiInputNode: MidiInputNode;
   private constructor(
     public readonly access: MIDIAccess,
-    private readonly audioContext: AudioContext
+    audioContext: AudioContext
   ) {
     this.midiOutputNode = new MidiOutputNode(access, audioContext, 'Device Midi Outputs', MIDI_OUTPUT_NODE_ID);
     this.midiInputNode = new MidiInputNode(access, audioContext, 'Device Midi Inputs', MIDI_INPUT_NODE_ID);

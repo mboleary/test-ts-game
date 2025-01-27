@@ -22,7 +22,9 @@ export class MidiOutputNode extends MusicEngineNode {
 
     // Generate Midi Ports based on Midi Map
     for (const entry of (this.midiAccess.outputs as unknown as Map<any, MIDIPort>)) {
-      this.outputMidiMap.set(entry[0], this.buildMidiPort(entry[1]));
+      const p = this.buildMidiPort(entry[1]);
+      this.outputMidiMap.set(entry[0], p);
+      this.ports.push(p);
     }
 
     // Listen for State Changes
@@ -33,10 +35,13 @@ export class MidiOutputNode extends MusicEngineNode {
         if (port.state === "connected" && !this.outputMidiMap.has(port.id)) {
           const toAdd = this.buildMidiPort(port);
           this.outputMidiMap.set(port.id, toAdd);
+          this.ports.push(toAdd);
         } else if (port.state !== "connected") {
           const toDelete = this.outputMidiMap.get(port.id);
           if (toDelete) {
             toDelete.disconnectAll();
+            this.outputMidiMap.delete(port.id);
+            this.ports.splice(this.ports.findIndex(p => p.id === toDelete.id), 1);
           }
         }
       }
