@@ -1,5 +1,6 @@
 import { NodeFactory } from "../NodeBuilder";
 import { MusicEngineOscillatorNode, SerializedMusicEngineOscillatorNode } from "../nodes";
+import { AudioOutputNode } from "../nodes/AudioOutputNode";
 import { GraphicalAnalyserNode, SequenceNode, SerializedGraphicalAnalyserNode, SerializedSequenceNode } from "../subsystem";
 
 type FactoryMap = 

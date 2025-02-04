@@ -2,22 +2,18 @@ import { nanoid } from "nanoid/non-secure";
 import { MusicEngineNode, SerializedMusicEngineNode } from "../../../nodes";
 import { AudioPort } from "../../../ports";
 import { PortDirection } from "../../../types";
+import { GraphicalDataType } from "./GraphicalAnalyserNode";
 import { defaultDrawingOptions } from "../const/defaultDrawingOptions";
 import { GraphicalAnalyserNodeDrawingOptions } from "../types/GraphicalAnalyserNodeDrawingOptions.type";
 
-const TYPE = 'graphical_analyser_node';
-
-export enum GraphicalDataType {
-    FREQUENCY = 'FREQUENCY',
-    WAVEFORM = 'WAVEFORM',
-};
+const TYPE = 'graphical_midi_analyser_node';
 
 export type SerializedGraphicalAnalyserNode = SerializedMusicEngineNode & {
     dataType: GraphicalDataType,
     drawingOptions: GraphicalAnalyserNodeDrawingOptions
 };
 
-export class GraphicalAnalyserNode extends MusicEngineNode {
+export class GraphicalMidiAnalyserNode extends MusicEngineNode {
     static type = TYPE;
 
     private readonly analyserNode: AnalyserNode;

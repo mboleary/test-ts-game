@@ -63,8 +63,8 @@ export class MidiInputNode extends MusicEngineNode {
     const sendPort = this.inputMidiMap.get((event.target as MIDIPort).id)
     if (sendPort && midiEvent.data) {
       const now = performance.now();
-      const diff = now - midiEvent.timeStamp;
-      console.log(`Timestamp ${midiEvent.timeStamp}, now: ${now}. diff: ${diff}`);
+      // const diff = now - midiEvent.timeStamp;
+      // console.log(`Timestamp ${midiEvent.timeStamp}, now: ${now}. diff: ${diff}`);
       sendPort.send(MidiMessageBuilder.fromBytes(midiEvent.data));
     }
   }
