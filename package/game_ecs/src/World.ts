@@ -7,14 +7,28 @@ import { SystemManager } from "./system/SystemManager";
 import { CachedQueryManager } from "./query/CachedQueryManager";
 import { System } from "./system/System";
 
+export type WorldOptions = {
+  lifecycles?: string[];
+  enableEventDrivenLifecycles?: boolean
+};
+
+export const defaultWorldOptions = {
+  enableEventDrivenLifecycles: true,
+};
+
 export class World {
   protected readonly internals = new ECSWorldInternals();
   protected readonly queryManager = new QueryManager(this.internals);
   protected readonly cachedQueryManager = new CachedQueryManager(this.internals, this.queryManager);
   protected readonly systemManager = new SystemManager(this.internals, this.cachedQueryManager, this, []);
 
-  constructor() {
-    
+  constructor(options: WorldOptions = defaultWorldOptions) {
+    if (options.enableEventDrivenLifecycles) {
+      this.systemManager.enableEventDrivenLifecycles();
+    }
+    if (options.lifecycles) {
+      options.lifecycles.forEach(lifecycle => this.systemManager.registerLifecycle(lifecycle));
+    }
   }
 
   /* Entity-related Methods */

@@ -1,22 +1,22 @@
-import { World, Scene } from "game_ecs";
-import { injectable } from "inversify";
+// import { World, Scene } from "game_ecs";
+// import { injectable } from "inversify";
 
-@injectable()
-export class GameWorldManager {
-    private _world: World | null = null;
+// @injectable()
+// export class GameWorldManager {
+//     private _world: World | null = null;
 
-    constructor() {}
+//     constructor() {}
 
-    public setCurrentScene(scene: Scene) {
-        // @TODO destroy old world
+//     public setCurrentScene(scene: Scene) {
+//         // @TODO destroy old world
 
-        this._world = scene.world;
-    }
+//         this._world = scene.world;
+//     }
 
-    public get world(): World {
-        if (!this._world) {
-            throw new Error("Scene has not been set");
-        }
-        return this._world;
-    }
-}
+//     public get world(): World {
+//         if (!this._world) {
+//             throw new Error("Scene has not been set");
+//         }
+//         return this._world;
+//     }
+// }

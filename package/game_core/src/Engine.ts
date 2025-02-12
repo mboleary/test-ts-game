@@ -1,8 +1,8 @@
-import { Scene, World } from "game_ecs";
-import { GameTimeManager, GameWorldManager } from "./managers";
+import { World } from "game_ecs";
+import { GameTimeManager, /*GameWorldManager*/ } from "./managers";
 import { EnginePluginManager } from "./plugin";
 import { BuiltPlugin } from "./plugin/Plugin";
-import { EngineSystemManager } from "./system/EngineSystemManager";
+// import { EngineSystemManager } from "./system/EngineSystemManager";
 import { Container } from "inversify";
 import { Time } from "./time";
 import { EngineLifecycleManager } from "./managers/EngineLifecycleManager";
@@ -10,7 +10,7 @@ import { EngineLifecycleManager } from "./managers/EngineLifecycleManager";
 export class Engine {
 
     private readonly container: Container;
-    private readonly worldManager: GameWorldManager;
+    // private readonly worldManager: GameWorldManager;
     private readonly pluginManager: EnginePluginManager;
     private readonly lifecycleManager: EngineLifecycleManager;
 
@@ -25,14 +25,14 @@ export class Engine {
         }
 
         this.container.bind(EnginePluginManager).toSelf();
-        this.container.bind(EngineSystemManager).toSelf();
-        this.container.bind(GameWorldManager).toSelf();
+        // this.container.bind(EngineSystemManager).toSelf();
+        // this.container.bind(GameWorldManager).toSelf();
         this.container.bind(GameTimeManager).toSelf();
         this.container.bind(Time).toSelf();
         this.container.bind(EngineLifecycleManager).toSelf();
 
         this.pluginManager = this.container.get(EnginePluginManager);
-        this.worldManager = this.container.get(GameWorldManager);
+        // this.worldManager = this.container.get(GameWorldManager);
         this.lifecycleManager = this.container.get(EngineLifecycleManager);
     }
 
@@ -77,11 +77,11 @@ export class Engine {
     }
 
     // Utility functions
-    public setCurrentScene(scene: Scene) {
-        this.worldManager.setCurrentScene(scene);
-    }
+    // public setCurrentScene(scene: Scene) {
+    //     this.worldManager.setCurrentScene(scene);
+    // }
 
-    public getWorld(): World {
-        return this.worldManager.world;
-    }
+    // public getWorld(): World {
+    //     return this.worldManager.world;
+    // }
 }
