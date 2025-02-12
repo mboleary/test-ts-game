@@ -1,7 +1,7 @@
 {
-  "name": "default",
+  "name": "asset-manager",
   "version": "1.0.0",
-  "description": "This package may be split out into several packages depending on how the IoC containers are written",
+  "description": "Manages the assets for the game engine",
   "main": "index.js",
   "scripts": {
     "test": "ava",

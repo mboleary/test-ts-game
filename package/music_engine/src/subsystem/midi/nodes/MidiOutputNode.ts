@@ -1,9 +1,13 @@
 import { nanoid } from "nanoid/non-secure";
-import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
+import { MusicEngineNode, SerializedMusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiReceivePort } from "../../../ports/MidiReceivePort";
 import { MusicEngineMidiMessage } from "../message/MusicEngineMidiMessage";
 
 const TYPE = "midi_output_node";
+
+export type SerializedMidiOutputNode = SerializedMusicEngineNode & {
+  type: typeof TYPE,
+}
 
 export class MidiOutputNode extends MusicEngineNode {
   private readonly outputMidiMap: Map<string, MidiReceivePort> = new Map();
@@ -18,20 +22,26 @@ export class MidiOutputNode extends MusicEngineNode {
 
     // Generate Midi Ports based on Midi Map
     for (const entry of (this.midiAccess.outputs as unknown as Map<any, MIDIPort>)) {
-      this.outputMidiMap.set(entry[0], this.buildMidiPort(entry[1]));
+      const p = this.buildMidiPort(entry[1]);
+      this.outputMidiMap.set(entry[0], p);
+      this.ports.push(p);
     }
 
     // Listen for State Changes
     midiAccess.addEventListener("statechange", (event: Event) => {
       if (event && (event as MIDIConnectionEvent).port) {
         const port = (event as MIDIConnectionEvent).port;
+        if (!port) return;
         if (port.state === "connected" && !this.outputMidiMap.has(port.id)) {
           const toAdd = this.buildMidiPort(port);
           this.outputMidiMap.set(port.id, toAdd);
+          this.ports.push(toAdd);
         } else if (port.state !== "connected") {
           const toDelete = this.outputMidiMap.get(port.id);
           if (toDelete) {
             toDelete.disconnectAll();
+            this.outputMidiMap.delete(port.id);
+            this.ports.splice(this.ports.findIndex(p => p.id === toDelete.id), 1);
           }
         }
       }
@@ -61,4 +71,17 @@ export class MidiOutputNode extends MusicEngineNode {
       }
     }
   }
+
+  /**
+     * NOTE: building this port from JSON isn't going to work due to the MidiAccess requirement
+     * @returns SerializedMidiOutputNode
+     */
+    public toJSON(): SerializedMidiOutputNode {
+      return {
+        type: TYPE,
+        name: this.name,
+        id: this.id,
+        labels: this.labels
+      };
+    }
 }

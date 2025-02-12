@@ -3,7 +3,7 @@
  */
 
 import { nanoid } from "nanoid/non-secure";
-import { MusicEngineNode } from "../../../nodes/MusicEngineNode";
+import { MusicEngineNode, SerializedMusicEngineNode } from "../../../nodes/MusicEngineNode";
 import { MidiSendPort } from "../../../ports/MidiSendPort";
 import { TriggerReceivePort } from "../../../ports/TriggerReceivePort";
 import { MusicEngineMidiMessageType } from "../../../types/MusicEngineMidiMessage.type";
@@ -11,14 +11,21 @@ import { MidiMessageBuilder } from "../../midi/message/MidiMessageBuilder";
 import { MidiNoteOnMessage } from "../../midi/message/MidiNoteOnMessage";
 import { MusicEngineMidiMessage } from "../../midi/message/MusicEngineMidiMessage";
 
-const TYPE = "sequencer_node"
+const TYPE = "sequencer_node";
+
+export type SerializedSequenceNode = SerializedMusicEngineNode & {
+  type: typeof TYPE,
+  noteArr: number[],
+}
 
 export class SequenceNode extends MusicEngineNode {
+  static type = TYPE;
+  
   constructor(
     context: AudioContext,
+    public readonly noteArr: number[],
     name: string = '',
     id: string = nanoid(),
-    public readonly noteArr: number[],
     labels: string[] = []
   ) {
     super(context, name, id, TYPE, labels);
@@ -43,5 +50,19 @@ export class SequenceNode extends MusicEngineNode {
     }
     this.midiOutPort.send(new MidiNoteOnMessage(this.noteArr[this.currIndex], this.velocity, time));
     this.currIndex = (this.currIndex + 1) % this.noteArr.length;
+  }
+
+  public toJSON(): SerializedSequenceNode {
+    return {
+      type: TYPE,
+      name: this.name,
+      id: this.id,
+      labels: this.labels,
+      noteArr: this.noteArr
+    };
+  }
+
+  static fromJSON(json: SerializedSequenceNode, audioContext: AudioContext): SequenceNode {
+    return new SequenceNode(audioContext, json.noteArr, json.name, json.id, json.labels);
   }
 }

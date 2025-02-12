@@ -17,15 +17,16 @@ export type MENodePortRepresentation = {
 };
 
 export enum PropType {
+    PORT = 'PORT',
     TEXT = 'TEXT',
     SELECT = 'SELECT',
-    PORT = 'PORT',
     RANGE = 'RANGE'
 }
 
 export type MENodeProp<NodeType, ValueType> = {
     key: keyof NodeType,
     type: PropType,
+    direction?: PortDirection,
     possibleValues?: ValueType[],
     portId?: string;
     value: ValueType;
