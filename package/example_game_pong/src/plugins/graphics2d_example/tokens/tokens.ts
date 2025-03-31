@@ -1,0 +1,1 @@
+export const Graphics2DOptions = Symbol('Graphics2DOptions');

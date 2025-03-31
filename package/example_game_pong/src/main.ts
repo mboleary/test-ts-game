@@ -1,25 +1,41 @@
-import { Engine } from "game_core_browser";
-import { Scene } from "game_ecs";
-import { v4 as uuidv4 } from "uuid";
+import { Engine } from "game_core";
 import { buildScene } from "./scene_main";
+import { InputPlugin } from "./plugins/basicInput/Input.plugin";
+import { Container } from "inversify";
+import { Input } from "./plugins/basicInput/Input";
+import { ECSPlugin } from "./plugins/ecsPlugin/ECS.plugin";
+import { Hotloop } from "game_core_browser";
 
-export function main() {
-    const engine = new Engine();
+function main() {
+  const container = new Container();
+  const engine = new Engine(container);
 
-    engine.initialize([]);
+  const inputPlugin = InputPlugin.build({
+    bindings: [
+      { name: "up", key: "ArrowUp" },
+      { name: "down", key: "ArrowDown" },
+    ],
+  });
 
-    // const scene = new Scene(uuidv4());
-    const scene = buildScene();
+  const ecsPlugin = ECSPlugin.build({
+    initCallback: async () => {
+      const world = buildScene(container.get(Input));
+      console.log("world", world);
+      return world;
+    }
+  });
 
-    engine.setCurrentScene(scene);
+  const hotloopPlugin = Hotloop.build();
 
-    engine.start();
+  engine.initialize([hotloopPlugin, inputPlugin, ecsPlugin]);
 
-    console.log(engine.getWorld());
+  engine.start();
 
-    window.addEventListener("beforeunload", (e) => {
-        engine.destroy();
-    });
+  window.addEventListener("beforeunload", (e) => {
+    engine.destroy();
+  });
 }
+
+
 
 main();

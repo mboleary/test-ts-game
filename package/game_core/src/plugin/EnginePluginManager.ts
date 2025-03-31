@@ -31,7 +31,12 @@ export class EnginePluginManager {
             throw new Error(`Already loaded plugin ${String(plugin.constructor.name)}`);
         }
 
-        console.log('Adding plugin', plugin);
+        console.log('Adding plugin', plugin, {
+          init: !!plugin.init,
+          start: !!plugin.start,
+          loop: !!plugin.loop,
+          destroy: !!plugin.destroy,
+        });
         
         if (plugin.init) {
             this.initLifecycle.push({

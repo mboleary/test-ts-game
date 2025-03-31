@@ -24,12 +24,12 @@ export class Engine {
             this.container = new Container();
         }
 
-        this.container.bind(EnginePluginManager).toSelf();
+        this.container.bind(EnginePluginManager).toSelf().inSingletonScope();
         // this.container.bind(EngineSystemManager).toSelf();
         // this.container.bind(GameWorldManager).toSelf();
-        this.container.bind(GameTimeManager).toSelf();
-        this.container.bind(Time).toSelf();
-        this.container.bind(EngineLifecycleManager).toSelf();
+        this.container.bind(GameTimeManager).toSelf().inSingletonScope();
+        this.container.bind(Time).toSelf().inSingletonScope();
+        this.container.bind(EngineLifecycleManager).toSelf().inSingletonScope();
 
         this.pluginManager = this.container.get(EnginePluginManager);
         // this.worldManager = this.container.get(GameWorldManager);
