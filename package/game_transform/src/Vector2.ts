@@ -99,7 +99,7 @@ export class Vector2 implements CommonInterface<Vector2> {
     }
 
     public get y() {
-        return this.vector[3];
+        return this.vector[1];
     }
 
 }

@@ -38,10 +38,10 @@ export class CachedQuery implements Eventable {
     }
 
     // Listen for updates
-    this.internals.subscribe(ENTITY_CREATE_EVENT_TYPE, this.handleEntityCreate);
-    this.internals.subscribe(ENTITY_DELETE_EVENT_TYPE, this.handleEntityDelete);
-    this.internals.subscribe(ENTITY_COMPONENT_SET_EVENT_TYPE, this.handleEntityComponentSet);
-    this.internals.subscribe(ENTITY_COMPONENT_UNSET_EVENT_TYPE, this.handleEntityComponentUnset);
+    this.internals.subscribe(ENTITY_CREATE_EVENT_TYPE, this.handleEntityCreate.bind(this));
+    this.internals.subscribe(ENTITY_DELETE_EVENT_TYPE, this.handleEntityDelete.bind(this));
+    this.internals.subscribe(ENTITY_COMPONENT_SET_EVENT_TYPE, this.handleEntityComponentSet.bind(this));
+    this.internals.subscribe(ENTITY_COMPONENT_UNSET_EVENT_TYPE, this.handleEntityComponentUnset.bind(this));
   }
 
   private handleEntityCreate(e: EntityCreateEvent) {

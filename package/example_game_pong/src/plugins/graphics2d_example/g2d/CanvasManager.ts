@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 export class CanvasManager {
   private canvas: HTMLCanvasElement | null = null;
   private context: CanvasRenderingContext2D | null = null;
+  private overlay: HTMLDivElement | null = null;
 
   constructor() {
 
@@ -16,11 +17,24 @@ export class CanvasManager {
     this.canvas = canvas;
     this.bindEvents(canvas);
 
+    // Trigger event call to set canvas size
+    this.handleResize(new Event("resize"));
+
     this.context = canvas.getContext("2d");
+  }
+
+  public setOverlay(overlay: HTMLDivElement) {
+    this.overlay = overlay;
   }
 
   public getContext() {
     return this.context;
+  }
+
+  public showOverlay(show: boolean) {
+    if (this.overlay) {
+      this.overlay.style.display = show ? "block" : " none";
+    }
   }
 
   private bindEvents(canvas: HTMLCanvasElement) {
