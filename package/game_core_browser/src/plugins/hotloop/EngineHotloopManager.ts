@@ -58,12 +58,13 @@ export class EngineHotloopManager extends CoreEngineHotloopManager {
     /**
      * This calls the hotloop and registers the callback for the next animation frame
      */
-    private main(): void {
+    private async main(): Promise<void> {
         try {
-            this.loop();
+            await this.loop();
         } catch (err) {
             console.error("Error thrown in main loop:", err);
             this.stopLoop();
+            return;
         }
         this.stopReference = window.requestAnimationFrame(this.main.bind(this));
     }
@@ -71,11 +72,11 @@ export class EngineHotloopManager extends CoreEngineHotloopManager {
     /**
      * Runs all loop functions
      */
-    private loop(): void {
+    private async loop(): Promise<void> {
         this.time.updateDeltaTime();
 
         for (const func of this.loopFunctions) {
-            func();
+            await func();
         }
     }
 }

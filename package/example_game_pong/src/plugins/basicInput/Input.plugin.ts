@@ -2,7 +2,7 @@ import { ContainerModule, inject, injectable, interfaces } from "inversify";
 import { BuiltPlugin, PluginOptions, Plugin } from "game_core";
 import { InputOptionsToken } from "./tokens.const";
 import { InputBinding } from "./binding.type";
-import { Input } from "./Input";
+import { destroy, init, Input } from "./Input";
 
 export type InputPluginOptions = {
   lifecycleOptions?: PluginOptions;
@@ -26,6 +26,12 @@ export class InputPlugin extends Plugin {
       this.input.defineKey(binding.name);
       this.input.bindKey(binding.name, binding.key);
     }
+
+    init()
+  }
+
+  public async destroy(): Promise<void> {
+    destroy();
   }
 
   static build(options: InputPluginOptions): BuiltPlugin {
