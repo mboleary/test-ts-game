@@ -27,7 +27,7 @@ export class InputPlugin extends Plugin {
       this.input.bindKey(binding.name, binding.key);
     }
 
-    init()
+    init();
   }
 
   public async destroy(): Promise<void> {

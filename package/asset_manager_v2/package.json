@@ -1,7 +1,7 @@
 {
-  "name": "game_ecs",
+  "name": "asset-manager",
   "version": "1.0.0",
-  "description": "ECS Library for game engine",
+  "description": "Asset Manager v2",
   "main": "build/index.js",
   "scripts": {
     "test": "vitest",

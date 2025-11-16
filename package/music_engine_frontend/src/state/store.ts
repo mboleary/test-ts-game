@@ -76,6 +76,7 @@ export type NodeStore = {
     container: Container,
 
     midiConnected: boolean,
+    assetsLoaded: boolean,
 
     onNodesChange: (changes: NodeChange<Node<NodeType>>[]) => void,
     onEdgesChange: (changes: EdgeChange[]) => void,
@@ -85,6 +86,7 @@ export type NodeStore = {
     removeNode: (id: string) => void,
     getMusicEngineNode: <T extends MusicEngineNode>(id: string) => T | null;
     setupMidi: () => Promise<void>;
+    loadAssets: () => Promise<void>;
 };
 
 // Construct Container
@@ -129,6 +131,8 @@ export const useNodeStore = create<NodeStore>()((set, get) => {
         edges: [],
 
         midiConnected: false,
+
+        assetsLoaded: false,
 
         container,
 
@@ -222,6 +226,44 @@ export const useNodeStore = create<NodeStore>()((set, get) => {
             console.log("Midi is setup", midiAccess);
 
             set({ nodes: [getNodeData(midiAccess.midiInputNode), getNodeData(midiAccess.midiOutputNode), ...get().nodes], midiConnected: true });
+        },
+
+        async loadAssets() {
+            container.assetManager.defineAsset("crow", [
+                {
+                    type: "fetch",
+                    options: {
+                        path: "/static/misc_crow.flac",
+                        as: "array_buffer"
+                    }
+                },
+                {
+                    type: "audio-buffer",
+                    options: {}
+                }
+            ]);
+            container.assetManager.defineAsset("loop", [
+                {
+                    type: "fetch",
+                    options: {
+                        path: "/static/s725.ogg",
+                        as: "array_buffer"
+                    }
+                },
+                {
+                    type: "audio-buffer",
+                    options: {}
+                }
+            ],
+            {
+                loop: true
+            });
+            container.assetManager.defineAssetGroup("Audio", ["crow", "loop"]);
+            await container.assetManager.loadGroup("Audio");
+
+            console.log("Assets have been loaded");
+
+            set({ ...get(), assetsLoaded: true });
         }
     };
 });

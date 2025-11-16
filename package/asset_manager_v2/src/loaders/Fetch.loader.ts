@@ -4,9 +4,10 @@ export enum FetchTypes {
     TEXT = "text",
     JSON = "json",
     BLOB = "blob",
+    ARRAY_BUFFER = "array_buffer"
 }
 
-export type FetchLoaderOptions = {
+export type FetchLoaderOptions = RequestInit & {
     path: string,
     as: FetchTypes
 };
@@ -20,7 +21,7 @@ export class FetchLoader extends Loader<never, any, FetchLoaderOptions> {
         return true;
     }
     public async run(input: never, options: FetchLoaderOptions): Promise<any> {
-        const resp = await fetch(options.path);
+        const resp = await fetch(options.path, options);
 
         let data = null;
 
@@ -33,6 +34,9 @@ export class FetchLoader extends Loader<never, any, FetchLoaderOptions> {
                 break;
             case FetchTypes.BLOB:
                 data = await resp.blob();
+                break;
+            case FetchTypes.ARRAY_BUFFER:
+                data = await resp.arrayBuffer();
                 break;
             default:
                 data = await resp.text();

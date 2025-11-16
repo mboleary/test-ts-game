@@ -147,6 +147,10 @@ export class AssetManager {
         return data;
     }
 
+    public getAssetData(name: string) {
+        return this.assetMap.get(name);
+    }
+
     public getAssetsInGroup(name: string) {
         return this.loadGroups.get(name);
     }

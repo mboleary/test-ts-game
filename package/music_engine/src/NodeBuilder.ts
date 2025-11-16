@@ -1,8 +1,9 @@
+import { AssetManager } from "asset-manager";
 import { MusicEngineNode, SerializedMusicEngineNode } from "./nodes";
 
 export type NodeFactory<T extends MusicEngineNode, S extends SerializedMusicEngineNode> = {
   name: string,
-  build: (params: S, audioContext: AudioContext) => T
+  build: (params: S, audioContext: AudioContext, assetManager: AssetManager) => T
 }
 
 export class NodeBuilder {
@@ -15,13 +16,13 @@ export class NodeBuilder {
     }
   }
 
-  public buildNode(nodeParams: SerializedMusicEngineNode, audioContext: AudioContext) {
+  public buildNode(nodeParams: SerializedMusicEngineNode, audioContext: AudioContext, assetManager: AssetManager) {
     const builder = this.factoryMap.get(nodeParams.type);
 
     if (!builder) {
       throw new Error(`No Node Builder was added for type ${nodeParams.type}`);
     }
 
-    return builder.build(nodeParams, audioContext);
+    return builder.build(nodeParams, audioContext, assetManager);
   }
 }

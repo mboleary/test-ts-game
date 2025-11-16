@@ -1,5 +1,7 @@
+import { AssetDefinition, AssetManager, FetchLoader } from "asset-manager";
 import { NodeBuilder } from "./NodeBuilder";
 import { MusicEngineNode, SerializedMusicEngineNode } from "./nodes";
+import { AudioBufferLoader } from "./loader/AudioBuffer.loader";
 // import { getPortArray } from "./util/getPortArray";
 
 export type SerializedNodeConnection = {
@@ -12,20 +14,31 @@ export type SerializedNodeConnection = {
 export type SerializedContainer = {
   nodes: SerializedMusicEngineNode[],
   edges: SerializedNodeConnection[],
+  assets: AssetDefinition[],
 };
 
 export class Container {
   public readonly audioContext: AudioContext;
+  public readonly assetManager: AssetManager;
 
   constructor(
     public readonly nodeBuilder: NodeBuilder,
     audioContext?: AudioContext,
+    assetManager?: AssetManager,
   ) {
     if (audioContext) {
       this.audioContext = audioContext;
     } else {
       this.audioContext = new AudioContext();
     }
+
+    if (assetManager) {
+        this.assetManager = assetManager;
+      } else {
+        this.assetManager = new AssetManager();
+        this.assetManager.registerLoader(new FetchLoader());
+        this.assetManager.registerLoader(new AudioBufferLoader(this.audioContext));
+      }
   }
 
   private nodeMap: Map<string, MusicEngineNode> = new Map();
@@ -44,7 +57,7 @@ export class Container {
       throw new Error('ID already taken');
     }
 
-    const node = this.nodeBuilder.buildNode(json, this.audioContext);
+    const node = this.nodeBuilder.buildNode(json, this.audioContext, this.assetManager);
     this.nodeMap.set(node.id, node);
     return node;
   }
@@ -103,8 +116,15 @@ export class Container {
     });
   }
 
-  public static fromJSON(json: SerializedContainer, nodeBuilder: NodeBuilder, audioContext?: AudioContext): Container {
-    const container = new Container(nodeBuilder, audioContext);
+  public static fromJSON(json: SerializedContainer, nodeBuilder: NodeBuilder, audioContext?: AudioContext, assetManager?: AssetManager): Container {
+    const container = new Container(nodeBuilder, audioContext, assetManager);
+
+    // Load assets and put them in an "Audio" group
+    for (const asset of json.assets) {
+        container.assetManager.defineAsset(asset.name, asset.chain, asset.meta, asset.cache);
+    }
+
+    container.assetManager.defineAssetGroup("Audio", json.assets.map(a => a.name));
 
     for (const node of json.nodes) {
       container.buildAndRegisterNode(node);

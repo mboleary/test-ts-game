@@ -6,13 +6,13 @@ import { DnDProvider } from "./components/DndContext";
   
 export function App() {
     return <ColorModeProvider>
-        <div className="flex-layout full-height">
-            <div className="flex">
-                <DnDProvider>
+        <DnDProvider>
+            <div className="flex-layout full-height">
+                <div className="flex">
                     <GraphView />
-                </DnDProvider>
+                </div>
+                <Sidebar />
             </div>
-            <Sidebar />
-        </div>
+        </DnDProvider>
     </ColorModeProvider>;
 }
