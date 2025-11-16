@@ -1,6 +1,7 @@
 export const nodeTypeBindings: Record<string, string> = {
     default: 'defaultNode',
-    graphical_analyser_node: 'CanvasNode'
+    graphical_analyser_node: 'CanvasNode',
+    graphical_midi_analyser_node: 'CanvasNode'
 };
 
 export function getNodeTypeBinding(nodeType: string, bindings: Record<string, string>) {

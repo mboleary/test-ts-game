@@ -5,7 +5,7 @@
     "outDir": "build",
     "lib": [
       "dom",
-      "es2020"
+      "es2023"
     ],
     "paths": {
       "nanoid/index.js": ["./node_modules/nanoid/index.browser.js"]

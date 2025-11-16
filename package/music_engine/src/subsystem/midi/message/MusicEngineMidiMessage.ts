@@ -10,7 +10,7 @@ export abstract class MusicEngineMidiMessage implements MusicEngineMidiMessageOb
   
   constructor(
     public readonly type: MusicEngineMidiMessageType,
-    public readonly time: number = 0,
+    public readonly time: number = 0, // Time is in seconds, matching the context time format
     public readonly channel: number = 0,
   ) {}
 

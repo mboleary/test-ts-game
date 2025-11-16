@@ -22,7 +22,10 @@ export type PropNodeType = {
  * @param node 
  * @returns 
  */
-function getNodeData(node: MusicEngineNode): Node<NodeType> {
+function getNodeData(
+    node: MusicEngineNode,
+    position: Node<NodeType>['position'] = {x: 0, y: 0}
+): Node<NodeType> {
     return {
         id: node.id,
         type: getNodeTypeBinding(node.type, nodeTypeBindings),
@@ -38,7 +41,7 @@ function getNodeData(node: MusicEngineNode): Node<NodeType> {
             })),
             props: [],
         },
-        position: {x: 0, y: 0},
+        position,
     };
 }
 
@@ -78,7 +81,7 @@ export type NodeStore = {
     onEdgesChange: (changes: EdgeChange[]) => void,
     addEdge: (data: Connection) => void,
     removeEdge: (id: string) => void,
-    addNode: (data: any) => void,
+    addNode: <T extends SerializedMusicEngineNode>(data: T, position?: Node<any>['position']) => void,
     removeNode: (id: string) => void,
     getMusicEngineNode: <T extends MusicEngineNode>(id: string) => T | null;
     setupMidi: () => Promise<void>;
@@ -189,11 +192,11 @@ export const useNodeStore = create<NodeStore>()((set, get) => {
             set({edges: edges.filter(edge => edge.id !== id)});
         },
 
-        addNode<T extends SerializedMusicEngineNode>(data: T) {
+        addNode(data: SerializedMusicEngineNode, position?: Node<any>['position']) {
             const container = get().container;
             const node = container.buildAndRegisterNode(data);
             console.log("added node to container", node, container);
-            const nodeData: Node<NodeType> = getNodeData(node);
+            const nodeData: Node<NodeType> = getNodeData(node, position);
             set({ nodes: [nodeData, ...get().nodes], container });
         },
 

@@ -1,130 +1,180 @@
 import { nanoid } from "nanoid/non-secure";
-import { MusicEngineNode, SerializedMusicEngineNode } from "../../../nodes";
-import { AudioPort } from "../../../ports";
-import { PortDirection } from "../../../types";
-import { GraphicalDataType } from "./GraphicalAnalyserNode";
-import { defaultDrawingOptions } from "../const/defaultDrawingOptions";
-import { GraphicalAnalyserNodeDrawingOptions } from "../types/GraphicalAnalyserNodeDrawingOptions.type";
+import { SerializedMusicEngineNode } from "../../../nodes";
+import { MidiReceivePort } from "../../../ports";
+import { MusicEngineMidiMessageType } from "../../../types";
+import { CanvasNode } from "./CanvasNode";
+import { MidiNoteOffMessage, MidiNoteOnMessage, MusicEngineMidiMessage } from "../../midi";
 
 const TYPE = 'graphical_midi_analyser_node';
 
-export type SerializedGraphicalAnalyserNode = SerializedMusicEngineNode & {
-    dataType: GraphicalDataType,
-    drawingOptions: GraphicalAnalyserNodeDrawingOptions
+export type GraphicalMidiAnalyserNodeDrawingOptions = {
+    midiRange: {
+        start: number,
+        end: number,
+    },
+    midiColors?: {
+        start: number,
+        end: number,
+        fillStyle: string
+    }[],
+    timeWidth: number,
+    defaultFillStyle: string,
+}
+
+export type SerializedGraphicalMidiAnalyserNode = SerializedMusicEngineNode & {
+    drawingOptions: GraphicalMidiAnalyserNodeDrawingOptions
 };
 
-export class GraphicalMidiAnalyserNode extends MusicEngineNode {
-    static type = TYPE;
+const defaultDrawingOptions = {
+    midiRange: {
+        start: 60, // (Middle) C4
+        end: 84, // C6
+    },
+    timeWidth: 10,
+    defaultFillStyle: "red",
+    midiColors: [
+        {
+            start: 72,
+            end: 84,
+            fillStyle: "orange"
+        }
+    ]
+};
 
-    private readonly analyserNode: AnalyserNode;
-    private canvasElement: HTMLCanvasElement | null;
-    private drawRef: number | null = null;
+type DrawNote = {
+    note: number,
+    velocity: number,
+    startTime: number,
+    endTime: number | null,
+    fillStyle?: string;
+}
+
+export class GraphicalMidiAnalyserNode extends CanvasNode {
+    static type = TYPE;
 
     constructor(
         context: AudioContext,
         canvasElement: HTMLCanvasElement | null,
-        private readonly dataType: GraphicalDataType = GraphicalDataType.WAVEFORM,
-        private readonly drawingOptions: GraphicalAnalyserNodeDrawingOptions = Object.assign({}, defaultDrawingOptions),
+        private readonly drawingOptions: GraphicalMidiAnalyserNodeDrawingOptions = Object.assign({}, defaultDrawingOptions),
         name: string = '',
         id: string = nanoid(),
         labels: string[] = [],
     ) {
-        super(context, name, id, TYPE, labels);
-        this.ports.push(this.audioIn);
-
-        this.canvasElement = canvasElement;
-        this.analyserNode = context.createAnalyser();
-        this.audioIn.registerAudioNode(this.analyserNode);
+        super(TYPE, context, canvasElement, name, id, labels);
+        this.ports.push(this.midiIn);
 
         if (canvasElement) {
             this.start();
         }
     }
 
-    public readonly audioIn: AudioPort = new AudioPort('audio', this, 'Audio In', PortDirection.IN);
+    public readonly midiIn: MidiReceivePort = new MidiReceivePort('midi', this, 'Midi In', this.handleMidi.bind(this));
 
-    private initDraw() {
-        const bufferLength = this.analyserNode.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        this.analyserNode.getByteTimeDomainData(dataArray);
+    private readonly notes: DrawNote[] = [
+        // @TODO this is for testing
+        {note: 69, velocity: 127, startTime: 5, endTime: 7}
+    ];
 
-        if (!this.canvasElement) return;
+    private handleMidi(message: MusicEngineMidiMessage) {
+        console.log("midi message", message);
+        switch(message.type) {
+            case MusicEngineMidiMessageType.NOTE_ON:
+                this.noteOn(message as MidiNoteOnMessage);
+                break;
+            case MusicEngineMidiMessageType.NOTE_OFF:
+                this.noteOff(message as MidiNoteOffMessage);
+                break;
+            default:
+        }
+    }
 
-        const canvasCtx = this.canvasElement.getContext("2d");
+    private noteOn(message: MidiNoteOnMessage) {
+        const note: DrawNote = {
+            note: message.key,
+            velocity: message.velocity,
+            // If the time is 0, it likely came from the midi input system
+            startTime: message.time === 0 ? 
+                window.performance.now() / 1000 : 
+                message.time,
+            endTime: null
+        };
 
-        if (!canvasCtx) return;
-
-        // Pre-emptively stop drawing if necessary
-        this.stop();
-
-        const draw = () => {
-            if (!this.canvasElement) {
-                this.stop();
-                return;
-            }
-
-            if (this.dataType === GraphicalDataType.FREQUENCY) {
-                this.analyserNode.getByteFrequencyData(dataArray);
-            } else {
-                this.analyserNode.getByteTimeDomainData(dataArray);
-            }
-    
-            canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-    
-            canvasCtx.lineWidth = this.drawingOptions.lineWidth || 2;
-            canvasCtx.strokeStyle = this.drawingOptions.strokeStyle || "#fff";
-    
-            canvasCtx.beginPath();
-    
-            const sliceWidth = (this.canvasElement.width * 1.0) / bufferLength;
-            let x = 0;
-    
-            for (let i = 0; i < bufferLength; i++) {
-                const v = dataArray[i] / 128.0;
-                const y = (v * this.canvasElement.height) / 2;
-    
-                if (i === 0) {
-                canvasCtx.moveTo(x, y);
-                } else {
-                canvasCtx.lineTo(x, y);
+        if (this.drawingOptions.midiColors) {
+            for (const range of this.drawingOptions.midiColors) {
+                if (message.key >= range.start && message.key <= range.end) {
+                    note.fillStyle = range.fillStyle;
+                    break;
                 }
-    
-                x += sliceWidth;
             }
-    
-            canvasCtx.lineTo(this.canvasElement.width, this.canvasElement.height / 2);
-            canvasCtx.stroke();
-
-            this.drawRef = requestAnimationFrame(draw);
         }
 
-        draw();
+        this.notes.push(note);
+        this.cullOldNotes();
+        this.notes.sort((a, b) => b.startTime - a.startTime); // Sort so that newest message is at the end
     }
 
-    
-
-    public setCanvas(canvasElement: HTMLCanvasElement) {
-        this.stop();
-        this.canvasElement = canvasElement;
+    private noteOff(message: MidiNoteOffMessage) {
+        const note = this.notes.findLast((note: DrawNote) => note.note === message.key && note.endTime === null);
+        if (note) {
+            // If the time is 0, it likely came from the midi input system
+            note.endTime = message.time === 0 ? 
+                window.performance.now() / 1000 : 
+                message.time;
+        }
+        console.log("updated note:", note);
     }
 
-    public start() {
-        this.initDraw();
-    }
+    private cullOldNotes() {
+        const now = window.performance.now() / 1000;
+        const timeLimit = now - this.drawingOptions.timeWidth;
+        for (let i = 0; i < this.notes.length; i++) {
+            const note = this.notes[i];
 
-    public stop() {
-        if (this.drawRef !== null) {
-            cancelAnimationFrame(this.drawRef);
+            if (note.endTime && note.endTime < timeLimit) {
+                this.notes.splice(i, 1);
+                i--;
+            }
         }
     }
 
-    public toJSON(): SerializedGraphicalAnalyserNode {
+    protected initDraw(drawCtx: CanvasRenderingContext2D) {
+        // this.notes.splice(0, this.notes.length);
+        drawCtx.fillStyle = "red";
+        console.log("midi draw init");
+    }
+
+    protected draw(drawCtx: CanvasRenderingContext2D, canvasElement: HTMLCanvasElement) {
+        let initialFillStyle = drawCtx.fillStyle;
+        const noteHeightPx = canvasElement.height / (this.drawingOptions.midiRange.end - this.drawingOptions.midiRange.start);
+        const noteWidthPx = canvasElement.width / this.drawingOptions.timeWidth;
+        const now = window.performance.now() / 1000;
+
+        for (const note of this.notes) {
+            const x = canvasElement.width - ((now - note.startTime) * noteWidthPx);
+            const w = note.endTime ? 
+                canvasElement.width - ((now - note.endTime) * noteWidthPx) - x:
+                canvasElement.width - x; 
+            const y = canvasElement.height - ((note.note - this.drawingOptions.midiRange.start) * noteHeightPx);
+            if (note.fillStyle) {
+                drawCtx.fillStyle = note.fillStyle;
+            }
+            // console.log('draw', x, y, w, noteHeightPx);
+            drawCtx.fillRect(x, y, w, noteHeightPx);
+            // Change the fill style back to the initial fill style
+            if (note.fillStyle) {
+                drawCtx.fillStyle = initialFillStyle;
+            }
+        }
+
+        drawCtx.fillStyle = initialFillStyle;
+    }
+
+    public toJSON(): SerializedGraphicalMidiAnalyserNode {
         return {
             type: TYPE,
             name: this.name,
             id: this.id,
             labels: this.labels,
-            dataType: this.dataType,
             drawingOptions: this.drawingOptions
         };
     }
@@ -135,7 +185,7 @@ export class GraphicalMidiAnalyserNode extends MusicEngineNode {
      * @param audioContext 
      * @returns 
      */
-    static fromJSON(json: SerializedGraphicalAnalyserNode, audioContext: AudioContext): GraphicalAnalyserNode {
-        return new GraphicalAnalyserNode(audioContext, null, json.dataType, json.drawingOptions, json.name, json.id, json.labels);
+    static fromJSON(json: SerializedGraphicalMidiAnalyserNode, audioContext: AudioContext): GraphicalMidiAnalyserNode {
+        return new GraphicalMidiAnalyserNode(audioContext, null, json.drawingOptions, json.name, json.id, json.labels);
     }
 }
