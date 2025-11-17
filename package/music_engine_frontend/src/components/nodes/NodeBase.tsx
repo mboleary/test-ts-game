@@ -23,7 +23,7 @@ export function NodeBase({ children, data, selected, isConnectable, id, type, ic
             type="target"
             position={Position.Left}
             style={{
-                background: PortTypeColors[item.type] || PortTypeColors.INVALID, // @TODO add port colors
+                background: PortTypeColors[item.type] || PortTypeColors.INVALID,
                 top: (showTitlebar ? PORT_TOP_OFFSET : 0) + (PORT_SPACING * (index + 1)),
                 color: "#666",
                 // PortType.PROP

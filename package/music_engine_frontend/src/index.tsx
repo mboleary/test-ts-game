@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import './style/nodes.css';
 import './style/layout.css';
+import './style/drag-node.css';
 import {App} from './App';
 
 const root = ReactDOM.createRoot(

@@ -1,0 +1,8 @@
+.drag-node {
+    background-color: #3367d9;
+    color: white;
+    line-height: 1.5em;
+    border-radius: 3px;
+    text-align: center;
+    padding: 3px;
+}

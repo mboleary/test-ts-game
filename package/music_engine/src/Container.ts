@@ -83,13 +83,6 @@ export class Container {
     const connectionsJSONArr = [];
 
     for (const node of this.nodeMap.values()) {
-      // nodeJSONArr.push({
-      //   name: node.name,
-      //   id: node.id,
-      //   type: node.type,
-      //   labels: node.labels
-      // });
-
       nodeJSONArr.push(node.toJSON());
 
       // const ports = getPortArray(node);
@@ -152,6 +145,4 @@ export class Container {
 
     return container;
   }
-
-  // public registerAsset(assetId: string, assetSrc: string) {}
 }

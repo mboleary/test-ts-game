@@ -6,9 +6,10 @@ import { nodeTypes } from "../components/nodes/nodeTypes";
 import { NodeStore, useNodeStore } from "../state/store";
 import { DarkModeToggleButton } from "../components/ControlButtons/DarkModeToggleButton";
 import { useColorMode } from "../components/context/ColorMode";
-import Sidebar from "../components/Sidebar";
-import { useDnD } from "../components/DndContext";
+import Sidebar from "../components/sidebar/Sidebar";
+import { useDnD } from "../components/context/DndContext";
 import { nanoid } from "nanoid";
+import { SerializedMusicEngineNode } from "music_engine";
 
 const selector = (store: NodeStore) => ({
     nodes: store.nodes,
@@ -37,7 +38,7 @@ export function GraphView() {
     const onDrop = useCallback((event: React.DragEvent) => {
         event.preventDefault();
 
-        const data = event.dataTransfer.getData('text/plain');
+        const data = event.dataTransfer.getData('application/json');
 
         console.log('onDrop', type, reactFlowInstance, event, data);
 
@@ -50,11 +51,11 @@ export function GraphView() {
             y: event.clientY,
         });
 
+        const parsedData = JSON.parse(data) as SerializedMusicEngineNode;
+
         store.addNode({
+            ...parsedData,
             id: nanoid(),
-            type: data,
-            name: data,
-            labels: ['dnd'],
         }, position);
     }, [reactFlowInstance, type]);
 
@@ -89,7 +90,6 @@ export function GraphView() {
                 </ViewportPortal>
                 
             </ReactFlow>
-            
         </ReactFlowProvider>
     </>;
 }

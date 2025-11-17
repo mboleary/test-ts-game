@@ -1,8 +1,8 @@
 import React from "react";
 import { GraphView } from "./views/GraphView";
 import { ColorModeProvider } from "./components/context/ColorMode";
-import Sidebar from "./components/Sidebar";
-import { DnDProvider } from "./components/DndContext";
+import Sidebar from "./components/sidebar/Sidebar";
+import { DnDProvider } from "./components/context/DndContext";
   
 export function App() {
     return <ColorModeProvider>
