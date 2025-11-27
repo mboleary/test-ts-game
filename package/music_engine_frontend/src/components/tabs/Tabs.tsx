@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { TabsProvider, useTabs } from "./TabsProvider";
 import { TabButton } from "./TabButton";
+import { TabHeader } from "./TabHeader";
 
 export type TabsProps = {
     children: ReactElement | ReactElement[],
@@ -9,12 +10,8 @@ export type TabsProps = {
 
 
 export function Tabs({ children, initialTab }: TabsProps) {
-    const { tabs } = useTabs();
-
     return <TabsProvider>
-        <div>
-            { tabs.map(tab => <TabButton id={tab.id} title={tab.title} />)}
-        </div>
+        <TabHeader initialTab={initialTab} />
         <>{ children }</>
     </TabsProvider>
 }

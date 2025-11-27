@@ -36,8 +36,11 @@ export function TabsProvider({ children }: TabsProviderProps) {
     const [tabs, setTabs] = useState<Tab[]>([]);
 
     const addTab = useCallback((id: string, title: string) => {
-        tabs.push({id, title});
-        setTabs(tabs.slice());
+        const foundTab = tabs.find((tab) => tab.id === id);
+        if (!foundTab) {
+            tabs.push({id, title});
+            setTabs(tabs.slice());
+        }
     }, [tabs, setTabs]);
 
     const updateTab = useCallback((id: string, title: string) => {

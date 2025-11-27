@@ -1,7 +1,7 @@
 import React from "react";
 import { GraphView } from "./views/GraphView";
 import { ColorModeProvider } from "./components/context/ColorMode";
-import Sidebar from "./components/sidebar/Sidebar";
+import { Sidebar } from "./components/sidebar/Sidebar";
 import { ReactFlowProvider } from "@xyflow/react";
   
 export function App() {

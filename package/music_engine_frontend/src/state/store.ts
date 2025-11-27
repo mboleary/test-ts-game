@@ -10,6 +10,7 @@ import { MENode, PropType } from '../types/MENodeRepresentation.type';
 import { PortTypeColors } from '../types/PortTypeColors.enum';
 import { nodeBuilder } from './musicEngineNodeBuilder';
 import { getNodeTypeBinding, nodeTypeBindings } from './nodeTypeBindings';
+import { AssetDefinition } from 'asset-manager';
 
 export type PropNodeType = {
     type: string;
@@ -72,6 +73,7 @@ type NodeType = MENode<MusicEngineNode | MusicEngineOscillatorNode | SequenceNod
 export type NodeStore = {
     nodes: Node<NodeType>[],
     edges: Edge[],
+    assets: AssetDefinition[],
 
     container: Container,
 
@@ -130,6 +132,8 @@ export const useNodeStore = create<NodeStore>()((set, get) => {
         ],
         edges: [],
 
+        assets: [],
+
         midiConnected: false,
 
         assetsLoaded: false,
@@ -137,7 +141,6 @@ export const useNodeStore = create<NodeStore>()((set, get) => {
         container,
 
         onNodesChange(changes) {
-            console.log("node change", changes);
             set({
                 nodes: applyNodeChanges(changes, get().nodes),
             });

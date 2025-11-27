@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import { useTabs } from "./TabsProvider";
 
 export type TabsProps = {
@@ -11,7 +11,9 @@ export type TabsProps = {
 export function Tab({ children, id, title }: TabsProps) {
     const { selectedTab, addTab } = useTabs();
 
-    addTab(id, title || id);
+    useEffect(() => {
+        addTab(id, title || id);
+    }, []);
 
     return <>{ selectedTab === id ? children : '' }</>;
 }
