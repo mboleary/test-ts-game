@@ -5,8 +5,8 @@ export enum PortTypeColors {
     INVALID = "#1a192b",
     MIDI = "#41D000",
     PARAM = "#FF5733",
-    TRIGGER = "#00CBD0",
     PROP = "#b514de",
+    TRIGGER = "#00CBD0",
 };
 
 export const PortTypeKey: Record<PortType, keyof PortTypeColors> = {
